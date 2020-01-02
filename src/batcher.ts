@@ -11,7 +11,7 @@ import {
   OpTypes, AddRelIdOp, AddResourceOp, RemoveRelIdOp,
 } from './types';
 
-import { makeAddResourceOp, makeAddRelOp, makeRemoveRelIdOp } from './ops';
+import { makeAddResourceOp, makeAddRelIdOp, makeRemoveRelIdOp } from './ops';
 import { ModelSchemaReader } from './schema';
 
 export class Batcher<S extends AbstractState> {
@@ -43,7 +43,11 @@ export class Batcher<S extends AbstractState> {
     );
   }
 
-  attachResources(entity: string, id: string, rel: string, relId: string) {
+  addResource(entity: string, id: string) {
+    this.put(makeAddResourceOp(entity, id));
+  }
+
+  attachResources(entity: string, id: string, rel: string, relId: string, index?: number, reciprocalIndex?: number) {
     const entitySchema = this.schema.entity(entity);
 
     const relEntity = entitySchema.getRelEntity(rel);
@@ -61,8 +65,8 @@ export class Batcher<S extends AbstractState> {
     this.remove(makeRemoveRelIdOp(relEntity, relId, reciprocalRel, id));
 
     // batch the addRelOps
-    this.put(makeAddRelOp(entity, id, rel, relId));
-    this.put(makeAddRelOp(relEntity, relId, reciprocalRel, id));
+    this.put(makeAddRelIdOp(entity, id, rel, relId, index));
+    this.put(makeAddRelIdOp(relEntity, relId, reciprocalRel, id, reciprocalIndex));
   }
 
   detachResources(entity: string, id: string, rel: string, relId: string) {
@@ -75,8 +79,8 @@ export class Batcher<S extends AbstractState> {
     }
 
     // negate any existing addRelOps
-    this.remove(makeAddRelOp(entity, id, rel, relId));
-    this.remove(makeAddRelOp(relEntity, relId, reciprocalRel, id));
+    this.remove(makeAddRelIdOp(entity, id, rel, relId));
+    this.remove(makeAddRelIdOp(relEntity, relId, reciprocalRel, id));
 
     // batch the removeRelIdOps
     this.put(makeRemoveRelIdOp(entity, id, rel, relId));
@@ -104,7 +108,7 @@ export class Batcher<S extends AbstractState> {
   }
 
   // todo: should be private
-  put(op: Op) {
+  private put(op: Op) {
     const key = this.makeOpKey(op);
 
     if (key) {

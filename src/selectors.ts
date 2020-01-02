@@ -114,18 +114,3 @@ export const makeSelectors = (
     getAttachedArr,
   }
 };
-
-export const makeMiddlewareSelectors = (
-  schema: ModelSchemaReader,
-  actionCreators: ActionCreators,
-  actionTypes: ActionTypes,
-  selectors: Selectors
-) => {
-  const deriveAttachOps = <S extends AbstractState>(
-    state: S,
-    args: { entity: string, id: string, rel: string, relId: string },
-    // pendingState?:
-  ) => {
-
-  }
-};

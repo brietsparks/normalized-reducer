@@ -16,14 +16,20 @@ export const makeRemoveResourceOp = (entity: string, id: string, rel: string, re
   }
 };
 
-export const makeAddRelOp = (entity: string, id: string, rel: string, relId: string): AddRelIdOp => {
-  return {
+export const makeAddRelIdOp = (entity: string, id: string, rel: string, relId: string, index?: number): AddRelIdOp => {
+  const op: AddRelIdOp = {
     opType: OpTypes.ADD_REL_ID,
     entity,
     id,
     rel,
     relId,
   };
+
+  if (index) {
+    op.index = index;
+  }
+
+  return op;
 };
 
 export const makeRemoveRelIdOp = (entity: string, id: string, rel: string, relId?: string): RemoveRelIdOp => {
