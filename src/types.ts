@@ -6,7 +6,7 @@ export enum OpTypes {
   ADD_RESOURCE = 'ADD_RESOURCE',
   REMOVE_RESOURCE = 'REMOVE_RESOURCE',
   ADD_REL_ID = 'ADD_REL_ID',
-  REMOVE_REL_ID = 'ADD_REL_ID',
+  REMOVE_REL_ID = 'REMOVE_REL_ID',
 }
 
 export interface Op {

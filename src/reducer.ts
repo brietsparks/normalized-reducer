@@ -6,7 +6,7 @@ import {
   DeriveActionWithOps,
   EntityReducer,
   EntityReducers, Op,
-  OpTypes,
+  OpTypes, RemoveRelIdOp,
   RemoveResourceOp,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
@@ -107,6 +107,42 @@ export const makeEntityReducer = (schema: EntitySchemaReader): EntityReducer => 
           ...state,
           [id]: { ...state[id], [rel]: relState }
         }
+      }
+
+      if (op.opType === OpTypes.REMOVE_REL_ID) {
+        const { id, rel, relId } = op as RemoveRelIdOp;
+
+        const cardinality = schema.getCardinality(rel);
+
+        let resource = state[id];
+        if (!resource) {
+          return state;
+        }
+
+        if (!resource.hasOwnProperty(rel)) {
+          return state;
+        }
+
+        if (cardinality === Cardinalities.ONE) {
+          if (relId !== resource[rel]) {
+            return state;
+          }
+
+          return {
+            ...state,
+            [id]: { ...state[id], [rel]: undefined }
+          };
+        }
+
+        const relState = state[id][rel] as string[];
+
+        return {
+          ...state,
+          [id]: {
+            ...state[id],
+            [rel]: relState.filter(existingRelId => existingRelId !== relId)
+          }
+        };
       }
 
       return state;

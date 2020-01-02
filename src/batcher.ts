@@ -8,7 +8,7 @@ import {
   DetachAction,
   Selectors,
   Op,
-  OpTypes, AddRelIdOp, AddResourceOp,
+  OpTypes, AddRelIdOp, AddResourceOp, RemoveRelIdOp,
 } from './types';
 
 import { makeAddResourceOp, makeAddRelOp, makeRemoveRelIdOp } from './ops';
@@ -131,9 +131,16 @@ export class Batcher<S extends AbstractState> {
       const cardinality = this.schema.entity(addRelIdOp.entity).getCardinality(addRelIdOp.rel);
       return makeAddRelIdOpKey(addRelIdOp, cardinality === Cardinalities.ONE);
     }
+
+    if (op.opType === OpTypes.REMOVE_REL_ID) {
+      const removeRelIdOp = op as RemoveRelIdOp;
+      const cardinality = this.schema.entity(removeRelIdOp.entity).getCardinality(removeRelIdOp.rel);
+      return makeRemoveRelIdOpKey(removeRelIdOp, cardinality === Cardinalities.ONE);
+    }
   };
 }
 
 const makeAddResourceOpKey = (op: AddResourceOp) => concat(OpTypes.ADD_RESOURCE, op.entity, op.id);
 const makeAddRelIdOpKey = (op: AddRelIdOp, singular: boolean) => concat(OpTypes.ADD_REL_ID, op.entity, op.id, op.rel, singular ? undefined : op.relId);
+const makeRemoveRelIdOpKey = (op: RemoveRelIdOp, singular: boolean) => concat(OpTypes.REMOVE_REL_ID, op.entity, op.id, op.rel, singular ? undefined : op.relId);
 const concat = (...strings: (string|undefined)[]) => strings.filter(s => s !== undefined).join('.');

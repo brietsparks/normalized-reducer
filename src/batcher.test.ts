@@ -7,7 +7,6 @@ import { AddAction, Cardinalities } from './types';
 import { makeAddRelOp, makeAddResourceOp, makeRemoveRelIdOp } from './ops';
 
 describe('batcher', () => {
-
   test('add-resource-op', () => {
     const batcher = new Batcher(blogModelSchemaReader, blogState, blogSelectors);
     // current state

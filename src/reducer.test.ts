@@ -2,7 +2,7 @@ import { makeEntityReducer } from './reducer';
 
 import { blogModelSchemaReader } from './schema.test';
 import { blogActionTypes } from './actions.test';
-import { AddRelIdOp, AttachAction, OpTypes } from './types';
+import { AddRelIdOp, AttachAction, OpTypes, RemoveRelIdOp } from './types';
 
 describe('reducer', () => {
   describe('makeEntityReducer', () => {
@@ -218,6 +218,108 @@ describe('reducer', () => {
         });
       });
 
+    });
+
+    describe('remove-rel-id operation', () => {
+      test('if resource does not exist', () => {
+        const state = {
+          'a1': { articleIds: [] }
+        };
+
+        const result = authorsReducer(state, [
+          {
+            opType: OpTypes.REMOVE_REL_ID,
+            entity: 'author',
+            id: 'a2',
+            rel: 'articleIds',
+            relId: 'r1',
+          } as RemoveRelIdOp,
+        ]);
+
+        expect(result).toEqual(state);
+      });
+
+      test('if resource does not have rel key', () => {
+        const state = {
+          'a1': { }
+        };
+
+        const result = authorsReducer(state, [
+          {
+            opType: OpTypes.REMOVE_REL_ID,
+            entity: 'author',
+            id: 'a2',
+            rel: 'articleIds',
+            relId: 'r1',
+          } as RemoveRelIdOp,
+        ]);
+
+        expect(result).toEqual(state);
+      });
+
+      describe('one-rel', () => {
+        test('if op relId is not the existing relId', () => {
+          const state = {
+            'r1': { authorId: 'a1' }
+          };
+
+          const result = articlesReducer(state, [
+            {
+              opType: OpTypes.REMOVE_REL_ID,
+              entity: 'article',
+              id: 'r1',
+              rel: 'authorId',
+              relId: 'a9000',
+            } as RemoveRelIdOp,
+          ]);
+
+          expect(result).toEqual(state);
+        });
+
+        test('basic usage', () => {
+          const state = {
+            'r1': { authorId: 'a1' }
+          };
+
+          const result = articlesReducer(state, [
+            {
+              opType: OpTypes.REMOVE_REL_ID,
+              entity: 'article',
+              id: 'r1',
+              rel: 'authorId',
+              relId: 'a1',
+            } as RemoveRelIdOp,
+          ]);
+
+          const expected = {
+            'r1': { authorId: undefined },
+          };
+
+          expect(result).toEqual(expected);
+        });
+      });
+
+      test('many-rel', () => {
+        const state = {
+          'a1': { articleIds: ['r1','r2','r3'] }
+        };
+
+        const result = authorsReducer(state, [
+          {
+            opType: OpTypes.REMOVE_REL_ID,
+            entity: 'author',
+            id: 'a1',
+            rel: 'articleIds',
+            relId: 'r2',
+          } as RemoveRelIdOp,
+        ]);
+
+        const expected = {
+          'a1': { articleIds: ['r1','r3'] }
+        };
+
+        expect(result).toEqual(expected);
+      });
     });
   });
 });
