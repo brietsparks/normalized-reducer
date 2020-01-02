@@ -73,7 +73,6 @@ export interface AttachPayload {
 }
 
 export interface AttachPayloadOptions {
-  displaceAttached?: boolean // if rel-to-base cardinality is one, whether to evict the occupying id within the rel resource
   createNonexistent?: boolean, // whether to ignore create create attachables that don't exist
 }
 
@@ -107,6 +106,9 @@ export interface DetachBatchPayload {
 
 export interface Action {
   type: string,
+  entity: string,
+  id: string,
+  ops?: Op[],
 }
 
 // actions
@@ -122,7 +124,7 @@ export type DetachBatchAction = Action & DetachBatchPayload;
 // action creators
 export type AddActionCreator = (entity: string, id: string, attach?: AddPayloadAttachable[], options?: AddPayloadOptions) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
-export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, options: AttachPayloadOptions) => AttachAction;
+export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, options?: AttachPayloadOptions) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, relKey: string, relId: string) => DetachAction;
 export type AddBatchActionCreator = (...items: AddPayload[]) => AddBatchAction;
 export type RemoveBatchActionCreator = (...items: RemovePayload[]) => RemoveBatchAction;
@@ -131,9 +133,9 @@ export type DetachBatchActionCreator = (...items: DetachPayload[]) => DetachBatc
 
 export interface ActionTypes {
   ADD: string,
-  // REMOVE: string,
-  // ATTACH: string,
-  // DETACH: string,
+  REMOVE: string,
+  ATTACH: string,
+  DETACH: string,
   // ADD_BATCH: string,
   // REMOVE_BATCH: string,
   // ATTACH_BATCH: string,
@@ -142,9 +144,9 @@ export interface ActionTypes {
 
 export interface ActionCreators {
   add: AddActionCreator,
-  // remove: RemoveActionCreator,
-  // attach: AttachActionCreator,
-  // detach: DetachActionCreator,
+  remove: RemoveActionCreator,
+  attach: AttachActionCreator,
+  detach: DetachActionCreator,
   // addBatch: AddBatchActionCreator,
   // removeBatch: RemoveBatchActionCreator,
   // attachBatch: AttachBatchActionCreator,
@@ -190,6 +192,7 @@ export type AbstractRelDataState = undefined | string | string[]
 // selector types
 //
 
+export type DeriveActionWithOps = <S extends AbstractState>(state: S, action: Action) => Action;
 export type CheckResource = <S extends AbstractState>(state: S, args: { entity: string, id: string }) => boolean;
 export type GetAttached = <S extends AbstractState>(state: S, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
 export type GetArr = <S extends AbstractState>(state: S, args: { entity: string, id: string, rel: string }) => string[]
@@ -213,7 +216,7 @@ export interface MiddlewareSelectors {
 // reducer types
 //
 
-export type EntityReducer = (state: AbstractEntityState, action: Action) => AbstractEntityState;
+export type EntityReducer = (state: AbstractEntityState, ops: Op[]) => AbstractEntityState;
 export interface EntityReducers {
   [entity: string]: EntityReducer
 }
@@ -221,7 +224,6 @@ export interface EntityReducers {
 //
 // option types
 //
-
 
 export type InvalidEntityHandler = (entity: string) => void;
 export type NonexistentResourceHandler = (entity: string, id: string) => void;

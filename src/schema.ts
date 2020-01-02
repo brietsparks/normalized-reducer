@@ -1,4 +1,4 @@
-import { ModelSchema, EntitySchema, RelSchema, Cardinalities } from './types';
+import { ModelSchema, EntitySchema, RelSchema, Cardinalities, AbstractResourceState } from './types';
 
 export class ModelSchemaReader {
   schema: ModelSchema;
@@ -9,7 +9,7 @@ export class ModelSchemaReader {
 
     this.entitySchemaReaders = Object.entries(schema).reduce(
       (entitySchemaReaders, [entity, entitySchema]) => {
-        entitySchemaReaders[entity] = new EntitySchemaReader(entitySchema, this);
+        entitySchemaReaders[entity] = new EntitySchemaReader(entity, entitySchema, this);
         return entitySchemaReaders;
       },
       {} as Record<string, EntitySchemaReader>
@@ -30,12 +30,37 @@ export class ModelSchemaReader {
 }
 
 export class EntitySchemaReader {
+  entity: string;
   schema: EntitySchema;
   modelSchemaReader: ModelSchemaReader;
 
-  constructor(schema: EntitySchema, modelSchemaReader: ModelSchemaReader) {
+  constructor(entity: string, schema: EntitySchema, modelSchemaReader: ModelSchemaReader) {
+    this.entity = entity;
     this.schema = schema;
     this.modelSchemaReader = modelSchemaReader;
+  }
+
+  getEntity() {
+    return this.entity;
+  }
+
+  getEmptyResourceState() {
+    return Object.entries(this.schema).reduce((state, [rel, relSchema]) => {
+      if (relSchema.cardinality === Cardinalities.ONE) {
+        state[rel] = undefined;
+      }
+
+      if (relSchema.cardinality === Cardinalities.MANY) {
+        state[rel] = [];
+      }
+
+      return state;
+    }, {} as AbstractResourceState)
+  }
+
+  getEmptyRelState(rel: string) {
+    const cardinality = this.getCardinality(rel);
+    return cardinality === Cardinalities.ONE ? undefined : [];
   }
 
   relExists(rel: string) {
