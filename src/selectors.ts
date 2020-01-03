@@ -108,9 +108,26 @@ export const makeSelectors = <S extends AbstractState> (
     return relState ? [relState] as string[] : [] as string[];
   };
 
+  const getEntityAttachedArr = (state: S, args: { entity: string, id: string }) => {
+    const result: { [rel: string]: string[] } = {};
+
+    if (!schema.entityExists(args.entity)) {
+      onInvalidEntity(args.entity);
+      return result;
+    }
+
+    const rels = schema.entity(args.entity).getRels();
+
+    return rels.reduce((attachedArrs, rel) => {
+      attachedArrs[rel] = getAttachedArr(state, { rel, ...args });
+      return attachedArrs;
+    }, result);
+  };
+
   return {
     checkResource,
     getAttached,
     getAttachedArr,
+    getEntityAttachedArr,
   }
 };

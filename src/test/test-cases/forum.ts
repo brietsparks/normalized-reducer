@@ -4,6 +4,8 @@ import {
   AbstractState,
 } from '../../types';
 
+import makeModule from '../..';
+
 import { ModelSchemaReader } from '../../schema';
 
 export enum ForumEntities {
@@ -92,3 +94,12 @@ export interface ForumState extends AbstractState {
     }
   }
 }
+
+export const {
+  emptyState: forumEmptyState,
+  actionCreators: forumActionCreators,
+  reducer: forumReducer,
+  transformAction: forumTransformAction,
+  selectors: forumSelectors,
+  actionTypes: forumActionTypes,
+} = makeModule<ForumState>(forumSchema);

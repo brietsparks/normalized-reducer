@@ -54,6 +54,18 @@ export const makeActionTransformer = <S extends AbstractState> (
 
     if (action.type === actionTypes.REMOVE) {
       const removeAction = action as RemoveAction;
+      const { entity, id } = removeAction ;
+
+      if (!selectors.checkResource(state, { entity, id })) {
+        removeAction.ops = [];
+        return removeAction;
+      }
+
+      pendingState.removeResource(entity, id);
+
+      removeAction.ops = pendingState.getAll();
+
+      return removeAction;
     }
 
     return action;

@@ -117,30 +117,18 @@ export type AddAction = Action & AddPayload;
 export type RemoveAction = Action & RemovePayload;
 export type AttachAction = Action & AttachPayload;
 export type DetachAction = Action & DetachPayload;
-export type AddBatchAction = Action & AddBatchPayload;
-export type RemoveBatchAction = Action & RemoveBatchPayload;
-export type AttachBatchAction = Action & AttachBatchPayload;
-export type DetachBatchAction = Action & DetachBatchPayload;
 
 // action creators
 export type AddActionCreator = (entity: string, id: string, attach?: AddPayloadAttachable[], options?: AddPayloadOptions) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, options?: AttachPayloadOptions) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, relKey: string, relId: string) => DetachAction;
-export type AddBatchActionCreator = (...items: AddPayload[]) => AddBatchAction;
-export type RemoveBatchActionCreator = (...items: RemovePayload[]) => RemoveBatchAction;
-export type AttachBatchActionCreator = (...items: AttachPayload[]) => AttachBatchAction;
-export type DetachBatchActionCreator = (...items: DetachPayload[]) => DetachBatchAction;
 
 export interface ActionTypes {
   ADD: string,
   REMOVE: string,
   ATTACH: string,
   DETACH: string,
-  // ADD_BATCH: string,
-  // REMOVE_BATCH: string,
-  // ATTACH_BATCH: string,
-  // DETACH_BATCH: string,
 }
 
 export interface ActionCreators {
@@ -148,10 +136,6 @@ export interface ActionCreators {
   remove: RemoveActionCreator,
   attach: AttachActionCreator,
   detach: DetachActionCreator,
-  // addBatch: AddBatchActionCreator,
-  // removeBatch: RemoveBatchActionCreator,
-  // attachBatch: AttachBatchActionCreator,
-  // detachBatch: DetachBatchActionCreator,
 }
 
 //
@@ -197,14 +181,13 @@ export type DeriveActionWithOps <S extends AbstractState> = (state: S, action: A
 export type CheckResource <S extends AbstractState> = (state: S, args: { entity: string, id: string }) => boolean;
 export type GetAttached <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
 export type GetArr <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]
-// export type DeriveAttachmentActions = <S extends AbstractState>(state: S, args: AttachPayload) => (AddAction|AttachAction|DetachAction)[];
-// export type DeriveRemovalActions = <S extends AbstractState>(state: S, args: RemovePayload) => DetachAction[];
-// export type DeriveDetachmentActions = <S extends AbstractState>(state: S, args: DetachPayload) => DetachAction[];
+export type GetEntityAttachedArr <S extends AbstractState> = (state: S, args: { entity: string, id: string }) => { [rel: string]: string[] };
 
 export interface Selectors<S extends AbstractState> {
   checkResource: CheckResource<S>
   getAttached: GetAttached<S>,
   getAttachedArr: GetArr<S>,
+  getEntityAttachedArr: GetEntityAttachedArr<S>,
 }
 
 

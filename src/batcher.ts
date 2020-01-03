@@ -8,10 +8,10 @@ import {
   DetachAction,
   Selectors,
   Op,
-  OpTypes, AddRelIdOp, AddResourceOp, RemoveRelIdOp,
+  OpTypes, AddRelIdOp, AddResourceOp, RemoveRelIdOp, RemoveResourceOp,
 } from './types';
 
-import { makeAddResourceOp, makeAddRelIdOp, makeRemoveRelIdOp } from './ops';
+import { makeAddResourceOp, makeAddRelIdOp, makeRemoveRelIdOp, makeRemoveResourceOp } from './ops';
 import { ModelSchemaReader } from './schema';
 
 export class Batcher<S extends AbstractState> {
@@ -49,6 +49,18 @@ export class Batcher<S extends AbstractState> {
 
   addResource(entity: string, id: string) {
     this.put(makeAddResourceOp(entity, id));
+  }
+
+  removeResource(entity: string, id: string) {
+    this.put(makeRemoveResourceOp(entity, id));
+
+    const attachedIdsByRel = this.selectors.getEntityAttachedArr(this.state, { entity, id });
+
+    Object.entries(attachedIdsByRel).forEach(([rel, attachedIds]) => {
+      attachedIds.forEach(attachedId => {
+        this.detachResources(entity, id, rel, attachedId);
+      })
+    });
   }
 
   attachResources(entity: string, id: string, rel: string, relId: string, index?: number, reciprocalIndex?: number) {
@@ -144,6 +156,11 @@ export class Batcher<S extends AbstractState> {
       return makeAddResourceOpKey(addResourceOp);
     }
 
+    if (op.opType === OpTypes.REMOVE_RESOURCE) {
+      const removeResourceOp = op as RemoveResourceOp;
+      return makeRemoveResourceOpKey(removeResourceOp);
+    }
+
     if (op.opType === OpTypes.ADD_REL_ID) {
       const addRelIdOp = op as AddRelIdOp;
       const cardinality = this.schema.entity(addRelIdOp.entity).getCardinality(addRelIdOp.rel);
@@ -159,6 +176,7 @@ export class Batcher<S extends AbstractState> {
 }
 
 const makeAddResourceOpKey = (op: AddResourceOp) => concat(OpTypes.ADD_RESOURCE, op.entity, op.id);
+const makeRemoveResourceOpKey = (op: RemoveResourceOp) => concat(OpTypes.REMOVE_RESOURCE, op.entity, op.id);
 const makeAddRelIdOpKey = (op: AddRelIdOp, singular: boolean) => concat(OpTypes.ADD_REL_ID, op.entity, op.id, op.rel, singular ? undefined : op.relId);
 const makeRemoveRelIdOpKey = (op: RemoveRelIdOp, singular: boolean) => concat(OpTypes.REMOVE_REL_ID, op.entity, op.id, op.rel, singular ? undefined : op.relId);
 const concat = (...strings: (string|undefined)[]) => strings.filter(s => s !== undefined).join('.');

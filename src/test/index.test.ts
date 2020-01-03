@@ -1,18 +1,6 @@
-import makeModule from '..';
-
-import {
-  ForumEntities,
-  forumSchema,
-  ForumState,
-} from './test-cases/forum';
+import { ForumEntities, forumReducer, forumActionCreators, forumEmptyState } from './test-cases/forum';
 
 describe('index', () => {
-  const {
-    reducer,
-    actionCreators,
-    emptyState,
-  } = makeModule<ForumState>(forumSchema);
-
   describe('add', () => {
     /*
     basic
@@ -38,13 +26,13 @@ describe('index', () => {
 
     describe('basic', () => {
       test('if id does not exist, then create the resource', () => {
-        const result = reducer(
-          emptyState,
-          actionCreators.add(ForumEntities.ACCOUNT, 'a1')
+        const result = forumReducer(
+          forumEmptyState,
+          forumActionCreators.add(ForumEntities.ACCOUNT, 'a1')
         );
 
         const expected = {
-          ...emptyState,
+          ...forumEmptyState,
           account: {
             'a1': { profileId: undefined }
           }
@@ -55,15 +43,15 @@ describe('index', () => {
 
       test('if id exists, then do not create the resource', () => {
         const state = {
-          ...emptyState,
+          ...forumEmptyState,
           account: {
             'a1': { profileId: undefined }
           }
         };
 
-        const result = reducer(
+        const result = forumReducer(
           state,
-          actionCreators.add(ForumEntities.ACCOUNT, 'a1')
+          forumActionCreators.add(ForumEntities.ACCOUNT, 'a1')
         );
 
         expect(result).toEqual(state);
@@ -74,15 +62,15 @@ describe('index', () => {
       describe('rel of cardinality of one', () => {
         test('if attachable resource does not exist, then do nothing', () => {
           const state = {
-            ...emptyState,
+            ...forumEmptyState,
             account: {
               'a1': { profileId: undefined }
             }
           };
 
-          const result = reducer(
+          const result = forumReducer(
             state,
-            actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+            forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
               rel: 'profileId',
               id: 'p1'
             }])
@@ -93,7 +81,7 @@ describe('index', () => {
 
         describe('a single attachable', () => {
           const expected = {
-            ...emptyState,
+            ...forumEmptyState,
             account: {
               'a1': { profileId: 'p1' }
             },
@@ -104,15 +92,15 @@ describe('index', () => {
 
           test('set rel value to attachable id', () => {
             const state = {
-              ...emptyState,
+              ...forumEmptyState,
               profile: {
                 'p1': { accountId: undefined }
               }
             };
 
-            const result = reducer(
+            const result = forumReducer(
               state,
-              actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
                 rel: 'profileId',
                 id: 'p1'
               }])
@@ -123,15 +111,15 @@ describe('index', () => {
 
           test('if no reciprocal rel key on attachable resource, then set key and value', () => {
             const state = {
-              ...emptyState,
+              ...forumEmptyState,
               profile: {
                 'p1': {}
               }
             };
 
-            const result = reducer(
+            const result = forumReducer(
               state,
-              actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
                 rel: 'profileId',
                 id: 'p1'
               }])
@@ -142,15 +130,15 @@ describe('index', () => {
 
           test('ignore index', () => {
             const state = {
-              ...emptyState,
+              ...forumEmptyState,
               profile: {
                 'p1': { accountId: undefined }
               }
             };
 
-            const result = reducer(
+            const result = forumReducer(
               state,
-              actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
                 rel: 'profileId',
                 id: 'p1',
                 index: 3,
@@ -164,23 +152,23 @@ describe('index', () => {
 
         test('multiple attachables: overwrite each time', () => {
           const state = {
-            ...emptyState,
+            ...forumEmptyState,
             profile: {
               'p1': { accountId: undefined },
               'p2': { accountId: undefined },
             }
           };
 
-          const result = reducer(
+          const result = forumReducer(
             state,
-            actionCreators.add(ForumEntities.ACCOUNT, 'a1', [
+            forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [
               { rel: 'profileId', id: 'p1' },
               { rel: 'profileId', id: 'p2' }
             ])
           );
 
           const expected = {
-            ...emptyState,
+            ...forumEmptyState,
             account: {
               'a1': { profileId: 'p2' }
             },
@@ -198,7 +186,7 @@ describe('index', () => {
         describe('a single attachable', () => {
           test('if no reciprocal index, then append to attachable', () => {
             const state = {
-              ...emptyState,
+              ...forumEmptyState,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -210,15 +198,15 @@ describe('index', () => {
               }
             };
 
-            const result = reducer(
+            const result = forumReducer(
               state,
-              actionCreators.add(ForumEntities.CATEGORY, 'c200', [
+              forumActionCreators.add(ForumEntities.CATEGORY, 'c200', [
                 { rel: 'postIds', id: 'o1' },
               ])
             );
 
             const expected = {
-              ...emptyState,
+              ...forumEmptyState,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -236,7 +224,7 @@ describe('index', () => {
 
           test('if reciprocal index, then insert in attachable', () => {
             const state = {
-              ...emptyState,
+              ...forumEmptyState,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -249,15 +237,15 @@ describe('index', () => {
               }
             };
 
-            const result = reducer(
+            const result = forumReducer(
               state,
-              actionCreators.add(ForumEntities.CATEGORY, 'c200', [
+              forumActionCreators.add(ForumEntities.CATEGORY, 'c200', [
                 { rel: 'postIds', id: 'o1', reciprocalIndex: 1 },
               ])
             );
 
             const expected = {
-              ...emptyState,
+              ...forumEmptyState,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -276,7 +264,7 @@ describe('index', () => {
 
           test('if no reciprocal rel key on attachable resource, then set key and value', () => {
             const state = {
-              ...emptyState,
+              ...forumEmptyState,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -284,15 +272,15 @@ describe('index', () => {
               },
             };
 
-            const result = reducer(
+            const result = forumReducer(
               state,
-              actionCreators.add(ForumEntities.CATEGORY, 'c1', [
+              forumActionCreators.add(ForumEntities.CATEGORY, 'c1', [
                 { rel: 'postIds', id: 'o1' },
               ])
             );
 
             const expected = {
-              ...emptyState,
+              ...forumEmptyState,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -310,7 +298,7 @@ describe('index', () => {
 
         test('multiple attachables: append/insert each', () => {
           const state = {
-            ...emptyState,
+            ...forumEmptyState,
             post: {
               'o1': {
                 profileId: undefined,
@@ -327,16 +315,16 @@ describe('index', () => {
             }
           };
 
-          const result = reducer(
+          const result = forumReducer(
             state,
-            actionCreators.add(ForumEntities.CATEGORY, 'c200', [
+            forumActionCreators.add(ForumEntities.CATEGORY, 'c200', [
               { rel: 'postIds', id: 'o1', index: 1, },
               { rel: 'postIds', id: 'o2', index: 0, reciprocalIndex: 1 },
             ])
           );
 
           const expected = {
-            ...emptyState,
+            ...forumEmptyState,
             post: {
               'o1': {
                 profileId: undefined,
@@ -366,8 +354,120 @@ describe('index', () => {
       if id exists, then remove resource
       if id does not exist, then do nothing
 
-    with attached: detach from all related resources
+    detach all existing attached resources
+      detach resource of reciprocal one-cardinality
+      detach resource of reciprocal many-cardinality
     */
+
+    describe('without attached', () => {
+      const state = {
+        ...forumEmptyState,
+        account: {
+          'a1': { profileId: undefined }
+        }
+      };
+
+      test('if id exists, then remove resource', () => {
+        const result = forumReducer(
+          state,
+          forumActionCreators.remove(ForumEntities.ACCOUNT, 'a1')
+        );
+
+        expect(result).toEqual(forumEmptyState);
+      });
+
+      test('if id does not exist, then do nothing', () => {
+        const result = forumReducer(
+          state,
+          forumActionCreators.remove(ForumEntities.ACCOUNT, 'a9000')
+        );
+
+        expect(result).toEqual(state);
+      });
+    });
+
+    describe('detach all existing attached resources', () => {
+      test('detach resource of reciprocal one-cardinality', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            a1: { profileId: 'p1' }
+          },
+          profile: {
+            p1: {
+              accountId: 'a1',
+              postIds: ['o1', 'o2']
+            }
+          },
+          post: {
+            o1: { profileId: 'p1', categoryIds: [] },
+            o2: { profileId: 'p1', categoryIds: [] },
+          }
+        };
+
+        const result = forumReducer(
+          state,
+          forumActionCreators.remove(ForumEntities.PROFILE, 'p1')
+        );
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            a1: { profileId: undefined }
+          },
+          post: {
+            o1: {
+              profileId: undefined,
+              categoryIds: [],
+            },
+            o2: {
+              profileId: undefined,
+              categoryIds: [],
+            },
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('detach resource of reciprocal many-cardinality', () => {
+        const state = {
+          ...forumEmptyState,
+          profile: {
+            p1: { postIds: ['o1', 'o2', 'o3'] }
+          },
+          post: {
+            o1: { profileId: 'p1', categoryIds: [] },
+            o2: { profileId: 'p1', categoryIds: ['c1'] },
+            o3: { profileId: 'p1', categoryIds: [] },
+          },
+          category: {
+            c1: { postIds: ['o2'] }
+          }
+        };
+
+        const result = forumReducer(
+          state,
+          forumActionCreators.remove(ForumEntities.POST, 'o2')
+        );
+
+        const expected = {
+          ...forumEmptyState,
+          profile: {
+            p1: { postIds: ['o1', 'o3'] }
+          },
+          post: {
+            o1: { profileId: 'p1', categoryIds: [] },
+            o3: { profileId: 'p1', categoryIds: [] },
+          },
+          category: {
+            c1: { postIds: [] }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+    });
   });
 
   describe('attach', () => {
@@ -398,5 +498,11 @@ describe('index', () => {
 
   describe('batched actions', () => {
     // test that opposing actions negate each other's effects
+
+    /*
+
+    remove detaches resources that were attached previously in batch (add and attach)
+
+    */
   });
 });

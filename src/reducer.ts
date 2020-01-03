@@ -118,6 +118,7 @@ export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchema
         const cardinality = schema.getCardinality(rel);
 
         let resource = state[id];
+
         if (!resource) {
           return state;
         }

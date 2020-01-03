@@ -8,7 +8,7 @@ export const makeAddResourceOp = (entity: string, id: string): AddResourceOp => 
   };
 };
 
-export const makeRemoveResourceOp = (entity: string, id: string, rel: string, relId: string): RemoveResourceOp => {
+export const makeRemoveResourceOp = (entity: string, id: string): RemoveResourceOp => {
   return {
     opType: OpTypes.REMOVE_RESOURCE,
     entity,

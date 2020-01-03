@@ -1,10 +1,10 @@
-import { blogSelectors } from './test-cases/blog';
-import { BlogState, blogState } from './test-cases/blog';
+import { blogSelectors, blogState } from './test-cases/blog';
+import { forumSelectors, forumEmptyState } from './test-cases/forum';
 
 describe('selectors', () => {
   describe('getArr', () => {
     test('cardinality of one', () => {
-      const result = blogSelectors.getAttachedArr<BlogState>(blogState, {
+      const result = blogSelectors.getAttachedArr(blogState, {
         entity: 'author',
         id: 'a1',
         rel: 'articleIds'
@@ -16,7 +16,7 @@ describe('selectors', () => {
     });
 
     test('cardinality of many', () => {
-      const result = blogSelectors.getAttachedArr<BlogState>(blogState, {
+      const result = blogSelectors.getAttachedArr(blogState, {
         entity: 'article',
         id: 'r1',
         rel: 'authorId'
@@ -26,5 +26,27 @@ describe('selectors', () => {
 
       expect(result).toEqual(expected);
     });
+  });
+
+  test('getEntityAttachedArr', () => {
+    // note: this is not actually valid state
+    const state = {
+      ...forumEmptyState,
+      profile: {
+        p1: {
+          accountId: 'a1',
+          postIds: ['o1', 'o2']
+        },
+      },
+    };
+
+    const result = forumSelectors.getEntityAttachedArr(state, { entity: 'profile', id: 'p1' });
+
+    const expected = {
+      accountId: ['a1'],
+      postIds: ['o1', 'o2']
+    };
+
+    expect(result).toEqual(expected);
   });
 });
