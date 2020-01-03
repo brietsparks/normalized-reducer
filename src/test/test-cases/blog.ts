@@ -57,7 +57,7 @@ export const blogState: BlogState = {
   }
 };
 
-export const blogModelSchemaReader = new ModelSchemaReader(blogSchema);
+export const blogModelSchemaReader = new ModelSchemaReader<BlogState>(blogSchema);
 
 export const {
   creators: blogActionCreators,

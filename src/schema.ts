@@ -1,8 +1,8 @@
-import { ModelSchema, EntitySchema, RelSchema, Cardinalities, AbstractResourceState } from './types';
+import { ModelSchema, EntitySchema, RelSchema, Cardinalities, AbstractResourceState, AbstractState } from './types';
 
-export class ModelSchemaReader {
+export class ModelSchemaReader <S extends AbstractState> {
   schema: ModelSchema;
-  entitySchemaReaders: Record<string, EntitySchemaReader>;
+  entitySchemaReaders: Record<string, EntitySchemaReader<S>>;
 
   constructor(schema: ModelSchema) {
     this.schema = schema;
@@ -12,8 +12,17 @@ export class ModelSchemaReader {
         entitySchemaReaders[entity] = new EntitySchemaReader(entity, entitySchema, this);
         return entitySchemaReaders;
       },
-      {} as Record<string, EntitySchemaReader>
+      {} as Record<string, EntitySchemaReader<S>>
     );
+  }
+
+  getEmptyState(): S {
+    const emptyState = this.getEntities().reduce((emptyState, entity) => {
+      emptyState[entity] = {};
+      return emptyState;
+    }, {} as AbstractState);
+
+    return emptyState as S;
   }
 
   entityExists(entity: string) {
@@ -29,12 +38,12 @@ export class ModelSchemaReader {
   }
 }
 
-export class EntitySchemaReader {
+export class EntitySchemaReader <S extends AbstractState> {
   entity: string;
   schema: EntitySchema;
-  modelSchemaReader: ModelSchemaReader;
+  modelSchemaReader: ModelSchemaReader<S>;
 
-  constructor(entity: string, schema: EntitySchema, modelSchemaReader: ModelSchemaReader) {
+  constructor(entity: string, schema: EntitySchema, modelSchemaReader: ModelSchemaReader<S>) {
     this.entity = entity;
     this.schema = schema;
     this.modelSchemaReader = modelSchemaReader;

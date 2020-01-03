@@ -12,9 +12,8 @@ import {
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
 import { arrayPut } from './util';
 
-
 export const makeReducer = <S extends AbstractState>(
-  schema: ModelSchemaReader,
+  schema: ModelSchemaReader<S>,
   actionTypes: ActionTypes,
   transformAction: DeriveActionWithOps
 ) => {
@@ -25,10 +24,12 @@ export const makeReducer = <S extends AbstractState>(
     return reducers;
   }, {});
 
-  return (state: S, action: Action) => {
-    if (!Object.keys(actionTypes).includes(action.type)) {
+  return (state: S = schema.getEmptyState(), anyAction: { type: string }) => {
+    if (!Object.keys(actionTypes).includes(anyAction.type)) {
       return state;
     }
+
+    const action = anyAction as Action;
 
     const actionWithOps = transformAction(state, action);
 
@@ -43,7 +44,7 @@ export const makeReducer = <S extends AbstractState>(
 };
 
 
-export const makeEntityReducer = (schema: EntitySchemaReader): EntityReducer => {
+export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchemaReader<S>): EntityReducer => {
   return (state= {}, ops: Op[] = []) => {
     return ops.reduce((state, op) => {
       if (op.entity !== schema.getEntity()) {

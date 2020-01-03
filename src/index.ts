@@ -2,7 +2,7 @@ import {
   ModelSchema,
   Namespaced,
   InvalidEntityHandler,
-  InvalidRelHandler,
+  InvalidRelHandler, AbstractState,
 } from './types';
 import { ModelSchemaReader } from './schema';
 import { makeActions } from './actions';
@@ -16,13 +16,14 @@ export interface Options {
   onInvalidRel: InvalidRelHandler,
 }
 
-export default function (schema: ModelSchema, options: Options) {
-  const schemaReader = new ModelSchemaReader(schema);
+export default function <S extends AbstractState>(schema: ModelSchema, options: Options) {
+  const schemaReader = new ModelSchemaReader<S>(schema);
 
   const { types, creators } = makeActions(schemaReader, options);
   const selectors = makeSelectors(schemaReader, creators, options);
   const transformAction = makeActionTransformer(schemaReader, types, selectors);
-  const reducer = makeReducer(schemaReader, types, transformAction);
+  const reducer = makeReducer<S>(schemaReader, types, transformAction);
+  const emptyState = schemaReader.getEmptyState();
 
   return {
     reducer,
@@ -30,5 +31,6 @@ export default function (schema: ModelSchema, options: Options) {
     actionTypes: types,
     actionCreators: creators,
     transformAction,
+    emptyState,
   }
 }

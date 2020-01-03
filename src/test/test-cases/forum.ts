@@ -4,6 +4,8 @@ import {
   AbstractState,
 } from '../../types';
 
+import { ModelSchemaReader } from '../../schema';
+
 export enum ForumEntities {
   ACCOUNT = 'account',
   PROFILE = 'profile',

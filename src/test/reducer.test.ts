@@ -1,9 +1,14 @@
-import { makeEntityReducer } from '../reducer';
+import { makeReducer, makeEntityReducer } from '../reducer';
 
-import { blogModelSchemaReader } from './test-cases/blog';
+import { blogModelSchemaReader, blogActionTypes, transformBlogAction } from './test-cases/blog';
 import { AddRelIdOp, OpTypes, RemoveRelIdOp } from '../types';
 
 describe('reducer', () => {
+  describe('makeReducer', () => {
+    const reducer = makeReducer(blogModelSchemaReader, blogActionTypes, transformBlogAction);
+    expect(reducer(undefined, { type: '' })).toEqual(blogModelSchemaReader.getEmptyState());
+  });
+
   describe('makeEntityReducer', () => {
     const authorsReducer = makeEntityReducer(blogModelSchemaReader.entity('author'));
     const articlesReducer = makeEntityReducer(blogModelSchemaReader.entity('article'));
