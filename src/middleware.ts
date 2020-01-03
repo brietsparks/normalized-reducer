@@ -25,14 +25,20 @@ export const makeActionTransformer = (
 
     if (action.type === actionTypes.ADD) {
       const addAction = action as AddAction;
+      const { entity, id } = addAction;
 
-      pendingState.addResource(addAction.entity, addAction.id);
+      if (selectors.checkResource(state, { entity, id })) {
+        addAction.ops = [];
+        return addAction;
+      }
+
+      pendingState.addResource(entity, id);
 
       if (addAction.attach) {
         addAction.attach.forEach(attachable => {
           pendingState.attachResources(
-            addAction.entity,
-            addAction.id,
+            entity,
+            id,
             attachable.rel,
             attachable.id,
             attachable.index,

@@ -1,8 +1,5 @@
-import { ModelSchemaReader } from './schema';
-import { blogSchema } from './test-cases';
-import { Cardinalities } from './types';
-
-export const blogModelSchemaReader = new ModelSchemaReader(blogSchema);
+import { blogModelSchemaReader } from './test-cases/blog';
+import { Cardinalities } from '../types';
 
 describe('schema', () => {
   test('getReciprocalCardinality', () => {

@@ -1,14 +1,6 @@
-import { makeActions } from './actions';
-import { blogModelSchemaReader } from './schema.test';
-import { defaultNamespaced, defaultInvalidEntityHandler } from './util';
+import { makeActions } from '../actions';
 
-export const {
-  creators: blogActionCreators,
-  types: blogActionTypes,
-} = makeActions(blogModelSchemaReader, {
-  namespaced: defaultNamespaced,
-  onInvalidEntity: defaultInvalidEntityHandler,
-});
+import { blogActionCreators, blogActionTypes } from './test-cases/blog';
 
 describe('actions', () => {
   describe('makeActions', () => {
@@ -36,7 +28,7 @@ describe('actions', () => {
               id: 'r1',
               index: 1,
               reciprocalIndex: 2,
-              options: { createNonexistent: true, displaceAttached: true }
+              options: { createNonexistent: true }
             }
           ],
           { ifExists: 'patch' }
@@ -56,7 +48,7 @@ describe('actions', () => {
               id: 'r1',
               index: 1,
               reciprocalIndex: 2,
-              options: { createNonexistent: true, displaceAttached: true }
+              options: { createNonexistent: true }
             }
           ],
           options: { ifExists: 'patch' },

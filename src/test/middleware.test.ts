@@ -1,16 +1,29 @@
-import { makeActionTransformer } from './middleware';
+import { makeActionTransformer } from '../middleware';
 
-import { BlogState, blogState } from './test-cases';
-import { blogModelSchemaReader } from './schema.test';
-import { blogActionTypes } from './actions.test';
-import { blogSelectors } from './selectors.test';
-import { AddAction, OpTypes } from './types';
+import { blogActionTypes, blogState, BlogState, transformBlogAction } from './test-cases/blog';
+import { AddAction, OpTypes } from '../types';
 
 describe('middleware', () => {
   describe('makeActionTransformer', () => {
-    const transform = makeActionTransformer(blogModelSchemaReader, blogActionTypes, blogSelectors);
 
     describe('add action', () => {
+      test('already existing resource', () => {
+        const action: AddAction = {
+          type: blogActionTypes.ADD,
+          entity: 'author',
+          id: 'a1',
+        };
+
+        const result = transformBlogAction(blogState, action);
+
+        const expected = {
+          ...action,
+          ops: []
+        };
+
+        expect(result).toEqual(expected);
+      });
+
       test('basic', () => {
         const action: AddAction = {
           type: blogActionTypes.ADD,
@@ -18,7 +31,7 @@ describe('middleware', () => {
           id: 'a200',
         };
 
-        const result = transform(blogState, action);
+        const result = transformBlogAction(blogState, action);
 
         const expected = {
           ...action,
@@ -54,7 +67,7 @@ describe('middleware', () => {
           ]
         };
 
-        const result = transform(state, action);
+        const result = transformBlogAction(state, action);
 
         const expected = {
           ...action,
@@ -111,7 +124,7 @@ describe('middleware', () => {
           ]
         };
 
-        const result = transform(state, action);
+        const result = transformBlogAction(state, action);
 
         const expected = {
           ...action,
@@ -156,5 +169,7 @@ describe('middleware', () => {
         expect(result).toEqual(expected);
       });
     });
+
+
   });
 });

@@ -1,12 +1,5 @@
-import { makeSelectors } from './selectors';
-import { blogModelSchemaReader } from './schema.test';
-import { BlogState, blogState } from './test-cases';
-import { blogActionTypes, blogActionCreators } from './actions.test';
-
-export const blogSelectors = makeSelectors(
-  blogModelSchemaReader,
-  blogActionCreators
-);
+import { blogSelectors } from './test-cases/blog';
+import { BlogState, blogState } from './test-cases/blog';
 
 describe('selectors', () => {
   describe('getArr', () => {

@@ -5,11 +5,16 @@ import {
   Cardinalities,
   AbstractEntityState,
   AbstractRelDataState
-} from './types';
+} from '../../types';
+import { makeActions } from '../../actions';
+import { defaultInvalidEntityHandler, defaultInvalidRelHandler, defaultNamespaced } from '../../util';
+import { ModelSchemaReader } from '../../schema';
+import { makeSelectors } from '../../selectors';
+import { makeActionTransformer } from '../../middleware';
 
 export enum BlogEntities {
+  ARTICLE = 'article',
   AUTHOR = 'author',
-  ARTICLE = 'article'
 }
 
 export const authorSchema: EntitySchema = {
@@ -51,3 +56,21 @@ export const blogState: BlogState = {
     'r2': { authorId: 'a1' },
   }
 };
+
+export const blogModelSchemaReader = new ModelSchemaReader(blogSchema);
+
+export const {
+  creators: blogActionCreators,
+  types: blogActionTypes,
+} = makeActions(blogModelSchemaReader, {
+  namespaced: defaultNamespaced,
+  onInvalidEntity: defaultInvalidEntityHandler,
+  onInvalidRel: defaultInvalidRelHandler,
+});
+
+export const blogSelectors = makeSelectors(
+  blogModelSchemaReader,
+  blogActionCreators
+);
+
+export const transformBlogAction = makeActionTransformer(blogModelSchemaReader, blogActionTypes, blogSelectors);

@@ -54,7 +54,7 @@ export interface AddPayloadAttachable {
 }
 
 export interface AddPayloadOptions {
-  ifExists?: ExistingResourceStrategy, // what to do if an addable resource's id already exists
+  // ifExists?: ExistingResourceStrategy, // what to do if an addable resource's id already exists
 }
 
 export interface RemovePayload {
@@ -231,12 +231,5 @@ export type InvalidRelHandler = (entity: string, rel: string) => void;
 export type InvalidRelDataHandler = (entity: string, rel: string, data: any) => void;
 
 export type ExistingResourceStrategy = 'ignore' | 'put' | 'patch'; // put replaces completely; patch merges their attached ids
-
-export interface AnomalyHandlers {
-  onInvalidEntity: InvalidEntityHandler,
-  onNonexistentResource: NonexistentResourceHandler,
-  onInvalidRel: InvalidRelHandler,
-  onInvalidRelData: InvalidRelDataHandler
-}
 
 export type Namespaced = (actionType: string) => string;

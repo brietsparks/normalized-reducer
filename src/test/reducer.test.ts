@@ -1,8 +1,7 @@
-import { makeEntityReducer } from './reducer';
+import { makeEntityReducer } from '../reducer';
 
-import { blogModelSchemaReader } from './schema.test';
-import { blogActionTypes } from './actions.test';
-import { AddRelIdOp, AttachAction, OpTypes, RemoveRelIdOp } from './types';
+import { blogModelSchemaReader } from './test-cases/blog';
+import { AddRelIdOp, OpTypes, RemoveRelIdOp } from '../types';
 
 describe('reducer', () => {
   describe('makeEntityReducer', () => {

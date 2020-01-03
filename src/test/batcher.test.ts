@@ -1,10 +1,7 @@
-import { Batcher } from './batcher';
+import { Batcher } from '../batcher';
 
-import { BlogState, blogState } from './test-cases';
-import { blogModelSchemaReader } from './schema.test';
-import { blogSelectors } from './selectors.test';
-import { AddAction, Cardinalities } from './types';
-import { makeAddRelIdOp, makeRemoveRelIdOp } from './ops';
+import { BlogState, blogState, blogModelSchemaReader, blogSelectors } from './test-cases/blog';
+import { makeAddRelIdOp, makeRemoveRelIdOp } from '../ops';
 
 describe('batcher', () => {
   test('add-resource-op', () => {
