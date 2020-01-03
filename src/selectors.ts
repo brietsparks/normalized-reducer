@@ -19,8 +19,8 @@ export interface Opts {
   onInvalidRelData?: InvalidRelDataHandler
 }
 
-export const makeSelectors = (
-  schema: ModelSchemaReader,
+export const makeSelectors = <S extends AbstractState> (
+  schema: ModelSchemaReader<S>,
   actionCreators: ActionCreators,
   {
     onInvalidEntity = noop,
@@ -28,8 +28,8 @@ export const makeSelectors = (
     onInvalidRel = noop,
     onInvalidRelData = noop
   }: Opts = {}
-): Selectors => {
-  const getEntityState = <S extends AbstractState>(state: S, args: { entity: string }) => {
+): Selectors<S> => {
+  const getEntityState = (state: S, args: { entity: string }) => {
     if (!schema.entityExists(args.entity)) {
       onInvalidEntity(args.entity);
       return undefined;
@@ -38,7 +38,7 @@ export const makeSelectors = (
     return state[args.entity];
   };
 
-  const checkResource = <S extends AbstractState>(state: S, args: { entity: string, id: string }) => {
+  const checkResource = (state: S, args: { entity: string, id: string }) => {
     const entityState = getEntityState(state, { entity: args.entity });
 
     if (!entityState) {
@@ -48,7 +48,7 @@ export const makeSelectors = (
     return !!entityState[args.id];
   };
 
-  const getResourceState = <S extends AbstractState>(state: S, args: { entity: string, id: string }) => {
+  const getResourceState = (state: S, args: { entity: string, id: string }) => {
     const entityState = getEntityState(state, { entity: args.entity });
 
     if (!entityState) {
@@ -65,7 +65,7 @@ export const makeSelectors = (
     return resource;
   };
 
-  const getAttached = <S extends AbstractState>(state: S, args: { entity: string, id: string, rel: string }) => {
+  const getAttached = (state: S, args: { entity: string, id: string, rel: string }) => {
     const resource = getResourceState(state, {
       entity: args.entity,
       id: args.id,
@@ -91,7 +91,7 @@ export const makeSelectors = (
     return relState;
   };
 
-  const getAttachedArr = <S extends AbstractState>(
+  const getAttachedArr = (
     state: S,
     args: {
       entity: string,
@@ -109,7 +109,7 @@ export const makeSelectors = (
   };
 
   return {
-    checkResource: checkResource,
+    checkResource,
     getAttached,
     getAttachedArr,
   }

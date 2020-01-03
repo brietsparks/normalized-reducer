@@ -8,7 +8,7 @@ import {
   ActionTypes,
   ActionCreators,
   RemoveAction,
-  InvalidRelHandler,
+  InvalidRelHandler, AbstractState,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -19,7 +19,7 @@ interface Opts {
   onInvalidRel: InvalidRelHandler,
 }
 
-export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: ActionTypes, creators: ActionCreators } => {
+export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S>, opts: Opts): { types: ActionTypes, creators: ActionCreators } => {
   const { namespaced, onInvalidEntity, onInvalidRel } = opts;
 
   const ADD = namespaced('ADD');

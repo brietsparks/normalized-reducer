@@ -15,12 +15,12 @@ import { makeAddResourceOp, makeAddRelIdOp, makeRemoveRelIdOp } from './ops';
 import { ModelSchemaReader } from './schema';
 
 export class Batcher<S extends AbstractState> {
-  schema: ModelSchemaReader;
+  schema: ModelSchemaReader<S>;
   state: S;
-  selectors: Selectors;
+  selectors: Selectors<S>;
   ops: Record<string, any> = {};
 
-  constructor(schema: ModelSchemaReader, state: S, selectors: Selectors) {
+  constructor(schema: ModelSchemaReader<S>, state: S, selectors: Selectors<S>) {
     this.schema = schema;
     this.state = state;
     this.selectors = selectors;
@@ -33,6 +33,10 @@ export class Batcher<S extends AbstractState> {
   get(op: Op) {
     const key = this.makeOpKey(op);
     return key ? this.ops[key] : undefined;
+  }
+
+  getByKey(key: string) {
+    return this.ops[key];
   }
 
   // whether the resource exists or will be added
@@ -99,7 +103,18 @@ export class Batcher<S extends AbstractState> {
     const cardinality = entitySchema.getCardinality(rel);
 
     if (cardinality === Cardinalities.ONE) {
-      const occupantId = this.selectors.getAttached(this.state, { entity, id, rel }) as string;
+      // get attached from state
+      let occupantId = this.selectors.getAttached(this.state, { entity, id, rel }) as string;
+
+      // get attached from batch
+      if (!occupantId) {
+        // todo: this is a hack to get the addRelIdOp
+        const occupantOp = this.getByKey(concat(OpTypes.ADD_REL_ID, entity, id, rel));
+
+        if (occupantOp) {
+          occupantId = occupantOp.relId;
+        }
+      }
 
       if (occupantId) {
         this.put(makeRemoveRelIdOp(relEntity, occupantId, reciprocalRel, id));
@@ -107,7 +122,6 @@ export class Batcher<S extends AbstractState> {
     }
   }
 
-  // todo: should be private
   private put(op: Op) {
     const key = this.makeOpKey(op);
 

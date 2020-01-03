@@ -13,12 +13,12 @@ import { makeAddResourceOp } from './ops';
 
 // makeActionTransformer is a selector that should be used to
 // intercept an action before it gets handled by the entity reducer(s)
-export const makeActionTransformer = (
-  schema: ModelSchemaReader,
+export const makeActionTransformer = <S extends AbstractState> (
+  schema: ModelSchemaReader<S>,
   actionTypes: ActionTypes,
-  selectors: Selectors
-): DeriveActionWithOps => {
-  return <S extends AbstractState>(state: S, action: Action): Action => {
+  selectors: Selectors<S>
+): DeriveActionWithOps<S> => {
+  return (state: S, action: Action): Action => {
     const pendingState = new Batcher<S>(schema, state, selectors);
 
     const entitySchema = schema.entity(action.entity);
@@ -44,7 +44,7 @@ export const makeActionTransformer = (
             attachable.index,
             attachable.reciprocalIndex,
           )
-        })
+        });
       }
 
       addAction.ops = pendingState.getAll();

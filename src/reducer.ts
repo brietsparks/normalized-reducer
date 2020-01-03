@@ -10,12 +10,12 @@ import {
   RemoveResourceOp,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
-import { arrayPut } from './util';
+import { arrayPut, deepFreeze } from './util';
 
 export const makeReducer = <S extends AbstractState>(
   schema: ModelSchemaReader<S>,
   actionTypes: ActionTypes,
-  transformAction: DeriveActionWithOps
+  transformAction: DeriveActionWithOps<S>
 ) => {
   const entities = schema.getEntities();
 
@@ -25,7 +25,7 @@ export const makeReducer = <S extends AbstractState>(
   }, {});
 
   return (state: S = schema.getEmptyState(), anyAction: { type: string }) => {
-    if (!Object.keys(actionTypes).includes(anyAction.type)) {
+    if (!Object.values(actionTypes).includes(anyAction.type)) {
       return state;
     }
 
@@ -34,11 +34,13 @@ export const makeReducer = <S extends AbstractState>(
     const actionWithOps = transformAction(state, action);
 
     return Object.keys(entityReducers).reduce((reducedState: S, entity: string) => {
+      const newReducedState = {...reducedState};
+
       const entityReducer = entityReducers[entity];
 
       // @ts-ignore // todo: typescript type incompatibility
-      reducedState[entity] = entityReducer(state[entity], actionWithOps.ops || []);
-      return reducedState;
+      newReducedState[entity] = entityReducer(newReducedState[entity], actionWithOps.ops || []);
+      return newReducedState;
     }, state)
   };
 };

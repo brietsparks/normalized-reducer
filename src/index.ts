@@ -9,6 +9,11 @@ import { makeActions } from './actions';
 import { makeSelectors } from './selectors';
 import { makeReducer } from './reducer';
 import { makeActionTransformer } from './middleware';
+import {
+  defaultNamespaced,
+  defaultInvalidEntityHandler,
+  defaultInvalidRelHandler,
+} from './util';
 
 export interface Options {
   namespaced: Namespaced,
@@ -16,7 +21,13 @@ export interface Options {
   onInvalidRel: InvalidRelHandler,
 }
 
-export default function <S extends AbstractState>(schema: ModelSchema, options: Options) {
+export default function <S extends AbstractState>(
+  schema: ModelSchema,
+  options: Options = {
+    namespaced: defaultNamespaced,
+    onInvalidEntity: defaultInvalidEntityHandler,
+    onInvalidRel: defaultInvalidRelHandler,
+  }) {
   const schemaReader = new ModelSchemaReader<S>(schema);
 
   const { types, creators } = makeActions(schemaReader, options);

@@ -1,11 +1,178 @@
 import makeModule from '..';
 
-import { ModelSchema } from '../types';
+import {
+  ForumEntities,
+  forumSchema,
+  ForumState,
+} from './test-cases/forum';
 
 describe('index', () => {
+  const {
+    reducer,
+    actionCreators,
+    emptyState,
+  } = makeModule<ForumState>(forumSchema);
+
   describe('add', () => {
-    test('', () => {
+    describe('basic', () => {
+      test('if id does not exist, then create the resource', () => {
+        const result = reducer(
+          emptyState,
+          actionCreators.add(ForumEntities.ACCOUNT, 'a1')
+        );
+
+        const expected = {
+          ...emptyState,
+          account: {
+            'a1': { profileId: undefined }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('if id exists, then do not create the resource', () => {
+        const state = {
+          ...emptyState,
+          account: {
+            'a1': { profileId: undefined }
+          }
+        };
+
+        const result = reducer(
+          state,
+          actionCreators.add(ForumEntities.ACCOUNT, 'a1')
+        );
+
+        expect(result).toEqual(state);
+      });
     });
+
+    describe('with attachables', () => {
+      describe('singular rel', () => {
+        test('if attachable resource does not exist, then do nothing', () => {
+          const state = {
+            ...emptyState,
+            account: {
+              'a1': { profileId: undefined }
+            }
+          };
+
+          const result = reducer(
+            state,
+            actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+              rel: 'profileId',
+              id: 'p1'
+            }])
+          );
+
+          expect(result).toEqual(state);
+        });
+
+        describe('one attachable', () => {
+          const expected = {
+            ...emptyState,
+            account: {
+              'a1': { profileId: 'p1' }
+            },
+            profile: {
+              'p1': { accountId: 'a1' }
+            }
+          };
+
+          test('set rel value to attachable id', () => {
+            const state = {
+              ...emptyState,
+              profile: {
+                'p1': { accountId: undefined }
+              }
+            };
+
+            const result = reducer(
+              state,
+              actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+                rel: 'profileId',
+                id: 'p1'
+              }])
+            );
+
+            expect(result).toEqual(expected);
+          });
+
+          test('if no reciprocal rel key on attachable resource, then set key and value', () => {
+            const state = {
+              ...emptyState,
+              profile: {
+                'p1': {}
+              }
+            };
+
+            const result = reducer(
+              state,
+              actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+                rel: 'profileId',
+                id: 'p1'
+              }])
+            );
+
+            expect(result).toEqual(expected);
+          });
+
+          test('ignore index', () => {
+            const state = {
+              ...emptyState,
+              profile: {
+                'p1': { accountId: undefined }
+              }
+            };
+
+            const result = reducer(
+              state,
+              actionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+                rel: 'profileId',
+                id: 'p1',
+                index: 3,
+                reciprocalIndex: 2, // reciprocal happens to be cardinality of one in this test
+              }])
+            );
+
+            expect(result).toEqual(expected);
+          });
+        });
+
+        test('more than one attachable: overwrite each time', () => {
+          const state = {
+            ...emptyState,
+            profile: {
+              'p1': { accountId: undefined },
+              'p2': { accountId: undefined },
+            }
+          };
+
+          const result = reducer(
+            state,
+            actionCreators.add(ForumEntities.ACCOUNT, 'a1', [
+              { rel: 'profileId', id: 'p1' },
+              { rel: 'profileId', id: 'p2' }
+            ])
+          );
+
+          const expected = {
+            ...emptyState,
+            account: {
+              'a1': { profileId: 'p2' }
+            },
+            profile: {
+              'p1': { accountId: undefined },
+              'p2': { accountId: 'a1' },
+            }
+          };
+
+          expect(result).toEqual(expected);
+        });
+      });
+    });
+
     /*
     basic
       if id does not exist, then create the resource
@@ -15,12 +182,10 @@ describe('index', () => {
       singular rel
         if attachable resource does not exist, then do nothing
         one attachable
-          set rel value to id
-          if no resource rel key, then set key and value
+          set rel value to attachable id
+          if no reciprocal rel key on attachable resource, then set key and value
           ignore index
-        more than one attachable:
-          overwrite each time
-      reciprocal singular rel: same prev
+        more than one attachable: overwrite each time
 
       plural rel
         one attachable

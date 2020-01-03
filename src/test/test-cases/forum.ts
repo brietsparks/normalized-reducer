@@ -61,27 +61,34 @@ export const categorySchema = {
   }
 };
 
+export const forumSchema = {
+  account: accountSchema,
+  profile: profileSchema,
+  post: postSchema,
+  category: categorySchema,
+};
+
 export interface ForumState extends AbstractState {
   account: {
     [id: string]: {
-      profileId: string
+      profileId?: string
     }
   }
   profile: {
     [id: string]: {
-      accountId: string,
-      postIds: string[],
+      accountId?: string,
+      postIds?: string[],
     }
   }
   post: {
     [id: string]: {
-      profileId: string,
-      categoryIds: string[],
+      profileId?: string,
+      categoryIds?: string[],
     }
   }
   category: {
     [id: string]: {
-      postIds: string[],
+      postIds?: string[],
     }
   }
 }

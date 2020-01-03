@@ -192,25 +192,20 @@ export type AbstractRelDataState = undefined | string | string[]
 // selector types
 //
 
-export type DeriveActionWithOps = <S extends AbstractState>(state: S, action: Action) => Action;
-export type CheckResource = <S extends AbstractState>(state: S, args: { entity: string, id: string }) => boolean;
-export type GetAttached = <S extends AbstractState>(state: S, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
-export type GetArr = <S extends AbstractState>(state: S, args: { entity: string, id: string, rel: string }) => string[]
-export type DeriveAttachmentActions = <S extends AbstractState>(state: S, args: AttachPayload) => (AddAction|AttachAction|DetachAction)[];
-export type DeriveRemovalActions = <S extends AbstractState>(state: S, args: RemovePayload) => DetachAction[];
-export type DeriveDetachmentActions = <S extends AbstractState>(state: S, args: DetachPayload) => DetachAction[];
+export type DeriveActionWithOps <S extends AbstractState> = (state: S, action: Action) => Action;
+export type CheckResource <S extends AbstractState> = (state: S, args: { entity: string, id: string }) => boolean;
+export type GetAttached <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
+export type GetArr <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]
+// export type DeriveAttachmentActions = <S extends AbstractState>(state: S, args: AttachPayload) => (AddAction|AttachAction|DetachAction)[];
+// export type DeriveRemovalActions = <S extends AbstractState>(state: S, args: RemovePayload) => DetachAction[];
+// export type DeriveDetachmentActions = <S extends AbstractState>(state: S, args: DetachPayload) => DetachAction[];
 
-export interface Selectors {
-  checkResource: CheckResource
-  getAttached: GetAttached,
-  getAttachedArr: GetArr,
+export interface Selectors<S extends AbstractState> {
+  checkResource: CheckResource<S>
+  getAttached: GetAttached<S>,
+  getAttachedArr: GetArr<S>,
 }
 
-export interface MiddlewareSelectors {
-  deriveAttachmentActions: DeriveAttachmentActions,
-  deriveRemovalActions: DeriveRemovalActions,
-  deriveDetachmentActions: DeriveDetachmentActions,
-}
 
 //
 // reducer types
