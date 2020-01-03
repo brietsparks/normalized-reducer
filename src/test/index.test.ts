@@ -720,11 +720,11 @@ describe('index', () => {
 
       [
         forumReducer(state, forumActionCreators.attach(
-          ForumEntities.ACCOUNT, 'a1', 'profileId', 'p9000')
-        ),
+          ForumEntities.ACCOUNT, 'a1', 'profileId', 'p9000'
+        )),
         forumReducer(state, forumActionCreators.attach(
-          ForumEntities.PROFILE, 'p1', 'accountId', 'a9000')
-        ),
+          ForumEntities.PROFILE, 'p1', 'accountId', 'a9000'
+        )),
       ].forEach(result => expect(result).toEqual(state))
     });
 
@@ -741,11 +741,11 @@ describe('index', () => {
 
       [
         forumReducer(state, forumActionCreators.attach(
-          ForumEntities.ACCOUNT, 'a1', 'profileId', 'p1')
-        ),
+          ForumEntities.ACCOUNT, 'a1', 'profileId', 'p1'
+        )),
         forumReducer(state, forumActionCreators.attach(
-          ForumEntities.PROFILE, 'p1', 'accountId', 'a1')
-        ),
+          ForumEntities.PROFILE, 'p1', 'accountId', 'a1'
+        )),
       ].forEach(result => {
         const expected = {
           ...forumEmptyState,
@@ -764,13 +764,194 @@ describe('index', () => {
 
   describe('detach', () => {
     /*
-    if resource does not exist, then do nothing
+    basic
+      one-cardinality
+      many-cardinality
 
-    if invalid attachment state, then remove the remaining rel id
+    if resource does not exist, then do nothing
+    if attachment does not exist then do nothing
+
+    if partially attached (invalid state), then still remove it completely
       when only one resource exists
       when both exist but only one is attached
-    if attachment does not exist then do nothing
+
     */
+
+    describe('basic', () => {
+      test('one-cardinality', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
+        };
+
+        [
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.ACCOUNT, 'a1', 'profileId', 'p1'
+          )),
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.PROFILE, 'p1', 'accountId', 'a1'
+          )),
+        ].forEach(result => {
+          const expected = {
+            ...forumEmptyState,
+            account: {
+              'a1': { profileId: undefined }
+            },
+            profile: {
+              'p1': { accountId: undefined }
+            }
+          };
+
+          expect(result).toEqual(expected);
+        });
+
+      });
+
+      test('many-cardinality', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1', 'c2', 'c3'] }
+          },
+          category: {
+            'c2': { postIds: ['o1'] }
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.detach(
+          ForumEntities.POST,
+          'o1',
+          'categoryIds',
+          'c2'
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1', 'c3'] }
+          },
+          category: {
+            'c2': { postIds: [] }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+    });
+
+    test('if resource does not exist, then do nothing', () => {
+      const state = {
+        ...forumEmptyState,
+        account: {
+          'a1': { profileId: 'p1' }
+        },
+        profile: {
+          'p1': { accountId: 'a1' }
+        }
+      };
+
+      [
+        forumReducer(state, forumActionCreators.detach(
+          ForumEntities.ACCOUNT, 'a9000', 'profileId', 'p1'
+        )),
+        forumReducer(state, forumActionCreators.detach(
+          ForumEntities.PROFILE, 'p9000', 'accountId', 'a1'
+        )),
+      ].forEach(result => {
+        expect(result).toEqual(state);
+      });
+    });
+
+    test('if attachment does not exist then do nothing', () => {
+      const state = {
+        ...forumEmptyState,
+        account: {
+          'a1': { profileId: 'p1' },
+          'a200': { profileId: undefined }
+        },
+        profile: {
+          'p1': { accountId: 'a1' }
+        }
+      };
+
+      [
+        forumReducer(state, forumActionCreators.detach(
+          ForumEntities.ACCOUNT, 'a200', 'profileId', 'p1'
+        )),
+        forumReducer(state, forumActionCreators.detach(
+          ForumEntities.PROFILE, 'p1', 'accountId', 'a200'
+        )),
+      ].forEach(result => {
+        expect(result).toEqual(state);
+      });
+    });
+
+    describe('if partially attached (invalid state), then still remove it completely', () => {
+      test('when only one resource exists', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1'] }
+          },
+        };
+
+        [
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.POST, 'o1', 'categoryIds', 'c1'
+          )),
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.CATEGORY, 'c1', 'postIds', 'o1'
+          )),
+        ].forEach(result => {
+          const expected = {
+            ...forumEmptyState,
+            post: {
+              'o1': { categoryIds: [] }
+            },
+          };
+
+          expect(result).toEqual(expected);
+        });
+      });
+
+      test('when both exist but only one is attached', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1'] }
+          },
+          category: {
+            'c1': { postIds: [] }
+          }
+        };
+
+        [
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.POST, 'o1', 'categoryIds', 'c1'
+          )),
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.CATEGORY, 'c1', 'postIds', 'o1'
+          )),
+        ].forEach(result => {
+          const expected = {
+            ...forumEmptyState,
+            post: {
+              'o1': { categoryIds: [] }
+            },
+            category: {
+              'c1': { postIds: [] }
+            }
+          };
+
+          expect(result).toEqual(expected);
+        });
+      });
+    });
   });
 
   describe('batched actions', () => {
@@ -781,5 +962,9 @@ describe('index', () => {
     remove detaches resources that were attached previously in batch (add and attach)
 
     */
+  });
+
+  describe('actions on self referencing schema', () => {
+
   });
 });

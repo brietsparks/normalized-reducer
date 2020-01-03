@@ -4,7 +4,7 @@ import {
   Action,
   ActionCreators,
   ActionTypes, AddAction, AttachAction,
-  DeriveActionWithOps, Op,
+  DeriveActionWithOps, DetachAction, Op,
   RemoveAction,
   Selectors
 } from './types';
@@ -77,6 +77,17 @@ export const makeActionTransformer = <S extends AbstractState> (
       attachAction.ops = pendingState.getAll();
 
       return attachAction;
+    }
+
+    if (action.type === actionTypes.DETACH) {
+      const detachAction = action as DetachAction;
+      const { entity, id, rel, relId } = detachAction;
+
+      pendingState.detachResources(entity, id, rel, relId);
+
+      detachAction.ops = pendingState.getAll();
+
+      return detachAction;
     }
 
     return action;
