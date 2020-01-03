@@ -25,7 +25,8 @@ export const makeAddRelIdOp = (entity: string, id: string, rel: string, relId: s
     relId,
   };
 
-  if (index) {
+  // must check against undefined because index might === 0
+  if (index !== undefined) {
     op.index = index;
   }
 

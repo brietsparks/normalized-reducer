@@ -1,9 +1,10 @@
 export const noop = () => {};
 
 export const arrayPut = <T>(array: T[], item: T, index?: number) => {
-  index
-    ? array.splice(index, 0, item)
-    : array.push(item);
+  // must check against undefined because index might === 0
+  index === undefined
+    ? array.push(item)
+    : array.splice(index, 0, item);
 };
 
 export const defaultNamespaced = (actionType: string) => `relational/${actionType}`;

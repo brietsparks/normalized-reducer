@@ -27,6 +27,7 @@ export interface AddRelIdOp extends Op {
   rel: string,
   relId: string,
   index?: number,
+  reciprocalIndex?: number,
 }
 
 export interface RemoveRelIdOp extends Op {
