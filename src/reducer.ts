@@ -104,6 +104,11 @@ export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchema
 
         let relState = state[id][rel] as string[];
         relState = [...relState];
+
+        if (relState.includes(relId)) {
+          return state;
+        }
+
         arrayPut(relState, relId, index);
 
         return {

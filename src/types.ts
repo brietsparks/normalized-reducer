@@ -51,7 +51,6 @@ export interface AddPayloadAttachable {
   id: string,
   index?: number,
   reciprocalIndex?: number,
-  options?: AttachPayloadOptions,
 }
 
 export interface AddPayloadOptions {
@@ -70,11 +69,6 @@ export interface AttachPayload {
   relId: string,
   index?: number, // the index within the base resource where the relId should be placed
   reciprocalIndex?: number, // the index within the rel resource where base id should be placed
-  options?: AttachPayloadOptions,
-}
-
-export interface AttachPayloadOptions {
-  createNonexistent?: boolean, // whether to ignore create create attachables that don't exist
 }
 
 export interface DetachPayload {
@@ -121,7 +115,7 @@ export type DetachAction = Action & DetachPayload;
 // action creators
 export type AddActionCreator = (entity: string, id: string, attach?: AddPayloadAttachable[], options?: AddPayloadOptions) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
-export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, options?: AttachPayloadOptions) => AttachAction;
+export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, relKey: string, relId: string) => DetachAction;
 
 export interface ActionTypes {

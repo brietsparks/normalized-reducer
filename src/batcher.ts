@@ -72,6 +72,11 @@ export class Batcher<S extends AbstractState> {
       return;
     }
 
+    // both must exist
+    if (!this.checkExistence(entity, id) || !this.checkExistence(relEntity, relId)) {
+      return;
+    }
+
     // detach occupants
     this.detachOccupant(entity, id, rel);
     this.detachOccupant(relEntity, relId, reciprocalRel);

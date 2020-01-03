@@ -8,7 +8,7 @@ describe('index', () => {
       if id exists, do not create the resource
 
     with attachables
-      rel of cardinality of one
+      rel of one-cardinality
         if attachable resource does not exist, then do nothing
         a single attachable
           set rel value to attachable id
@@ -16,7 +16,7 @@ describe('index', () => {
           ignore index
         multiple attachables: overwrite each time
 
-      rel of cardinality of many
+      rel of many-cardinality
         a single attachable
           if no reciprocal index, then append to attachable
           if reciprocal index, then insert in attachable
@@ -59,7 +59,7 @@ describe('index', () => {
     });
 
     describe('with attachables', () => {
-      describe('rel of cardinality of one', () => {
+      describe('rel of one-cardinality', () => {
         test('if attachable resource does not exist, then do nothing', () => {
           const state = {
             ...forumEmptyState,
@@ -182,7 +182,7 @@ describe('index', () => {
         });
       });
 
-      describe('rel of cardinality of many', () => {
+      describe('rel of many-cardinality', () => {
         describe('a single attachable', () => {
           test('if no reciprocal index, then append to attachable', () => {
             const state = {
@@ -472,23 +472,300 @@ describe('index', () => {
 
   describe('attach', () => {
     /*
-    rel of cardinality of one
+    rel of one-cardinality
       set rel value to id
       if no resource rel key, then set key and value
       ignore index
-    reciprocal rel of cardinality of one: same prev
 
-    rel of cardinality of many
+    rel of many-cardinality
       if no index, then append
       if index, then insert
-      if no resource rel key, then set key and value
-    reciprocal rel of cardinality of many: same prev
+      if no resource rel key, then set key and value,
+      if already attached, then do nothing
+
+    if base resource does not exist, then do nothing
+    if partially attached (invalid state), then fix the attachment
     */
+
+    describe('rel of one-cardinality', () => {
+      test('set rel value to id', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: undefined }
+          },
+          profile: {
+            'p1': { accountId: undefined }
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.attach(
+          ForumEntities.ACCOUNT,
+          'a1',
+          'profileId',
+          'p1'
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('if no resource rel key, then set key and value', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            'a1': {}
+          },
+          profile: {
+            'p1': {}
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.attach(
+          ForumEntities.ACCOUNT,
+          'a1',
+          'profileId',
+          'p1'
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('ignore index', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: undefined }
+          },
+          profile: {
+            'p1': { accountId: undefined }
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.attach(
+          ForumEntities.ACCOUNT,
+          'a1',
+          'profileId',
+          'p1',
+          { index: 1, reciprocalIndex: 2 }
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+    });
+
+    describe('rel of many-cardinality', () => {
+      test('if no index, then append', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+            'c2': { postIds: [] }
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.attach(
+          ForumEntities.POST,
+          'o1',
+          'categoryIds',
+          'c2'
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1', 'c2'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+            'c2': { postIds: ['o1'] }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('if index, then insert', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1', 'c2'] },
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+            'c2': { postIds: ['o1'] },
+            'c3': { postIds: [] },
+          }
+        };
+
+        [
+          forumReducer(state, forumActionCreators.attach(
+            ForumEntities.POST, 'o1', 'categoryIds', 'c3', { index: 1 }
+          )),
+          forumReducer(state, forumActionCreators.attach(
+            ForumEntities.CATEGORY, 'c3', 'postIds', 'o1', { reciprocalIndex: 1 }
+          ))
+        ].forEach(result => {
+          const expected = {
+            ...forumEmptyState,
+            post: {
+              'o1': { categoryIds: ['c1', 'c3', 'c2'] },
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+              'c2': { postIds: ['o1'] },
+              'c3': { postIds: ['o1'] },
+            }
+          };
+
+          expect(result).toEqual(expected);
+        });
+      });
+
+      test('if no resource rel key, then set key and value', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': {}
+          },
+          category: {
+            'c1': {},
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.attach(
+          ForumEntities.POST,
+          'o1',
+          'categoryIds',
+          'c1'
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('if already attached, then do nothing', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.attach(
+          ForumEntities.POST,
+          'o1',
+          'categoryIds',
+          'c1'
+        ));
+
+        expect(result).toEqual(state);
+      });
+    });
+
+    test('if either resource does not exist, then do nothing', () => {
+      const state = {
+        ...forumEmptyState,
+        account: {
+          'a1': { profileId: undefined }
+        },
+        profile: {
+          'p1': { accountId: undefined }
+        }
+      };
+
+      [
+        forumReducer(state, forumActionCreators.attach(
+          ForumEntities.ACCOUNT, 'a1', 'profileId', 'p9000')
+        ),
+        forumReducer(state, forumActionCreators.attach(
+          ForumEntities.PROFILE, 'p1', 'accountId', 'a9000')
+        ),
+      ].forEach(result => expect(result).toEqual(state))
+    });
+
+    test('if partially attached (invalid state), then fix the attachment', () => {
+      const state = {
+        ...forumEmptyState,
+        account: {
+          'a1': { profileId: 'p1' }
+        },
+        profile: {
+          'p1': { accountId: undefined }
+        }
+      };
+
+      [
+        forumReducer(state, forumActionCreators.attach(
+          ForumEntities.ACCOUNT, 'a1', 'profileId', 'p1')
+        ),
+        forumReducer(state, forumActionCreators.attach(
+          ForumEntities.PROFILE, 'p1', 'accountId', 'a1')
+        ),
+      ].forEach(result => {
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
+        };
+
+        expect(result).toEqual(expected)
+      })
+    });
   });
 
   describe('detach', () => {
     /*
     if resource does not exist, then do nothing
+
     if invalid attachment state, then remove the remaining rel id
       when only one resource exists
       when both exist but only one is attached

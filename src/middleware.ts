@@ -3,7 +3,7 @@ import {
   AbstractState,
   Action,
   ActionCreators,
-  ActionTypes, AddAction,
+  ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, Op,
   RemoveAction,
   Selectors
@@ -66,6 +66,17 @@ export const makeActionTransformer = <S extends AbstractState> (
       removeAction.ops = pendingState.getAll();
 
       return removeAction;
+    }
+
+    if (action.type === actionTypes.ATTACH) {
+      const attachAction = action as AttachAction;
+      const { entity, id, rel, relId, index, reciprocalIndex } = attachAction;
+
+      pendingState.attachResources(entity, id, rel, relId, index, reciprocalIndex);
+
+      attachAction.ops = pendingState.getAll();
+
+      return attachAction;
     }
 
     return action;
