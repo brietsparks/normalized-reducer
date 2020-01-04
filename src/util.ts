@@ -16,10 +16,10 @@ export function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
 export const defaultNamespaced = (actionType: string) => `relational/${actionType}`;
 
 export const defaultInvalidEntityHandler = (entity: string) => {
-  throw new Error(`invalid entity "${entity}"`);
+  // throw new Error(`invalid entity "${entity}"`);
 };
 export const defaultInvalidRelHandler = (entity: string, rel: string) => {
-  throw new Error(`invalid rel "${rel}" in entity "${entity}"`)
+  // throw new Error(`invalid rel "${rel}" in entity "${entity}"`)
 };
 
 export function deepFreeze(o: any) {

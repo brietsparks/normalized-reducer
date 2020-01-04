@@ -1,13 +1,13 @@
 import {
   AbstractEntityState,
   AbstractState,
-  Action,
+  OpAction,
   ActionTypes, AddRelIdOp, AddResourceOp, Cardinalities,
   DeriveActionWithOps,
   EntityReducer,
   EntityReducers, MoveRelIdOp, Op,
   OpTypes, RemoveRelIdOp,
-  RemoveResourceOp,
+  RemoveResourceOp, Action, SetStateAction, SetEntityState, SetResourceState, SetRelState,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
 import { arrayMove, arrayPut, deepFreeze } from './util';
@@ -24,14 +24,76 @@ export const makeReducer = <S extends AbstractState>(
     return reducers;
   }, {});
 
-  return (state: S = schema.getEmptyState(), anyAction: { type: string }) => {
+  return (state: S = schema.getEmptyState(), anyAction: Action) => {
     if (!Object.values(actionTypes).includes(anyAction.type)) {
       return state;
     }
 
-    const action = anyAction as Action;
+    //
+    // handle state setter actions
+    //
 
-    const actionWithOps = transformAction(state, action);
+    if (anyAction.type === actionTypes.SET_STATE) {
+      const action = anyAction as SetStateAction<S>;
+      return action.state;
+    }
+
+    if (anyAction.type === actionTypes.SET_ENTITY_STATE) {
+      const action = anyAction as SetEntityState;
+
+      if (!schema.entityExists(action.entity)) {
+        return state;
+      }
+
+      return {
+        ...state,
+        [action.entity]: action.state
+      };
+    }
+
+    if (anyAction.type === actionTypes.SET_RESOURCE_STATE) {
+      const action = anyAction as SetResourceState;
+
+      if (!schema.entityExists(action.entity)) {
+        return state;
+      }
+
+      return {
+        ...state,
+        [action.entity]: {
+          ...state[action.entity],
+          [action.id]: action.state
+        }
+      };
+    }
+
+    if (anyAction.type === actionTypes.SET_REL_STATE) {
+      const action = anyAction as SetRelState;
+
+      if (!schema.entityExists(action.entity)) {
+        return state;
+      }
+
+      const resource = state[action.entity][action.id] || {};
+
+      return {
+        ...state,
+        [action.entity]: {
+          ...state[action.entity],
+          [action.id]: {
+            ...resource,
+            [action.rel]: action.state,
+          }
+        }
+      };
+    }
+
+    //
+    // handle entity operations
+    //
+
+    const opAction = anyAction as OpAction;
+    const actionWithOps = transformAction(state, opAction);
 
     return Object.keys(entityReducers).reduce((reducedState: S, entity: string) => {
       const newReducedState = {...reducedState};

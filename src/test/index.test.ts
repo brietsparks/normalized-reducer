@@ -1038,6 +1038,95 @@ describe('index', () => {
     });
   });
 
+  test('set state', () => {
+    const state = {
+      ...forumEmptyState,
+      account: {
+        'a1': { profileId: 'p1' }
+      },
+      profile: {
+        'p1': { accountId: 'a1' }
+      }
+    };
+
+    const result = forumReducer(undefined, forumActionCreators.setState(state));
+
+    expect(result).toEqual(state);
+  });
+
+  test('set entity state', () => {
+    [undefined, forumEmptyState].forEach(state => {
+      const entityState = {
+        'a1': { profileId: 'p1' }
+      };
+
+      const result = forumReducer(state, forumActionCreators.setEntityState(
+        ForumEntities.ACCOUNT, entityState
+      ));
+
+      const expected = {
+        ...forumEmptyState,
+        account: {
+          'a1': { profileId: 'p1' }
+        },
+      };
+
+      expect(result).toEqual(expected);
+    });
+  });
+
+  test('set resource state', () => {
+    [undefined, forumEmptyState].forEach(state => {
+      const resourceState = {
+        profileId: 'p200', categoryIds: ['c1']
+      };
+
+      const result = forumReducer(state, forumActionCreators.setResourceState(
+        ForumEntities.POST, 'o1', resourceState
+      ));
+
+      const expected = {
+        ...forumEmptyState,
+        post: {
+          'o1': { profileId: 'p200', categoryIds: ['c1'] }
+        }
+      };
+
+      expect(result).toEqual(expected);
+    });
+  });
+
+  test('set rel state', () => {
+    [undefined, forumEmptyState].forEach(state => {
+      const result = forumReducer(state, forumActionCreators.setRelState(
+        ForumEntities.POST, 'o1', 'categoryIds', ['c1']
+      ));
+
+      const expected = {
+        ...forumEmptyState,
+        post: {
+          'o1': { categoryIds: ['c1'] }
+        }
+      };
+
+      expect(result).toEqual(expected);
+    });
+  });
+
+  test('state setters: if entity is invalid, then ignore', () => {
+    [
+      forumReducer(forumEmptyState, forumActionCreators.setEntityState(
+        'chicken', { 'k1': { profileId: 'p1' } }
+      )),
+      forumReducer(forumEmptyState, forumActionCreators.setResourceState(
+        'chicken', 'k1', { profileId: 'p200', categoryIds: ['c1'] }
+      )),
+      forumReducer(forumEmptyState, forumActionCreators.setRelState(
+        'chicken', 'k1', 'categoryIds', ['c1'],
+      )),
+    ].forEach(result => expect(result).toEqual(forumEmptyState));
+  });
+
   describe('batched actions', () => {
     // test that opposing actions negate each other's effects
 

@@ -36,7 +36,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
   const SET_REL_STATE = namespaced('SET_REL_STATE');
 
   const entityExists = (entity: string) => schema.entityExists(entity);
-  const relExists = (entity: string, rel: string) => schema.entity(entity).relExists(rel);
+  const relExists = (entity: string, rel: string) => schema.entity(entity)?.relExists(rel);
 
   const add = (
     entity: string,
@@ -146,7 +146,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     };
   };
 
-  const setStateAction = (state: S) => ({ type: SET_STATE, state });
+  const setState = (state: S) => ({ type: SET_STATE, state });
 
   const setEntityState = (entity: string, state: AbstractEntityState) => {
     if (!entityExists(entity)) {
@@ -209,7 +209,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       attach,
       detach,
       moveAttached,
-      setStateAction,
+      setState,
       setEntityState,
       setResourceState,
       setRelState,

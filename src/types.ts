@@ -99,17 +99,20 @@ export interface MoveAttachedPayload {
 
 export interface Action {
   type: string,
+}
+
+export interface OpAction extends Action {
   entity: string,
   id: string,
   ops?: Op[],
 }
 
 // actions
-export type AddAction = Action & AddPayload;
-export type RemoveAction = Action & RemovePayload;
-export type AttachAction = Action & AttachPayload;
-export type DetachAction = Action & DetachPayload;
-export type MoveAttachedAction = Action & MoveAttachedPayload;
+export type AddAction = OpAction & AddPayload;
+export type RemoveAction = OpAction & RemovePayload;
+export type AttachAction = OpAction & AttachPayload;
+export type DetachAction = OpAction & DetachPayload;
+export type MoveAttachedAction = OpAction & MoveAttachedPayload;
 
 export interface SetStateAction<T extends AbstractState> {
   type: string,
@@ -166,7 +169,7 @@ export interface ActionCreators<T extends AbstractState> {
   attach: AttachActionCreator,
   detach: DetachActionCreator,
   moveAttached: MoveAttachedActionCreator,
-  setStateAction: SetStateActionCreator<T>,
+  setState: SetStateActionCreator<T>,
   setEntityState: SetEntityStateCreator,
   setResourceState: SetResourceStateCreator,
   setRelState: SetRelStateCreator,
@@ -211,7 +214,7 @@ export type AbstractRelDataState = undefined | string | string[]
 // selector types
 //
 
-export type DeriveActionWithOps <S extends AbstractState> = (state: S, action: Action) => Action;
+export type DeriveActionWithOps <S extends AbstractState> = (state: S, action: OpAction) => OpAction;
 export type CheckResource <S extends AbstractState> = (state: S, args: { entity: string, id: string }) => boolean;
 export type GetAttached <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
 export type GetArr <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]

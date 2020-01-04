@@ -1,7 +1,7 @@
 import { ModelSchemaReader } from './schema';
 import {
   AbstractState,
-  Action,
+  OpAction,
   ActionCreators,
   ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
@@ -18,7 +18,7 @@ export const makeActionTransformer = <S extends AbstractState> (
   actionTypes: ActionTypes,
   selectors: Selectors<S>
 ): DeriveActionWithOps<S> => {
-  return (state: S, action: Action): Action => {
+  return (state: S, action: OpAction): OpAction => {
     const pendingState = new Batcher<S>(schema, state, selectors);
 
     const entitySchema = schema.entity(action.entity);
