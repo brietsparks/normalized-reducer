@@ -102,8 +102,6 @@ export interface Action {
 }
 
 export interface OpAction extends Action {
-  entity: string,
-  id: string,
   ops?: Op[],
 }
 
@@ -114,9 +112,21 @@ export type AttachAction = OpAction & AttachPayload;
 export type DetachAction = OpAction & DetachPayload;
 export type MoveAttachedAction = OpAction & MoveAttachedPayload;
 
-export interface SetStateAction<T extends AbstractState> {
+export type ConcreteOpAction =
+  AddAction |
+  RemoveAction |
+  AttachAction |
+  DetachAction |
+  MoveAttachedAction;
+
+export interface BatchAction extends Action {
+  actions: ConcreteOpAction[],
+  ops?: Op[],
+}
+
+export interface SetStateAction<S extends AbstractState> {
   type: string,
-  state: T
+  state: S
 }
 
 export interface SetEntityState {
@@ -146,6 +156,7 @@ export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
 export type MoveAttachedActionCreator = (entity: string, id: string, rel: string, src: number, dest: number) => MoveAttachedAction;
+export type BatchActionCreator = (...actions: ConcreteOpAction[]) => BatchAction;
 export type SetStateActionCreator <T extends AbstractState> = (state: T) => SetStateAction<T>;
 export type SetEntityStateCreator = (entity: string, state: AbstractEntityState) => SetEntityState;
 export type SetResourceStateCreator = (entity: string, id: string, state: AbstractResourceState) => SetResourceState;
@@ -157,6 +168,7 @@ export interface ActionTypes {
   ATTACH: string,
   DETACH: string,
   MOVE_ATTACHED: string,
+  BATCH: string
   SET_STATE: string,
   SET_ENTITY_STATE: string,
   SET_RESOURCE_STATE: string,
@@ -169,6 +181,7 @@ export interface ActionCreators<T extends AbstractState> {
   attach: AttachActionCreator,
   detach: DetachActionCreator,
   moveAttached: MoveAttachedActionCreator,
+  batch: BatchActionCreator,
   setState: SetStateActionCreator<T>,
   setEntityState: SetEntityStateCreator,
   setResourceState: SetResourceStateCreator,

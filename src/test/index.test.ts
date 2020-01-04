@@ -1128,12 +1128,28 @@ describe('index', () => {
   });
 
   describe('batched actions', () => {
+    describe('basic', () => {
+      test('add multiple', () => {
+        const result = forumReducer(undefined, forumActionCreators.batch(
+          forumActionCreators.add(ForumEntities.ACCOUNT, 'a1'),
+          forumActionCreators.add(ForumEntities.ACCOUNT, 'a2'),
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: undefined },
+            'a2': { profileId: undefined }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+    });
+
     // test that opposing actions negate each other's effects
-
     /*
-
     remove detaches resources that were attached previously in batch (add and attach)
-
     */
   });
 

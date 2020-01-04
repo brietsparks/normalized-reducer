@@ -6,7 +6,7 @@ import {
   ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
   RemoveAction,
-  Selectors
+  Selectors, BatchAction, Action
 } from './types';
 import { Batcher } from './batcher';
 import { makeAddResourceOp, makeMoveAttachedOp } from './ops';
@@ -18,10 +18,24 @@ export const makeActionTransformer = <S extends AbstractState> (
   actionTypes: ActionTypes,
   selectors: Selectors<S>
 ): DeriveActionWithOps<S> => {
-  return (state: S, action: OpAction): OpAction => {
-    const pendingState = new Batcher<S>(schema, state, selectors);
+  const transformAction = (state: S, action: Action, batcher?: Batcher<S>): OpAction => {
+    const pendingState = batcher || new Batcher<S>(schema, state, selectors);
 
-    const entitySchema = schema.entity(action.entity);
+    if (action.type === actionTypes.BATCH) {
+      const batchAction = action as BatchAction;
+
+      batchAction.ops = batchAction.actions.reduce((ops, action) => {
+        const transformedAction = transformAction(state, action, batcher);
+
+        if (transformedAction.ops) {
+          ops.push(...transformedAction.ops);
+        }
+
+        return ops;
+      }, [] as Op[]);
+
+      return batchAction;
+    }
 
     if (action.type === actionTypes.ADD) {
       const addAction = action as AddAction;
@@ -101,4 +115,6 @@ export const makeActionTransformer = <S extends AbstractState> (
 
     return action;
   };
+
+  return transformAction;
 };

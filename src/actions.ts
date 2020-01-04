@@ -11,7 +11,7 @@ import {
   AbstractState,
   AbstractResourceState,
   AbstractRelDataState,
-  AbstractEntityState,
+  AbstractEntityState, ConcreteOpAction,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -30,6 +30,8 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
   const ATTACH = namespaced('ATTACH');
   const DETACH = namespaced('DETACH');
   const MOVE_ATTACHED = namespaced('MOVE_ATTACHED');
+  const BATCH = namespaced('BATCH');
+
   const SET_STATE = namespaced('SET_STATE');
   const SET_ENTITY_STATE = namespaced('SET_ENTITY_STATE');
   const SET_RESOURCE_STATE = namespaced('SET_RESOURCE_STATE');
@@ -146,6 +148,13 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     };
   };
 
+  const batch = (...actions: ConcreteOpAction[]) => {
+    return {
+      type: BATCH,
+      actions
+    };
+  };
+
   const setState = (state: S) => ({ type: SET_STATE, state });
 
   const setEntityState = (entity: string, state: AbstractEntityState) => {
@@ -198,6 +207,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       ATTACH,
       DETACH,
       MOVE_ATTACHED,
+      BATCH,
       SET_STATE,
       SET_ENTITY_STATE,
       SET_RESOURCE_STATE,
@@ -209,6 +219,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       attach,
       detach,
       moveAttached,
+      batch,
       setState,
       setEntityState,
       setResourceState,
