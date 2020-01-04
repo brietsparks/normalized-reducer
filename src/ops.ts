@@ -1,4 +1,4 @@
-import { AddRelIdOp, AddResourceOp, OpTypes, RemoveRelIdOp, RemoveResourceOp } from './types';
+import { AddRelIdOp, AddResourceOp, MoveRelIdOp, OpTypes, RemoveRelIdOp, RemoveResourceOp } from './types';
 
 export const makeAddResourceOp = (entity: string, id: string): AddResourceOp => {
   return {
@@ -40,5 +40,16 @@ export const makeRemoveRelIdOp = (entity: string, id: string, rel: string, relId
     id,
     rel,
     relId,
+  };
+};
+
+export const makeMoveAttachedOp = (entity: string, id: string, rel: string, src: number, dest:number): MoveRelIdOp => {
+  return {
+    opType: OpTypes.MOVE_REL_ID,
+    entity,
+    id,
+    rel,
+    src,
+    dest,
   };
 };

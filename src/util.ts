@@ -7,6 +7,12 @@ export const arrayPut = <T>(array: T[], item: T, index?: number) => {
     : array.splice(index, 0, item);
 };
 
+export function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
+  const element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+}
+
 export const defaultNamespaced = (actionType: string) => `relational/${actionType}`;
 
 export const defaultInvalidEntityHandler = (entity: string) => {

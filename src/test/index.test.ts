@@ -954,6 +954,90 @@ describe('index', () => {
     });
   });
 
+  describe('move attached id', () => {
+    /*
+    move attached id
+    if resource does not exist, then ignore
+    if resource does not exist or does not have rel key, then ignore
+    if resource has cardinality of one, then ignore
+    */
+
+    test('move attached id', () => {
+      const state = {
+        ...forumEmptyState,
+        post: {
+          'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
+        },
+        category: {
+          'c1': { postIds: ['o1'] },
+          'c2': { postIds: ['o1'] },
+          'c3': { postIds: ['o1'] },
+          'c4': { postIds: ['o1'] },
+          'c5': { postIds: ['o1'] },
+        }
+      };
+
+      const result = forumReducer(state, forumActionCreators.moveAttached(
+        ForumEntities.POST,
+        'o1',
+        'categoryIds',
+        1, 3
+      ));
+
+      const expected =  {
+        ...forumEmptyState,
+        post: {
+          'o1': { categoryIds: ['c1', 'c3', 'c4', 'c2', 'c5'] }
+        },
+        category: {
+          'c1': { postIds: ['o1'] },
+          'c2': { postIds: ['o1'] },
+          'c3': { postIds: ['o1'] },
+          'c4': { postIds: ['o1'] },
+          'c5': { postIds: ['o1'] },
+        }
+      };
+
+      expect(result).toEqual(expected);
+    });
+
+    test('if resource does not exist or does not have rel key, then ignore', () => {
+      const state = {
+        ...forumEmptyState,
+        post: {
+          'o1': {}
+        }
+      };
+
+      [
+        forumReducer(state, forumActionCreators.moveAttached(
+          ForumEntities.POST, 'o2', 'categoryIds', 1, 3
+        )),
+        forumReducer(state, forumActionCreators.moveAttached(
+          ForumEntities.POST, 'o1', 'categoryIds', 1, 3
+        ))
+      ].forEach(result => expect(result).toEqual(state));
+    });
+
+    test('if rel is cardinality of one, then ignore', () => {
+      const state = {
+        ...forumEmptyState,
+        account: {
+          'a1': { profileId: 'p1' }
+        },
+        profile: {
+          'p1': { accountId: 'a1' }
+        }
+      };
+
+      const result = forumReducer(state, forumActionCreators.moveAttached(
+        ForumEntities.ACCOUNT, 'a1', 'profileId', 0, 3
+      ));
+
+      expect(result).toEqual(state);
+    });
+  });
+
   describe('batched actions', () => {
     // test that opposing actions negate each other's effects
 

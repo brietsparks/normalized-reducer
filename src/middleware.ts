@@ -4,12 +4,12 @@ import {
   Action,
   ActionCreators,
   ActionTypes, AddAction, AttachAction,
-  DeriveActionWithOps, DetachAction, Op,
+  DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
   RemoveAction,
   Selectors
 } from './types';
 import { Batcher } from './batcher';
-import { makeAddResourceOp } from './ops';
+import { makeAddResourceOp, makeMoveAttachedOp } from './ops';
 
 // makeActionTransformer is a selector that should be used to
 // intercept an action before it gets handled by the entity reducer(s)
@@ -88,6 +88,15 @@ export const makeActionTransformer = <S extends AbstractState> (
       detachAction.ops = pendingState.getAll();
 
       return detachAction;
+    }
+
+    if (action.type === actionTypes.MOVE_ATTACHED) {
+      const moveAttachedAction = action as MoveAttachedAction;
+      const { entity, id, rel, src, dest } = moveAttachedAction;
+
+      moveAttachedAction.ops = [makeMoveAttachedOp(entity, id, rel, src, dest)];
+
+      return moveAttachedAction;
     }
 
     return action;

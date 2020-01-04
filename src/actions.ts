@@ -25,6 +25,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
   const REMOVE = namespaced('REMOVE');
   const ATTACH = namespaced('ATTACH');
   const DETACH = namespaced('DETACH');
+  const MOVE_ATTACHED = namespaced('MOVE_ATTACHED');
 
   const entityExists = (entity: string) => schema.entityExists(entity);
   const relExists = (entity: string, rel: string) => schema.entity(entity).relExists(rel);
@@ -118,18 +119,39 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     }
   };
 
+  const moveAttached = (entity: string, id: string, rel: string, src: number, dest: number) => {
+    if (!entityExists(entity)) {
+      onInvalidEntity(entity);
+    }
+
+    if (!relExists(entity, rel)) {
+      onInvalidEntity(entity);
+    }
+
+    return {
+      type: MOVE_ATTACHED,
+      entity,
+      id,
+      rel,
+      src,
+      dest
+    };
+  };
+
   return {
     types: {
       ADD,
       REMOVE,
       ATTACH,
       DETACH,
+      MOVE_ATTACHED,
     },
     creators: {
       add,
       remove,
       attach,
       detach,
+      moveAttached,
     }
   }
 };

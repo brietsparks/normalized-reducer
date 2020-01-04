@@ -5,12 +5,12 @@ import {
   ActionTypes, AddRelIdOp, AddResourceOp, Cardinalities,
   DeriveActionWithOps,
   EntityReducer,
-  EntityReducers, Op,
+  EntityReducers, MoveRelIdOp, Op,
   OpTypes, RemoveRelIdOp,
   RemoveResourceOp,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
-import { arrayPut, deepFreeze } from './util';
+import { arrayMove, arrayPut, deepFreeze } from './util';
 
 export const makeReducer = <S extends AbstractState>(
   schema: ModelSchemaReader<S>,
@@ -124,11 +124,7 @@ export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchema
 
         let resource = state[id];
 
-        if (!resource) {
-          return state;
-        }
-
-        if (!resource.hasOwnProperty(rel)) {
+        if (!resource || !resource.hasOwnProperty(rel)) {
           return state;
         }
 
@@ -150,6 +146,30 @@ export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchema
           [id]: {
             ...state[id],
             [rel]: relState.filter(existingRelId => existingRelId !== relId)
+          }
+        };
+      }
+
+      if (op.opType === OpTypes.MOVE_REL_ID) {
+        const { id, rel, src, dest } = op as MoveRelIdOp;
+
+        const cardinality = schema.getCardinality(rel);
+
+        let resource = state[id];
+
+        if (!resource || !resource.hasOwnProperty(rel) || cardinality === Cardinalities.ONE) {
+          return state;
+        }
+
+        let relState = state[id][rel] as string[];
+        relState = [...relState];
+        arrayMove(relState, src, dest);
+
+        return {
+          ...state,
+          [id]: {
+            ...state[id],
+            [rel]: relState
           }
         };
       }

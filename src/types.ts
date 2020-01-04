@@ -7,6 +7,7 @@ export enum OpTypes {
   REMOVE_RESOURCE = 'REMOVE_RESOURCE',
   ADD_REL_ID = 'ADD_REL_ID',
   REMOVE_REL_ID = 'REMOVE_REL_ID',
+  MOVE_REL_ID = 'MOVE_REL_ID',
 }
 
 export interface Op {
@@ -33,6 +34,12 @@ export interface AddRelIdOp extends Op {
 export interface RemoveRelIdOp extends Op {
   rel: string,
   relId?: string,
+}
+
+export interface MoveRelIdOp extends Op {
+  rel: string,
+  src: number,
+  dest: number,
 }
 
 //
@@ -78,22 +85,13 @@ export interface DetachPayload {
   relId: string,
 }
 
-export interface AddBatchPayload {
-  items: AddPayload[]
+export interface MoveAttachedPayload {
+  entity: string,
+  id: string,
+  rel: string,
+  src: number,
+  dest: number,
 }
-
-export interface RemoveBatchPayload {
-  items: RemovePayload[]
-}
-
-export interface AttachBatchPayload {
-  items: AttachPayload[]
-}
-
-export interface DetachBatchPayload {
-  items: DetachPayload[]
-}
-
 
 //
 // Action: a request object that is an argument to the reducer
@@ -111,18 +109,21 @@ export type AddAction = Action & AddPayload;
 export type RemoveAction = Action & RemovePayload;
 export type AttachAction = Action & AttachPayload;
 export type DetachAction = Action & DetachPayload;
+export type MoveAttachedAction = Action & MoveAttachedPayload;
 
 // action creators
 export type AddActionCreator = (entity: string, id: string, attach?: AddPayloadAttachable[], options?: AddPayloadOptions) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
-export type DetachActionCreator = (entity: string, id: string, relKey: string, relId: string) => DetachAction;
+export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
+export type MoveAttachedActionCreator = (entity: string, id: string, rel: string, src: number, dest: number) => MoveAttachedAction;
 
 export interface ActionTypes {
   ADD: string,
   REMOVE: string,
   ATTACH: string,
   DETACH: string,
+  MOVE_ATTACHED: string,
 }
 
 export interface ActionCreators {
@@ -130,6 +131,7 @@ export interface ActionCreators {
   remove: RemoveActionCreator,
   attach: AttachActionCreator,
   detach: DetachActionCreator,
+  moveAttached: MoveAttachedActionCreator,
 }
 
 //
