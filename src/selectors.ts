@@ -21,7 +21,7 @@ export interface Opts {
 
 export const makeSelectors = <S extends AbstractState> (
   schema: ModelSchemaReader<S>,
-  actionCreators: ActionCreators,
+  actionCreators: ActionCreators<S>,
   {
     onInvalidEntity = noop,
     onNonexistentResource = noop,

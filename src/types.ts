@@ -111,12 +111,42 @@ export type AttachAction = Action & AttachPayload;
 export type DetachAction = Action & DetachPayload;
 export type MoveAttachedAction = Action & MoveAttachedPayload;
 
+export interface SetStateAction<T extends AbstractState> {
+  type: string,
+  state: T
+}
+
+export interface SetEntityState {
+  type: string,
+  entity: string,
+  state: AbstractEntityState
+}
+
+export interface SetResourceState {
+  type: string,
+  entity: string,
+  id: string,
+  state: AbstractResourceState
+}
+
+export interface SetRelState {
+  type: string,
+  entity: string,
+  id: string,
+  rel: string,
+  state: AbstractRelDataState
+}
+
 // action creators
 export type AddActionCreator = (entity: string, id: string, attach?: AddPayloadAttachable[], options?: AddPayloadOptions) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
 export type MoveAttachedActionCreator = (entity: string, id: string, rel: string, src: number, dest: number) => MoveAttachedAction;
+export type SetStateActionCreator <T extends AbstractState> = (state: T) => SetStateAction<T>;
+export type SetEntityStateCreator = (entity: string, state: AbstractEntityState) => SetEntityState;
+export type SetResourceStateCreator = (entity: string, id: string, state: AbstractResourceState) => SetResourceState;
+export type SetRelStateCreator = (entity: string, id: string, rel: string, state: AbstractRelDataState) => SetRelState;
 
 export interface ActionTypes {
   ADD: string,
@@ -124,14 +154,22 @@ export interface ActionTypes {
   ATTACH: string,
   DETACH: string,
   MOVE_ATTACHED: string,
+  SET_STATE: string,
+  SET_ENTITY_STATE: string,
+  SET_RESOURCE_STATE: string,
+  SET_REL_STATE: string,
 }
 
-export interface ActionCreators {
+export interface ActionCreators<T extends AbstractState> {
   add: AddActionCreator,
   remove: RemoveActionCreator,
   attach: AttachActionCreator,
   detach: DetachActionCreator,
   moveAttached: MoveAttachedActionCreator,
+  setStateAction: SetStateActionCreator<T>,
+  setEntityState: SetEntityStateCreator,
+  setResourceState: SetResourceStateCreator,
+  setRelState: SetRelStateCreator,
 }
 
 //

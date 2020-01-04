@@ -7,7 +7,11 @@ import {
   ActionTypes,
   ActionCreators,
   RemoveAction,
-  InvalidRelHandler, AbstractState,
+  InvalidRelHandler,
+  AbstractState,
+  AbstractResourceState,
+  AbstractRelDataState,
+  AbstractEntityState,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -18,7 +22,7 @@ interface Opts {
   onInvalidRel: InvalidRelHandler,
 }
 
-export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S>, opts: Opts): { types: ActionTypes, creators: ActionCreators } => {
+export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S>, opts: Opts): { types: ActionTypes, creators: ActionCreators<S> } => {
   const { namespaced, onInvalidEntity, onInvalidRel } = opts;
 
   const ADD = namespaced('ADD');
@@ -26,6 +30,10 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
   const ATTACH = namespaced('ATTACH');
   const DETACH = namespaced('DETACH');
   const MOVE_ATTACHED = namespaced('MOVE_ATTACHED');
+  const SET_STATE = namespaced('SET_STATE');
+  const SET_ENTITY_STATE = namespaced('SET_ENTITY_STATE');
+  const SET_RESOURCE_STATE = namespaced('SET_RESOURCE_STATE');
+  const SET_REL_STATE = namespaced('SET_REL_STATE');
 
   const entityExists = (entity: string) => schema.entityExists(entity);
   const relExists = (entity: string, rel: string) => schema.entity(entity).relExists(rel);
@@ -82,7 +90,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     }
 
     if (!relExists(entity, rel)) {
-      onInvalidEntity(entity);
+      onInvalidRel(entity, rel);
     }
 
     return {
@@ -107,7 +115,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     }
 
     if (!relExists(entity, rel)) {
-      onInvalidEntity(entity);
+      onInvalidRel(entity, rel);
     }
 
     return {
@@ -125,7 +133,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     }
 
     if (!relExists(entity, rel)) {
-      onInvalidEntity(entity);
+      onInvalidRel(entity, rel);
     }
 
     return {
@@ -138,6 +146,51 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     };
   };
 
+  const setStateAction = (state: S) => ({ type: SET_STATE, state });
+
+  const setEntityState = (entity: string, state: AbstractEntityState) => {
+    if (!entityExists(entity)) {
+      onInvalidEntity(entity);
+    }
+
+    return {
+      type: SET_ENTITY_STATE,
+      entity,
+      state
+    }
+  };
+
+  const setResourceState = (entity: string, id: string, state: AbstractResourceState) => {
+    if (!entityExists(entity)) {
+      onInvalidEntity(entity);
+    }
+
+    return {
+      type: SET_RESOURCE_STATE,
+      entity,
+      id,
+      state
+    }
+  };
+
+  const setRelState = (entity: string, id: string, rel: string, state: AbstractRelDataState) => {
+    if (!entityExists(entity)) {
+      onInvalidEntity(entity);
+    }
+
+    if (!relExists(entity, rel)) {
+      onInvalidRel(entity, rel);
+    }
+
+    return {
+      type: SET_REL_STATE,
+      entity,
+      id,
+      rel,
+      state
+    }
+  };
+
   return {
     types: {
       ADD,
@@ -145,6 +198,10 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       ATTACH,
       DETACH,
       MOVE_ATTACHED,
+      SET_STATE,
+      SET_ENTITY_STATE,
+      SET_RESOURCE_STATE,
+      SET_REL_STATE,
     },
     creators: {
       add,
@@ -152,6 +209,10 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       attach,
       detach,
       moveAttached,
+      setStateAction,
+      setEntityState,
+      setResourceState,
+      setRelState,
     }
   }
 };
