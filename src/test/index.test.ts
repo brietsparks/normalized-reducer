@@ -1129,7 +1129,7 @@ describe('index', () => {
 
   describe('batched actions', () => {
     describe('basic', () => {
-      test('add multiple', () => {
+      test('add-actions', () => {
         const result = forumReducer(undefined, forumActionCreators.batch(
           forumActionCreators.add(ForumEntities.ACCOUNT, 'a1'),
           forumActionCreators.add(ForumEntities.ACCOUNT, 'a2'),
@@ -1145,12 +1145,137 @@ describe('index', () => {
 
         expect(result).toEqual(expected);
       });
+
+      test('remove-actions', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            'a1': {},
+            'a2': {},
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.batch(
+          forumActionCreators.remove(ForumEntities.ACCOUNT, 'a1'),
+          forumActionCreators.remove(ForumEntities.ACCOUNT, 'a2'),
+        ));
+
+        expect(result).toEqual(forumEmptyState);
+      });
+
+      test('attach-actions', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            'a1': {},
+          },
+          profile: {
+            'p1': {},
+          },
+          post: {
+            'o1': {}
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.batch(
+          forumActionCreators.attach(ForumEntities.ACCOUNT, 'a1', 'profileId', 'p1'),
+          forumActionCreators.attach(ForumEntities.PROFILE, 'p1', 'postIds', 'o1'),
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: 'p1' },
+          },
+          profile: {
+            'p1': { accountId: 'a1', postIds: ['o1'] },
+          },
+          post: {
+            'o1': { profileId: 'p1' }
+          }
+        };
+
+         expect(result).toEqual(expected);
+      });
+
+      test('detach-actions', () => {
+        const state = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: 'p1' },
+          },
+          profile: {
+            'p1': { accountId: 'a1', postIds: ['o1'] },
+          },
+          post: {
+            'o1': { profileId: 'p1' },
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.batch(
+          forumActionCreators.detach(ForumEntities.ACCOUNT, 'a1', 'profileId', 'p1'),
+          forumActionCreators.detach(ForumEntities.PROFILE, 'p1', 'postIds', 'o1'),
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { profileId: undefined },
+          },
+          profile: {
+            'p1': { accountId: undefined, postIds: [] },
+          },
+          post: {
+            'o1': { profileId: undefined },
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('move-attached actions', () => {
+        const state = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+            'c2': { postIds: ['o1'] },
+            'c3': { postIds: ['o1'] },
+            'c4': { postIds: ['o1'] },
+            'c5': { postIds: ['o1'] },
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.batch(
+          forumActionCreators.moveAttached(ForumEntities.POST, 'o1', 'categoryIds', 1, 3),
+          forumActionCreators.moveAttached(ForumEntities.POST, 'o1', 'categoryIds', 0, 1),
+        ));
+
+        const expected = {
+          ...forumEmptyState,
+          post: {
+            'o1': { categoryIds: ['c3', 'c1', 'c4', 'c2', 'c5'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+            'c2': { postIds: ['o1'] },
+            'c3': { postIds: ['o1'] },
+            'c4': { postIds: ['o1'] },
+            'c5': { postIds: ['o1'] },
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
     });
 
-    // test that opposing actions negate each other's effects
-    /*
-    remove detaches resources that were attached previously in batch (add and attach)
-    */
+    describe('opposing operations negate eachother', () => {
+      /*
+      remove detaches resources that were attached previously in batch (add and attach)
+      */
+    });
   });
 
   describe('actions on self referencing schema', () => {
