@@ -1,10 +1,11 @@
 import { AddRelIdOp, AddResourceOp, MoveRelIdOp, OpTypes, RemoveRelIdOp, RemoveResourceOp } from './types';
 
-export const makeAddResourceOp = (entity: string, id: string): AddResourceOp => {
+export const makeAddResourceOp = (entity: string, id: string, data?: object): AddResourceOp => {
   return {
     opType: OpTypes.ADD_RESOURCE,
     entity,
-    id
+    id,
+    data,
   };
 };
 

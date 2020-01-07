@@ -18,6 +18,7 @@ export interface Op {
 
 export interface AddResourceOp extends Op {
   opType: OpTypes.ADD_RESOURCE,
+  data?: object,
 }
 
 export interface RemoveResourceOp extends Op {
@@ -58,7 +59,7 @@ export interface OpAction extends Action {
 export interface AddAction extends OpAction {
   entity: string,
   id: string,
-  data?: any,
+  data?: object,
   attach?: AddAttachable[],
   index?: number,
 }
@@ -138,7 +139,7 @@ export interface SetRelState {
 }
 
 // action creators
-export type AddActionCreator = (entity: string, id: string, data?: any, attach?: AddAttachable[], index?: number) => AddAction;
+export type AddActionCreator = (entity: string, id: string, data?: object, attach?: AddAttachable[], index?: number) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;

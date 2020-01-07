@@ -42,7 +42,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
   const add = (
     entity: string,
     id: string,
-    data?: any,
+    data?: { [key: string]: any },
     attach?: AddAttachable[],
     index?: number,
   ): AddAction => {
@@ -56,11 +56,20 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       }
     });
 
+    const cleanedData = typeof data === 'object'
+      ? Object.keys(data).reduce((cleanData, key) => {
+        if (!relExists(entity, key)) {
+          cleanData[key] = data[key];
+        }
+        return cleanData;
+      }, {} as { [key: string]: any })
+      : undefined;
+
     return {
       type: ADD,
       entity,
       id,
-      data,
+      data: cleanedData,
       attach,
       index,
     };

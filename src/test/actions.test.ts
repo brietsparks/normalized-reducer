@@ -18,7 +18,7 @@ describe('actions', () => {
         const result = blogActionCreators.add(
           'author',
           'a1',
-          { name: 'Jar Jar' },
+          { name: 'Jar Jar', articleIds: ['bad data!'] },
           [
             {
               rel: 'articleIds',
