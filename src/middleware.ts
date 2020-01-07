@@ -2,14 +2,13 @@ import { ModelSchemaReader } from './schema';
 import {
   AbstractState,
   OpAction,
-  ActionCreators,
   ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
   RemoveAction,
   Selectors, BatchAction, Action
 } from './types';
-import { Batcher } from './batcher';
-import { makeAddResourceOp, makeMoveAttachedOp } from './ops';
+import { PendingState } from './state';
+import { makeMoveAttachedOp } from './ops';
 
 // makeActionTransformer is a selector that should be used to
 // intercept an action before it gets handled by the entity reducer(s)
@@ -18,14 +17,14 @@ export const makeActionTransformer = <S extends AbstractState> (
   actionTypes: ActionTypes,
   selectors: Selectors<S>
 ): DeriveActionWithOps<S> => {
-  const transformAction = (state: S, action: Action, batcher?: Batcher<S>): OpAction => {
-    const pendingState = batcher || new Batcher<S>(schema, state, selectors);
+  const transformAction = (state: S, action: Action, pending?: PendingState<S>): OpAction => {
+    const pendingState = pending || new PendingState<S>(schema, state, selectors);
 
     if (action.type === actionTypes.BATCH) {
       const batchAction = action as BatchAction;
 
       batchAction.ops = batchAction.actions.reduce((ops, action) => {
-        const transformedAction = transformAction(state, action, batcher);
+        const transformedAction = transformAction(state, action, pendingState);
 
         if (transformedAction.ops) {
           ops.push(...transformedAction.ops);
@@ -61,7 +60,7 @@ export const makeActionTransformer = <S extends AbstractState> (
         });
       }
 
-      addAction.ops = pendingState.getAll();
+      addAction.ops = pendingState.getOps();
 
       return addAction;
     }
@@ -77,7 +76,7 @@ export const makeActionTransformer = <S extends AbstractState> (
 
       pendingState.removeResource(entity, id);
 
-      removeAction.ops = pendingState.getAll();
+      removeAction.ops = pendingState.getOps();
 
       return removeAction;
     }
@@ -88,7 +87,7 @@ export const makeActionTransformer = <S extends AbstractState> (
 
       pendingState.attachResources(entity, id, rel, relId, index, reciprocalIndex);
 
-      attachAction.ops = pendingState.getAll();
+      attachAction.ops = pendingState.getOps();
 
       return attachAction;
     }
@@ -99,7 +98,7 @@ export const makeActionTransformer = <S extends AbstractState> (
 
       pendingState.detachResources(entity, id, rel, relId);
 
-      detachAction.ops = pendingState.getAll();
+      detachAction.ops = pendingState.getOps();
 
       return detachAction;
     }
