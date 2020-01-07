@@ -1,0 +1,5 @@
+describe('attributive-reducer', () => {
+  test('', () => {
+
+  });
+});
