@@ -4,6 +4,7 @@ import {
   InvalidEntityHandler,
   InvalidRelHandler, AbstractState,
 } from './types';
+
 import { ModelSchemaReader } from './schema';
 import { makeActions } from './actions';
 import { makeSelectors } from './selectors';
@@ -20,6 +21,8 @@ export interface Options {
   onInvalidEntity: InvalidEntityHandler,
   onInvalidRel: InvalidRelHandler,
 }
+
+export * from './types';
 
 export default function <S extends AbstractState>(
   schema: ModelSchema,

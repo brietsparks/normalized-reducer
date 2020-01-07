@@ -2,7 +2,11 @@
   "name": "relational-reducer",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "files": [
+    "/dist/"
+  ],
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "test": "jest --watchAll",
     "build": "tsc"
