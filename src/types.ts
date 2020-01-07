@@ -43,17 +43,6 @@ export interface MoveRelIdOp extends Op {
 }
 
 //
-// Payload: a body of domain data
-//
-
-export interface AddAttachable {
-  rel: string,
-  id: string,
-  index?: number,
-  reciprocalIndex?: number,
-}
-
-//
 // Action: a request object that is an argument to the reducer
 //
 
@@ -69,10 +58,19 @@ export interface OpAction extends Action {
 export interface AddAction extends OpAction {
   entity: string,
   id: string,
+  data?: any,
   attach?: AddAttachable[],
+  index?: number,
 }
 
-export interface  RemoveAction extends OpAction {
+export interface AddAttachable {
+  rel: string,
+  id: string,
+  index?: number,
+  reciprocalIndex?: number,
+}
+
+export interface RemoveAction extends OpAction {
   entity: string,
   id: string,
 }
@@ -140,7 +138,7 @@ export interface SetRelState {
 }
 
 // action creators
-export type AddActionCreator = (entity: string, id: string, attach?: AddAttachable[]) => AddAction;
+export type AddActionCreator = (entity: string, id: string, data?: any, attach?: AddAttachable[], index?: number) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;

@@ -70,7 +70,7 @@ describe('index', () => {
 
           const result = forumReducer(
             state,
-            forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+            forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', {}, [{
               rel: 'profileId',
               id: 'p1'
             }])
@@ -100,7 +100,7 @@ describe('index', () => {
 
             const result = forumReducer(
               state,
-              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', {}, [{
                 rel: 'profileId',
                 id: 'p1'
               }])
@@ -119,7 +119,7 @@ describe('index', () => {
 
             const result = forumReducer(
               state,
-              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', {}, [{
                 rel: 'profileId',
                 id: 'p1'
               }])
@@ -138,7 +138,7 @@ describe('index', () => {
 
             const result = forumReducer(
               state,
-              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [{
+              forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', {}, [{
                 rel: 'profileId',
                 id: 'p1',
                 index: 3,
@@ -161,7 +161,7 @@ describe('index', () => {
 
           const result = forumReducer(
             state,
-            forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', [
+            forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', {}, [
               { rel: 'profileId', id: 'p1' },
               { rel: 'profileId', id: 'p2' }
             ])
@@ -200,7 +200,7 @@ describe('index', () => {
 
             const result = forumReducer(
               state,
-              forumActionCreators.add(ForumEntities.CATEGORY, 'c200', [
+              forumActionCreators.add(ForumEntities.CATEGORY, 'c200', {}, [
                 { rel: 'postIds', id: 'o1' },
               ])
             );
@@ -239,7 +239,7 @@ describe('index', () => {
 
             const result = forumReducer(
               state,
-              forumActionCreators.add(ForumEntities.CATEGORY, 'c200', [
+              forumActionCreators.add(ForumEntities.CATEGORY, 'c200', {}, [
                 { rel: 'postIds', id: 'o1', reciprocalIndex: 1 },
               ])
             );
@@ -274,7 +274,7 @@ describe('index', () => {
 
             const result = forumReducer(
               state,
-              forumActionCreators.add(ForumEntities.CATEGORY, 'c1', [
+              forumActionCreators.add(ForumEntities.CATEGORY, 'c1', {}, [
                 { rel: 'postIds', id: 'o1' },
               ])
             );
@@ -317,7 +317,7 @@ describe('index', () => {
 
           const result = forumReducer(
             state,
-            forumActionCreators.add(ForumEntities.CATEGORY, 'c200', [
+            forumActionCreators.add(ForumEntities.CATEGORY, 'c200', {}, [
               { rel: 'postIds', id: 'o1', index: 1, },
               { rel: 'postIds', id: 'o2', index: 0, reciprocalIndex: 1 },
             ])

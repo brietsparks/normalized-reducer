@@ -18,6 +18,7 @@ describe('actions', () => {
         const result = blogActionCreators.add(
           'author',
           'a1',
+          { name: 'Jar Jar' },
           [
             {
               rel: 'articleIds',
@@ -36,6 +37,7 @@ describe('actions', () => {
           type: blogActionTypes.ADD,
           entity: 'author',
           id: 'a1',
+          data: { name: 'Jar Jar' },
           attach: [
             {
               rel: 'articleIds',

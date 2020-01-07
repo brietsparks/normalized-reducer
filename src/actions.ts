@@ -42,7 +42,9 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
   const add = (
     entity: string,
     id: string,
+    data?: any,
     attach?: AddAttachable[],
+    index?: number,
   ): AddAction => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
@@ -58,7 +60,9 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       type: ADD,
       entity,
       id,
+      data,
       attach,
+      index,
     };
   };
 
