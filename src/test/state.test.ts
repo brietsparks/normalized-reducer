@@ -1,36 +1,37 @@
-import { Batcher } from '../batcher';
+import { PendingState } from '../state';
 
 import { BlogState, blogState, blogModelSchemaReader, blogSelectors } from './test-cases/blog';
 import { makeAddRelIdOp, makeRemoveRelIdOp } from '../ops';
 
-describe('batcher', () => {
+describe('pendingState', () => {
   test('add-resource-op', () => {
-    const batcher = new Batcher(blogModelSchemaReader, blogState, blogSelectors);
+    const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
     // current state
-    expect(batcher.checkExistence('author', 'a1')).toEqual(true);
-    expect(batcher.checkExistence('article', 'r1')).toEqual(true);
+    expect(pendingState.checkExistence('author', 'a1')).toEqual(true);
+    expect(pendingState.checkExistence('article', 'r1')).toEqual(true);
 
     // modify the cache
-    expect(batcher.checkExistence('author', 'a9000')).toEqual(false);
-    batcher.addResource('author', 'a9000');
-    expect(batcher.checkExistence('author', 'a9000')).toEqual(true);
+    expect(pendingState.checkExistence('author', 'a9000')).toEqual(false);
+    pendingState.addResource('author', 'a9000');
+    expect(pendingState.checkExistence('author', 'a9000')).toEqual(true);
   });
 
   describe('attach/detach resources', () => {
     test('detach then attach', () => {
-      const batcher = new Batcher(blogModelSchemaReader, blogState, blogSelectors);
+      const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
 
       //
       // detach
       //
-      batcher.detachResources('author', 'a1', 'articleIds', 'r1');
-      expect(batcher.getAll()).toEqual([
+      pendingState.detachResources('author', 'a1', 'articleIds', 'r1');
+
+      expect(pendingState.getOps()).toEqual([
         makeRemoveRelIdOp('author', 'a1', 'articleIds', 'r1'),
         makeRemoveRelIdOp('article', 'r1', 'authorId', 'a1'),
       ]);
 
-      batcher.detachResources('article', 'r2', 'authorId', 'a1');
-      expect(batcher.getAll()).toEqual([
+      pendingState.detachResources('article', 'r2', 'authorId', 'a1');
+      expect(pendingState.getOps()).toEqual([
         makeRemoveRelIdOp('author', 'a1', 'articleIds', 'r1'),
         makeRemoveRelIdOp('article', 'r1', 'authorId', 'a1'),
         makeRemoveRelIdOp('article', 'r2', 'authorId', 'a1'),
@@ -40,8 +41,8 @@ describe('batcher', () => {
       //
       // detach
       //
-      batcher.attachResources('author', 'a1', 'articleIds', 'r1');
-      expect(batcher.getAll()).toEqual([
+      pendingState.attachResources('author', 'a1', 'articleIds', 'r1');
+      expect(pendingState.getOps()).toEqual([
         makeRemoveRelIdOp('article', 'r2', 'authorId', 'a1'),
         makeRemoveRelIdOp('author', 'a1', 'articleIds', 'r2'),
         makeAddRelIdOp('author', 'a1', 'articleIds', 'r1'),
@@ -60,19 +61,19 @@ describe('batcher', () => {
         },
       };
 
-      const batcher = new Batcher(blogModelSchemaReader, blogState, blogSelectors);
+      const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
 
       //
       // attach
       //
-      batcher.attachResources('author', 'a1', 'articleIds', 'r1');
-      expect(batcher.getAll()).toEqual([
+      pendingState.attachResources('author', 'a1', 'articleIds', 'r1');
+      expect(pendingState.getOps()).toEqual([
         makeAddRelIdOp('author', 'a1', 'articleIds', 'r1'),
         makeAddRelIdOp('article', 'r1', 'authorId', 'a1')
       ]);
 
-      batcher.attachResources('article', 'r2', 'authorId', 'a1');
-      expect(batcher.getAll()).toEqual([
+      pendingState.attachResources('article', 'r2', 'authorId', 'a1');
+      expect(pendingState.getOps()).toEqual([
         makeAddRelIdOp('author', 'a1', 'articleIds', 'r1'),
         makeAddRelIdOp('article', 'r1', 'authorId', 'a1'),
         makeAddRelIdOp('article', 'r2', 'authorId', 'a1'),
@@ -82,8 +83,8 @@ describe('batcher', () => {
       //
       // detach
       //
-      batcher.detachResources('author', 'a1', 'articleIds', 'r1');
-      expect(batcher.getAll()).toEqual([
+      pendingState.detachResources('author', 'a1', 'articleIds', 'r1');
+      expect(pendingState.getOps()).toEqual([
         makeAddRelIdOp('article', 'r2', 'authorId', 'a1'),
         makeAddRelIdOp('author', 'a1', 'articleIds', 'r2'),
         makeRemoveRelIdOp('author', 'a1', 'articleIds', 'r1'),
@@ -102,10 +103,10 @@ describe('batcher', () => {
         }
       };
 
-      const batcher = new Batcher(blogModelSchemaReader, blogState, blogSelectors);
+      const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
 
-      batcher.attachResources('author', 'a2', 'articleIds', 'r1');
-      expect(batcher.getAll()).toEqual([
+      pendingState.attachResources('author', 'a2', 'articleIds', 'r1');
+      expect(pendingState.getOps()).toEqual([
         makeRemoveRelIdOp('author', 'a1', 'articleIds', 'r1'),
         makeAddRelIdOp('author', 'a2', 'articleIds', 'r1'),
         makeAddRelIdOp('article', 'r1', 'authorId', 'a2'),
