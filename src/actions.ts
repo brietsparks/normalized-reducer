@@ -2,8 +2,7 @@ import {
   Namespaced,
   AddAction,
   InvalidEntityHandler,
-  AddPayloadOptions,
-  AddPayloadAttachable,
+  AddAttachable,
   ActionTypes,
   ActionCreators,
   RemoveAction,
@@ -43,8 +42,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
   const add = (
     entity: string,
     id: string,
-    attach?: AddPayloadAttachable[],
-    options?: AddPayloadOptions
+    attach?: AddAttachable[],
   ): AddAction => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
@@ -61,7 +59,6 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       entity,
       id,
       attach,
-      options,
     };
   };
 

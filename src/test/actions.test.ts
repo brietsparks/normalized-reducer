@@ -28,10 +28,8 @@ describe('actions', () => {
               id: 'r1',
               index: 1,
               reciprocalIndex: 2,
-              options: { createNonexistent: true }
             }
           ],
-          { ifExists: 'patch' }
         );
 
         const expected = {
@@ -48,10 +46,8 @@ describe('actions', () => {
               id: 'r1',
               index: 1,
               reciprocalIndex: 2,
-              options: { createNonexistent: true }
             }
           ],
-          options: { ifExists: 'patch' },
         };
 
         expect(result).toEqual(expected);

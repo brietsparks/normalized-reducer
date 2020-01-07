@@ -46,51 +46,11 @@ export interface MoveRelIdOp extends Op {
 // Payload: a body of domain data
 //
 
-export interface AddPayload {
-  entity: string,
-  id: string,
-  attach?: AddPayloadAttachable[],
-  options?: AddPayloadOptions,
-}
-
-export interface AddPayloadAttachable {
+export interface AddAttachable {
   rel: string,
   id: string,
   index?: number,
   reciprocalIndex?: number,
-}
-
-export interface AddPayloadOptions {
-  // ifExists?: ExistingResourceStrategy, // what to do if an addable resource's id already exists
-}
-
-export interface RemovePayload {
-  entity: string,
-  id: string,
-}
-
-export interface AttachPayload {
-  entity: string,
-  id: string,
-  rel: string,
-  relId: string,
-  index?: number, // the index within the base resource where the relId should be placed
-  reciprocalIndex?: number, // the index within the rel resource where base id should be placed
-}
-
-export interface DetachPayload {
-  entity: string,
-  id: string,
-  rel: string,
-  relId: string,
-}
-
-export interface MoveAttachedPayload {
-  entity: string,
-  id: string,
-  rel: string,
-  src: number,
-  dest: number,
 }
 
 //
@@ -106,11 +66,40 @@ export interface OpAction extends Action {
 }
 
 // actions
-export type AddAction = OpAction & AddPayload;
-export type RemoveAction = OpAction & RemovePayload;
-export type AttachAction = OpAction & AttachPayload;
-export type DetachAction = OpAction & DetachPayload;
-export type MoveAttachedAction = OpAction & MoveAttachedPayload;
+export interface AddAction extends OpAction {
+  entity: string,
+  id: string,
+  attach?: AddAttachable[],
+}
+
+export interface  RemoveAction extends OpAction {
+  entity: string,
+  id: string,
+}
+
+export interface AttachAction extends OpAction {
+  entity: string,
+  id: string,
+  rel: string,
+  relId: string,
+  index?: number, // the index within the base resource where the relId should be placed
+  reciprocalIndex?: number, // the index within the rel resource where base id should be placed
+}
+
+export interface DetachAction extends OpAction {
+  entity: string,
+  id: string,
+  rel: string,
+  relId: string,
+}
+
+export interface MoveAttachedAction extends OpAction {
+  entity: string,
+  id: string,
+  rel: string,
+  src: number,
+  dest: number,
+}
 
 export type ConcreteOpAction =
   AddAction |
@@ -151,7 +140,7 @@ export interface SetRelState {
 }
 
 // action creators
-export type AddActionCreator = (entity: string, id: string, attach?: AddPayloadAttachable[], options?: AddPayloadOptions) => AddAction;
+export type AddActionCreator = (entity: string, id: string, attach?: AddAttachable[]) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
