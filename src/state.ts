@@ -39,7 +39,7 @@ export class PendingState {
   removeResource(entity: string, id: string) {
     this.ops.putRemoveResource(entity, id);
 
-    const attachedIdsByRel = this.selectors.getEntityAttachedArr(this.state, { entity, id });
+    const attachedIdsByRel = this.selectors.getAllAttachedArr(this.state, { entity, id });
 
     Object.entries(attachedIdsByRel).forEach(([rel, attachedIds]) => {
       attachedIds.forEach(attachedId => {

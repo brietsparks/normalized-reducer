@@ -2,7 +2,7 @@ import { blogSelectors, blogState } from './test-cases/blog';
 import { forumSelectors, forumEmptyState } from './test-cases/forum';
 
 describe('selectors', () => {
-  describe('getArr', () => {
+  describe('getAttachedArr', () => {
     test('cardinality of one', () => {
       const result = blogSelectors.getAttachedArr(blogState, {
         entity: 'author',
@@ -46,7 +46,7 @@ describe('selectors', () => {
       }
     };
 
-    const result = forumSelectors.getEntityAttachedArr(state, { entity: 'profile', id: 'p1' });
+    const result = forumSelectors.getAllAttachedArr(state, { entity: 'profile', id: 'p1' });
 
     const expected = {
       accountId: ['a1'],

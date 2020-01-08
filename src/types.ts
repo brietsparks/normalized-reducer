@@ -241,7 +241,7 @@ export enum Cardinalities {
 }
 
 //
-// state types
+// state types todo: remove state suffix
 //
 
 export type State = { resources: ResourcesByEntityState, ids: IdsByEntityState };
@@ -257,16 +257,26 @@ export type RelDataState = undefined | string | string[];
 //
 
 export type DeriveActionWithOps = (state: State, action: OpAction) => OpAction;
+export type GetAllIds = (state: State) => IdsByEntityState;
+export type GetAllResources = (state: State) => ResourcesByEntityState;
+export type GetIds = (state: State, args: { entity: string }) => string[];
+export type GetResources = (state: State, args: { entity: string }) => ResourcesState | undefined;
 export type CheckResource = (state: State, args: { entity: string, id: string }) => boolean;
+export type GetResource = (state: State, args: { entity: string, id: string }) => ResourceState | undefined;
 export type GetAttached = (state: State, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
-export type GetArr = (state: State, args: { entity: string, id: string, rel: string }) => string[]
-export type GetEntityAttachedArr = (state: State, args: { entity: string, id: string }) => { [rel: string]: string[] };
+export type GetAttachedArr = (state: State, args: { entity: string, id: string, rel: string }) => string[]
+export type GetAllAttachedArr = (state: State, args: { entity: string, id: string }) => { [rel: string]: string[] };
 
 export interface Selectors {
+  getAllIds: GetAllIds,
+  getAllResources: GetAllResources,
+  getIds: GetIds,
+  getResources: GetResources,
   checkResource: CheckResource,
+  getResource: GetResource,
   getAttached: GetAttached,
-  getAttachedArr: GetArr,
-  getEntityAttachedArr: GetEntityAttachedArr,
+  getAttachedArr: GetAttachedArr,
+  getAllAttachedArr: GetAllAttachedArr,
 }
 
 

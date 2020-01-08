@@ -29,26 +29,41 @@ export const makeSelectors = (
     onInvalidRelData = noop
   }: Opts = {}
 ): Selectors => {
-  const getEntitiesState = (state: State) => state.resources;
-  const getIdsState = (state: State) => state.ids;
+  const getAllIds = (state: State) => state.ids;
+  const getAllResources = (state: State) => state.resources;
 
-  const getEntityState = (state: State, args: { entity: string }) => {
-    const entityState = getEntitiesState(state);
+  const getIds = (state: State, args: { entity: string }) => {
+    const idsByEntity = getAllIds(state);
 
-    if (typeof entityState !== 'object') {
-      return undefined;
+    if (!schema.entityExists(args.entity)) {
+      onInvalidEntity(args.entity);
+      return [];
     }
+
+    if (typeof idsByEntity !== 'object') {
+      return [];
+    }
+
+    return idsByEntity[args.entity];
+  };
+
+  const getResources = (state: State, args: { entity: string }) => {
+    const resourcesByEntity = getAllResources(state);
 
     if (!schema.entityExists(args.entity)) {
       onInvalidEntity(args.entity);
       return undefined;
     }
 
-    return entityState[args.entity];
+    if (typeof resourcesByEntity !== 'object') {
+      return undefined;
+    }
+
+    return resourcesByEntity[args.entity];
   };
 
   const checkResource = (state: State, args: { entity: string, id: string }) => {
-    const entityState = getEntityState(state, { entity: args.entity });
+    const entityState = getResources(state, { entity: args.entity });
 
     if (!entityState) {
       return false;
@@ -57,8 +72,8 @@ export const makeSelectors = (
     return !!entityState[args.id];
   };
 
-  const getResourceState = (state: State, args: { entity: string, id: string }) => {
-    const entityState = getEntityState(state, { entity: args.entity });
+  const getResource = (state: State, args: { entity: string, id: string }) => {
+    const entityState = getResources(state, { entity: args.entity });
 
     if (!entityState) {
       return undefined;
@@ -75,7 +90,7 @@ export const makeSelectors = (
   };
 
   const getAttached = (state: State, args: { entity: string, id: string, rel: string }) => {
-    const resource = getResourceState(state, {
+    const resource = getResource(state, {
       entity: args.entity,
       id: args.id,
     });
@@ -100,14 +115,7 @@ export const makeSelectors = (
     return relState;
   };
 
-  const getAttachedArr = (
-    state: State,
-    args: {
-      entity: string,
-      id: string,
-      rel: string,
-    },
-  ): string[] => {
+  const getAttachedArr = (state: State, args: { entity: string, id: string, rel: string }): string[] => {
     const relState = getAttached(state, args);
 
     if (schema.entity(args.entity).getCardinality(args.rel) === Cardinalities.MANY) {
@@ -117,7 +125,7 @@ export const makeSelectors = (
     return relState ? [relState] as string[] : [] as string[];
   };
 
-  const getEntityAttachedArr = (state: State, args: { entity: string, id: string }) => {
+  const getAllAttachedArr = (state: State, args: { entity: string, id: string }) => {
     const result: { [rel: string]: string[] } = {};
 
     if (!schema.entityExists(args.entity)) {
@@ -134,9 +142,14 @@ export const makeSelectors = (
   };
 
   return {
+    getAllIds,
+    getAllResources,
+    getIds,
+    getResources,
     checkResource,
+    getResource,
     getAttached,
     getAttachedArr,
-    getEntityAttachedArr,
+    getAllAttachedArr,
   }
 };
