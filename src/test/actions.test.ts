@@ -11,6 +11,7 @@ describe('actions', () => {
           type: blogActionTypes.ADD,
           entity: 'author',
           id: 'a1',
+          data: {},
         });
       });
 

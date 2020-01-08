@@ -48,6 +48,10 @@ export class PendingState<S extends AbstractState> {
     });
   }
 
+  editResource(entity: string, id: string, data: object) {
+    this.ops.putEditResource(entity, id, data);
+  }
+
   attachResources(entity: string, id: string, rel: string, relId: string, index?: number, reciprocalIndex?: number) {
     const entitySchema = this.schema.entity(entity);
 

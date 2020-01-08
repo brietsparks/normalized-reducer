@@ -5,6 +5,8 @@
 export enum OpTypes {
   ADD_RESOURCE = 'ADD_RESOURCE',
   REMOVE_RESOURCE = 'REMOVE_RESOURCE',
+  EDIT_RESOURCE = 'EDIT_RESOURCE',
+  MOVE_RESOURCE = 'MOVE_RESOURCE',
   ADD_REL_ID = 'ADD_REL_ID',
   REMOVE_REL_ID = 'REMOVE_REL_ID',
   MOVE_REL_ID = 'MOVE_REL_ID',
@@ -23,6 +25,17 @@ export interface AddResourceOp extends Op {
 
 export interface RemoveResourceOp extends Op {
   opType: OpTypes.REMOVE_RESOURCE,
+}
+
+export interface EditResourceOp extends Op {
+  opType: OpTypes.EDIT_RESOURCE,
+  data: { [key: string]: any },
+}
+
+export interface MoveResourceOp extends Omit<Op, 'id'> {
+  opType: OpTypes.MOVE_RESOURCE,
+  src: number,
+  dest: number,
 }
 
 export interface AddRelIdOp extends Op {
@@ -76,6 +89,18 @@ export interface RemoveAction extends OpAction {
   id: string,
 }
 
+export interface EditAction extends OpAction {
+  entity: string,
+  id: string,
+  data: object
+}
+
+export interface MoveAction extends Omit<OpAction, 'id'> {
+  entity: string,
+  src: number,
+  dest: number,
+}
+
 export interface AttachAction extends OpAction {
   entity: string,
   id: string,
@@ -103,6 +128,8 @@ export interface MoveAttachedAction extends OpAction {
 export type ConcreteOpAction =
   AddAction |
   RemoveAction |
+  EditAction |
+  MoveAction |
   AttachAction |
   DetachAction |
   MoveAttachedAction;
@@ -141,6 +168,8 @@ export interface SetRelState {
 // action creators
 export type AddActionCreator = (entity: string, id: string, data?: object, attach?: AddAttachable[], index?: number) => AddAction;
 export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
+export type EditActionCreator = (entity: string, id: string, data: object) => EditAction;
+export type MoveActionCreator = (entity: string, src: number, dest: number) => MoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
 export type MoveAttachedActionCreator = (entity: string, id: string, rel: string, src: number, dest: number) => MoveAttachedAction;
@@ -153,6 +182,8 @@ export type SetRelStateCreator = (entity: string, id: string, rel: string, state
 export interface ActionTypes {
   ADD: string,
   REMOVE: string,
+  EDIT: string,
+  MOVE: string,
   ATTACH: string,
   DETACH: string,
   MOVE_ATTACHED: string,
@@ -166,6 +197,8 @@ export interface ActionTypes {
 export interface ActionCreators<T extends AbstractState> {
   add: AddActionCreator,
   remove: RemoveActionCreator,
+  edit: EditActionCreator,
+  move: MoveActionCreator,
   attach: AttachActionCreator,
   detach: DetachActionCreator,
   moveAttached: MoveAttachedActionCreator,

@@ -2,12 +2,12 @@ import {
   AbstractState,
   AddRelIdOp,
   AddResourceOp,
-  ModelSchema,
+  Cardinalities,
+  EditResourceOp,
   MoveRelIdOp,
   OpTypes,
   RemoveRelIdOp,
-  RemoveResourceOp,
-  Cardinalities
+  RemoveResourceOp
 } from './types';
 import { ModelSchemaReader } from './schema';
 
@@ -26,6 +26,15 @@ export const makeRemoveResourceOp = (entity: string, id: string): RemoveResource
     entity,
     id,
   }
+};
+
+export const makeEditResourceOp = (entity: string, id: string, data: object): EditResourceOp => {
+  return {
+    opType: OpTypes.EDIT_RESOURCE,
+    entity,
+    id,
+    data
+  };
 };
 
 export const makeAddRelIdOp = (entity: string, id: string, rel: string, relId: string, index?: number): AddRelIdOp => {
@@ -107,6 +116,14 @@ export class OpsBatch<S extends AbstractState> {
   }
   deleteRemoveResource(entity: string, id: string) {
     throw new Error('deleteRemoveResource not implemented');
+  }
+
+  //
+  // editResource
+  //
+  putEditResource(entity: string, id: string, data: object) {
+    const key = concat(entity, id);
+    this.ops[key] = makeEditResourceOp(entity, id, data);
   }
 
   //

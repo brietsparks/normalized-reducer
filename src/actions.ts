@@ -10,10 +10,12 @@ import {
   AbstractState,
   AbstractResourceState,
   AbstractRelDataState,
-  AbstractEntityState, ConcreteOpAction,
+  AbstractEntityState, ConcreteOpAction, EditAction,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
+
+import { cleanData } from './validator';
 
 interface Opts {
   namespaced: Namespaced,
@@ -26,6 +28,8 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
 
   const ADD = namespaced('ADD');
   const REMOVE = namespaced('REMOVE');
+  const EDIT = namespaced('EDIT');
+  const MOVE = namespaced('MOVE');
   const ATTACH = namespaced('ATTACH');
   const DETACH = namespaced('DETACH');
   const MOVE_ATTACHED = namespaced('MOVE_ATTACHED');
@@ -56,14 +60,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       }
     });
 
-    const cleanedData = typeof data === 'object'
-      ? Object.keys(data).reduce((cleanData, key) => {
-        if (!relExists(entity, key)) {
-          cleanData[key] = data[key];
-        }
-        return cleanData;
-      }, {} as { [key: string]: any })
-      : undefined;
+    const cleanedData = cleanData<S>(data, schema, entity);
 
     return {
       type: ADD,
@@ -87,6 +84,42 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       type: REMOVE,
       entity,
       id
+    };
+  };
+
+  const edit = (
+    entity: string,
+    id: string,
+    data: { [key: string]: any },
+  ) => {
+    if (!entityExists(entity)) {
+      onInvalidEntity(entity);
+    }
+
+    const cleanedData = cleanData<S>(data, schema, entity);
+
+    return {
+      type: EDIT,
+      entity,
+      id,
+      data: cleanedData,
+    };
+  };
+
+  const move = (
+    entity: string,
+    src: number,
+    dest: number
+  ) => {
+    if (!entityExists(entity)) {
+      onInvalidEntity(entity);
+    }
+
+    return {
+      type: MOVE,
+      entity,
+      src,
+      dest,
     };
   };
 
@@ -214,6 +247,8 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     types: {
       ADD,
       REMOVE,
+      EDIT,
+      MOVE,
       ATTACH,
       DETACH,
       MOVE_ATTACHED,
@@ -226,6 +261,8 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     creators: {
       add,
       remove,
+      edit,
+      move,
       attach,
       detach,
       moveAttached,

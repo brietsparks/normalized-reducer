@@ -7,7 +7,7 @@ import {
   EntityReducer,
   EntityReducers, MoveRelIdOp, Op,
   OpTypes, RemoveRelIdOp,
-  RemoveResourceOp, Action, SetStateAction, SetEntityState, SetResourceState, SetRelState,
+  RemoveResourceOp, Action, SetStateAction, SetEntityState, SetResourceState, SetRelState, EditResourceOp,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
 import { arrayMove, arrayPut, deepFreeze } from './util';
@@ -176,6 +176,27 @@ export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchema
           ...state,
           [id]: { ...state[id], [rel]: relState }
         }
+      }
+
+      if (op.opType === OpTypes.EDIT_RESOURCE) {
+        const { id, data } = op as EditResourceOp;
+
+        let resource = state[id];
+
+        if (!resource) {
+          return state;
+        }
+
+        const newResource = { ...resource };
+
+        Object.entries(data).forEach(([key, value]) => {
+          newResource[key] = data[key] = value;
+        });
+
+        return {
+          ...state,
+          [id]: newResource
+        };
       }
 
       if (op.opType === OpTypes.REMOVE_REL_ID) {

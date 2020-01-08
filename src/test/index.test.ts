@@ -508,6 +508,86 @@ describe('index', () => {
     });
   });
 
+  describe('edit', () => {
+    /*
+    edit only non-rel resource attributes
+    ignore nonexistent resource
+    */
+
+    const state = {
+      ...forumEmptyState,
+      profile: {
+        'p1': {
+          postIds: ['o1']
+        }
+      },
+      post: {
+        'o1': {
+          title: 'Foo',
+          body: 'Lorem ipsum',
+          profileId: 'p1',
+          postIds: ['o1']
+        }
+      },
+      category: {
+        'c1': { postIds: ['o1'] }
+      }
+    };
+
+    test('edit only non-rel resource attributes', () => {
+      const result = forumReducer(state, forumActionCreators.edit(
+        ForumEntities.POST,
+        'o1',
+        {
+          title: 'Bar',
+          caption: 'Foobar', body:
+          undefined,
+          profileId: 'p9000',
+          categoryIds: ['c9000']
+        }
+      ));
+
+      const expected = {
+        ...forumEmptyState,
+        profile: {
+          'p1': {
+            postIds: ['o1']
+          }
+        },
+        post: {
+          'o1': {
+            title: 'Bar',
+            caption: 'Foobar',
+            body: undefined,
+            profileId: 'p1',
+            postIds: ['o1']
+          }
+        },
+        category: {
+          'c1': { postIds: ['o1'] }
+        }
+      };
+
+      expect(result).toEqual(expected);
+    });
+
+    test('ignore non-existent resource', () => {
+      const result = forumReducer(state, forumActionCreators.edit(
+        ForumEntities.PROFILE,
+        'o9000',
+        { title: 'abc123' }
+      ));
+
+      expect(result).toEqual(state);
+    });
+  });
+
+  describe('move', () => {
+    /*
+
+    */
+  });
+
   describe('attach', () => {
     /*
     rel of one-cardinality
