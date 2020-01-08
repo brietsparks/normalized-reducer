@@ -7,10 +7,10 @@ import {
   ActionCreators,
   RemoveAction,
   InvalidRelHandler,
-  AbstractState,
-  AbstractResourceState,
-  AbstractRelDataState,
-  AbstractEntityState, ConcreteOpAction, EditAction,
+  EntitiesState,
+  ResourceState,
+  RelDataState,
+  EntityState, ConcreteOpAction, EditAction,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -23,7 +23,7 @@ interface Opts {
   onInvalidRel: InvalidRelHandler,
 }
 
-export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S>, opts: Opts): { types: ActionTypes, creators: ActionCreators<S> } => {
+export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: ActionTypes, creators: ActionCreators } => {
   const { namespaced, onInvalidEntity, onInvalidRel } = opts;
 
   const ADD = namespaced('ADD');
@@ -60,7 +60,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       }
     });
 
-    const cleanedData = cleanData<S>(data, schema, entity);
+    const cleanedData = cleanData(data, schema, entity);
 
     return {
       type: ADD,
@@ -96,7 +96,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
       onInvalidEntity(entity);
     }
 
-    const cleanedData = cleanData<S>(data, schema, entity);
+    const cleanedData = cleanData(data, schema, entity);
 
     return {
       type: EDIT,
@@ -198,9 +198,9 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     };
   };
 
-  const setState = (state: S) => ({ type: SET_STATE, state });
+  const setState = (state: EntityState) => ({ type: SET_STATE, state });
 
-  const setEntityState = (entity: string, state: AbstractEntityState) => {
+  const setEntityState = (entity: string, state: EntityState) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -212,7 +212,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     }
   };
 
-  const setResourceState = (entity: string, id: string, state: AbstractResourceState) => {
+  const setResourceState = (entity: string, id: string, state: ResourceState) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -225,7 +225,7 @@ export const makeActions = <S extends AbstractState>(schema: ModelSchemaReader<S
     }
   };
 
-  const setRelState = (entity: string, id: string, rel: string, state: AbstractRelDataState) => {
+  const setRelState = (entity: string, id: string, rel: string, state: RelDataState) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }

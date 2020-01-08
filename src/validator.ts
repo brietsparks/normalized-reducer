@@ -1,7 +1,6 @@
 import { ModelSchemaReader } from './schema';
-import { AbstractState } from './types';
 
-export const cleanData = <S extends AbstractState>(data: any, schema: ModelSchemaReader<S>, entity: string) => {
+export const cleanData = (data: any, schema: ModelSchemaReader, entity: string) => {
   return typeof data === 'object'
     ? Object.keys(data).reduce((cleanData, key) => {
       if (!schema.entity(entity).relExists(key)) {

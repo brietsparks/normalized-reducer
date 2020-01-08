@@ -139,22 +139,22 @@ export interface BatchAction extends Action {
   ops?: Op[],
 }
 
-export interface SetStateAction<S extends AbstractState> {
+export interface SetStateAction {
   type: string,
-  state: S
+  state: EntitiesState
 }
 
 export interface SetEntityState {
   type: string,
   entity: string,
-  state: AbstractEntityState
+  state: EntityState
 }
 
 export interface SetResourceState {
   type: string,
   entity: string,
   id: string,
-  state: AbstractResourceState
+  state: ResourceState
 }
 
 export interface SetRelState {
@@ -162,7 +162,7 @@ export interface SetRelState {
   entity: string,
   id: string,
   rel: string,
-  state: AbstractRelDataState
+  state: RelDataState
 }
 
 // action creators
@@ -174,10 +174,10 @@ export type AttachActionCreator = (entity: string, id: string, rel: string, relI
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
 export type MoveAttachedActionCreator = (entity: string, id: string, rel: string, src: number, dest: number) => MoveAttachedAction;
 export type BatchActionCreator = (...actions: ConcreteOpAction[]) => BatchAction;
-export type SetStateActionCreator <T extends AbstractState> = (state: T) => SetStateAction<T>;
-export type SetEntityStateCreator = (entity: string, state: AbstractEntityState) => SetEntityState;
-export type SetResourceStateCreator = (entity: string, id: string, state: AbstractResourceState) => SetResourceState;
-export type SetRelStateCreator = (entity: string, id: string, rel: string, state: AbstractRelDataState) => SetRelState;
+export type SetStateActionCreator = (state: EntitiesState) => SetStateAction;
+export type SetEntityStateCreator = (entity: string, state: EntityState) => SetEntityState;
+export type SetResourceStateCreator = (entity: string, id: string, state: ResourceState) => SetResourceState;
+export type SetRelStateCreator = (entity: string, id: string, rel: string, state: RelDataState) => SetRelState;
 
 export interface ActionTypes {
   ADD: string,
@@ -194,7 +194,7 @@ export interface ActionTypes {
   SET_REL_STATE: string,
 }
 
-export interface ActionCreators<T extends AbstractState> {
+export interface ActionCreators {
   add: AddActionCreator,
   remove: RemoveActionCreator,
   edit: EditActionCreator,
@@ -203,7 +203,7 @@ export interface ActionCreators<T extends AbstractState> {
   detach: DetachActionCreator,
   moveAttached: MoveAttachedActionCreator,
   batch: BatchActionCreator,
-  setState: SetStateActionCreator<T>,
+  setState: SetStateActionCreator,
   setEntityState: SetEntityStateCreator,
   setResourceState: SetResourceStateCreator,
   setRelState: SetRelStateCreator,
@@ -238,27 +238,27 @@ export enum Cardinalities {
 // state types
 //
 
-export type AbstractState = { [entity: string]: AbstractEntityState }
-export type AbstractEntityState = { [id: string]: AbstractResourceState }
-export type AbstractResourceState = { [attr: string]: AbstractRelDataState | any }
-export type AbstractRelDataState = undefined | string | string[]
+export type EntitiesState = { [entity: string]: EntityState }
+export type EntityState = { [id: string]: ResourceState }
+export type ResourceState = { [attr: string]: RelDataState | any }
+export type RelDataState = undefined | string | string[]
 
 
 //
 // selector types
 //
 
-export type DeriveActionWithOps <S extends AbstractState> = (state: S, action: OpAction) => OpAction;
-export type CheckResource <S extends AbstractState> = (state: S, args: { entity: string, id: string }) => boolean;
-export type GetAttached <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
-export type GetArr <S extends AbstractState> = (state: S, args: { entity: string, id: string, rel: string }) => string[]
-export type GetEntityAttachedArr <S extends AbstractState> = (state: S, args: { entity: string, id: string }) => { [rel: string]: string[] };
+export type DeriveActionWithOps = (state: EntitiesState, action: OpAction) => OpAction;
+export type CheckResource = (state: EntitiesState, args: { entity: string, id: string }) => boolean;
+export type GetAttached = (state: EntitiesState, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
+export type GetArr = (state: EntitiesState, args: { entity: string, id: string, rel: string }) => string[]
+export type GetEntityAttachedArr = (state: EntitiesState, args: { entity: string, id: string }) => { [rel: string]: string[] };
 
-export interface Selectors<S extends AbstractState> {
-  checkResource: CheckResource<S>
-  getAttached: GetAttached<S>,
-  getAttachedArr: GetArr<S>,
-  getEntityAttachedArr: GetEntityAttachedArr<S>,
+export interface Selectors {
+  checkResource: CheckResource,
+  getAttached: GetAttached,
+  getAttachedArr: GetArr,
+  getEntityAttachedArr: GetEntityAttachedArr,
 }
 
 
@@ -266,7 +266,7 @@ export interface Selectors<S extends AbstractState> {
 // reducer types
 //
 
-export type EntityReducer = (state: AbstractEntityState, ops: Op[]) => AbstractEntityState;
+export type EntityReducer = (state: EntityState, ops: Op[]) => EntityState;
 export interface EntityReducers {
   [entity: string]: EntityReducer
 }

@@ -1,13 +1,13 @@
 import {
   Cardinalities,
-  AbstractState,
+  EntitiesState,
   InvalidEntityHandler,
   InvalidRelHandler,
   InvalidRelDataHandler,
   NonexistentResourceHandler,
   ActionCreators,
   ActionTypes,
-  Selectors,
+  Selectors, EntityState,
 } from './types';
 import { ModelSchemaReader } from './schema';
 import { noop } from './util';
@@ -19,17 +19,17 @@ export interface Opts {
   onInvalidRelData?: InvalidRelDataHandler
 }
 
-export const makeSelectors = <S extends AbstractState> (
-  schema: ModelSchemaReader<S>,
-  actionCreators: ActionCreators<S>,
+export const makeSelectors = (
+  schema: ModelSchemaReader,
+  actionCreators: ActionCreators,
   {
     onInvalidEntity = noop,
     onNonexistentResource = noop,
     onInvalidRel = noop,
     onInvalidRelData = noop
   }: Opts = {}
-): Selectors<S> => {
-  const getEntityState = (state: S, args: { entity: string }) => {
+): Selectors => {
+  const getEntityState = (state: EntityState, args: { entity: string }) => {
     if (!schema.entityExists(args.entity)) {
       onInvalidEntity(args.entity);
       return undefined;
@@ -38,7 +38,7 @@ export const makeSelectors = <S extends AbstractState> (
     return state[args.entity];
   };
 
-  const checkResource = (state: S, args: { entity: string, id: string }) => {
+  const checkResource = (state: EntityState, args: { entity: string, id: string }) => {
     const entityState = getEntityState(state, { entity: args.entity });
 
     if (!entityState) {
@@ -48,7 +48,7 @@ export const makeSelectors = <S extends AbstractState> (
     return !!entityState[args.id];
   };
 
-  const getResourceState = (state: S, args: { entity: string, id: string }) => {
+  const getResourceState = (state: EntityState, args: { entity: string, id: string }) => {
     const entityState = getEntityState(state, { entity: args.entity });
 
     if (!entityState) {
@@ -65,7 +65,7 @@ export const makeSelectors = <S extends AbstractState> (
     return resource;
   };
 
-  const getAttached = (state: S, args: { entity: string, id: string, rel: string }) => {
+  const getAttached = (state: EntityState, args: { entity: string, id: string, rel: string }) => {
     const resource = getResourceState(state, {
       entity: args.entity,
       id: args.id,
@@ -92,7 +92,7 @@ export const makeSelectors = <S extends AbstractState> (
   };
 
   const getAttachedArr = (
-    state: S,
+    state: EntityState,
     args: {
       entity: string,
       id: string,
@@ -108,7 +108,7 @@ export const makeSelectors = <S extends AbstractState> (
     return relState ? [relState] as string[] : [] as string[];
   };
 
-  const getEntityAttachedArr = (state: S, args: { entity: string, id: string }) => {
+  const getEntityAttachedArr = (state: EntityState, args: { entity: string, id: string }) => {
     const result: { [rel: string]: string[] } = {};
 
     if (!schema.entityExists(args.entity)) {

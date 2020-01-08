@@ -1,6 +1,6 @@
 import {
-  AbstractEntityState,
-  AbstractState,
+  EntityState,
+  EntitiesState,
   OpAction,
   ActionTypes, AddRelIdOp, AddResourceOp, Cardinalities,
   DeriveActionWithOps,
@@ -12,10 +12,10 @@ import {
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
 import { arrayMove, arrayPut, deepFreeze } from './util';
 
-export const makeReducer = <S extends AbstractState>(
-  schema: ModelSchemaReader<S>,
+export const makeReducer = (
+  schema: ModelSchemaReader,
   actionTypes: ActionTypes,
-  transformAction: DeriveActionWithOps<S>
+  transformAction: DeriveActionWithOps
 ) => {
   const entities = schema.getEntities();
 
@@ -24,7 +24,7 @@ export const makeReducer = <S extends AbstractState>(
     return reducers;
   }, {});
 
-  return (state: S = schema.getEmptyState(), anyAction: Action) => {
+  return (state: EntityState = schema.getEmptyState(), anyAction: Action) => {
     if (!Object.values(actionTypes).includes(anyAction.type)) {
       return state;
     }
@@ -33,7 +33,7 @@ export const makeReducer = <S extends AbstractState>(
     // handle state setter actions
     //
     if (anyAction.type === actionTypes.SET_STATE) {
-      const action = anyAction as SetStateAction<S>;
+      const action = anyAction as SetStateAction;
       return action.state;
     }
 
@@ -94,7 +94,7 @@ export const makeReducer = <S extends AbstractState>(
     const opAction = anyAction as OpAction;
     const actionWithOps = transformAction(state, opAction);
 
-    return Object.keys(entityReducers).reduce((reducedState: S, entity: string) => {
+    return Object.keys(entityReducers).reduce((reducedState: EntityState, entity: string) => {
       const newReducedState = {...reducedState};
 
       const entityReducer = entityReducers[entity];
@@ -107,7 +107,7 @@ export const makeReducer = <S extends AbstractState>(
 };
 
 
-export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchemaReader<S>): EntityReducer => {
+export const makeEntityReducer = (schema: EntitySchemaReader): EntityReducer => {
   return (state= {}, ops: Op[] = []) => {
     return ops.reduce((state, op) => {
       if (op.entity !== schema.getEntity()) {

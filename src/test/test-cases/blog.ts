@@ -1,10 +1,10 @@
 import {
-  AbstractState,
+  EntitiesState,
   ModelSchema,
   EntitySchema,
   Cardinalities,
-  AbstractEntityState,
-  AbstractRelDataState
+  EntityState,
+  RelDataState
 } from '../../types';
 import { makeActions } from '../../actions';
 import { defaultInvalidEntityHandler, defaultInvalidRelHandler, defaultNamespaced } from '../../util';
@@ -38,12 +38,12 @@ export const blogSchema: ModelSchema = {
   [BlogEntities.ARTICLE]: articleSchema,
 };
 
-export interface BlogState extends AbstractState {
+export interface BlogState extends EntitiesState {
   author: {
-    [id: string]: { articleIds: AbstractRelDataState }
+    [id: string]: { articleIds: RelDataState }
   },
   article: {
-    [id: string]: { authorId: AbstractRelDataState }
+    [id: string]: { authorId: RelDataState }
   },
 }
 
@@ -57,7 +57,7 @@ export const blogState: BlogState = {
   }
 };
 
-export const blogModelSchemaReader = new ModelSchemaReader<BlogState>(blogSchema);
+export const blogModelSchemaReader = new ModelSchemaReader(blogSchema);
 
 export const {
   creators: blogActionCreators,

@@ -1,5 +1,5 @@
 import {
-  AbstractState,
+  EntitiesState,
   AddRelIdOp,
   AddResourceOp,
   Cardinalities,
@@ -77,11 +77,11 @@ export const makeMoveAttachedOp = (entity: string, id: string, rel: string, src:
   };
 };
 
-export class OpsBatch<S extends AbstractState> {
+export class OpsBatch {
   ops: Record<string, any> = {};
-  schema: ModelSchemaReader<S>;
+  schema: ModelSchemaReader;
 
-  constructor(schema: ModelSchemaReader<S>) {
+  constructor(schema: ModelSchemaReader) {
     this.schema = schema;
   }
 

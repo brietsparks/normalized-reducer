@@ -1,8 +1,16 @@
-import { ModelSchema, EntitySchema, RelSchema, Cardinalities, AbstractResourceState, AbstractState } from './types';
+import {
+  ModelSchema,
+  EntitySchema,
+  RelSchema,
+  Cardinalities,
+  ResourceState,
+  EntitiesState,
+  EntityState
+} from './types';
 
-export class ModelSchemaReader <S extends AbstractState> {
+export class ModelSchemaReader {
   schema: ModelSchema;
-  entitySchemaReaders: Record<string, EntitySchemaReader<S>>;
+  entitySchemaReaders: Record<string, EntitySchemaReader>;
 
   constructor(schema: ModelSchema) {
     this.schema = schema;
@@ -12,17 +20,15 @@ export class ModelSchemaReader <S extends AbstractState> {
         entitySchemaReaders[entity] = new EntitySchemaReader(entity, entitySchema, this);
         return entitySchemaReaders;
       },
-      {} as Record<string, EntitySchemaReader<S>>
+      {} as Record<string, EntitySchemaReader>
     );
   }
 
-  getEmptyState(): S {
-    const emptyState = this.getEntities().reduce((emptyState, entity) => {
+  getEmptyState(): EntityState {
+    return this.getEntities().reduce((emptyState, entity) => {
       emptyState[entity] = {};
       return emptyState;
-    }, {} as AbstractState);
-
-    return emptyState as S;
+    }, {} as EntitiesState);
   }
 
   entityExists(entity: string) {
@@ -38,12 +44,12 @@ export class ModelSchemaReader <S extends AbstractState> {
   }
 }
 
-export class EntitySchemaReader <S extends AbstractState> {
+export class EntitySchemaReader {
   entity: string;
   schema: EntitySchema;
-  modelSchemaReader: ModelSchemaReader<S>;
+  modelSchemaReader: ModelSchemaReader;
 
-  constructor(entity: string, schema: EntitySchema, modelSchemaReader: ModelSchemaReader<S>) {
+  constructor(entity: string, schema: EntitySchema, modelSchemaReader: ModelSchemaReader) {
     this.entity = entity;
     this.schema = schema;
     this.modelSchemaReader = modelSchemaReader;
@@ -64,7 +70,7 @@ export class EntitySchemaReader <S extends AbstractState> {
       }
 
       return state;
-    }, {} as AbstractResourceState)
+    }, {} as ResourceState)
   }
 
   getEmptyRelState(rel: string) {

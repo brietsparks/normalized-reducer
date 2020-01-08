@@ -1,23 +1,23 @@
 import {
-  AbstractState,
+  EntitiesState,
   Cardinalities,
-  Selectors,
+  Selectors, EntityState,
 } from './types';
 
 import { OpsBatch } from './ops';
 import { ModelSchemaReader } from './schema';
 
-export class PendingState<S extends AbstractState> {
-  schema: ModelSchemaReader<S>;
-  state: S;
-  selectors: Selectors<S>;
-  ops: OpsBatch<S>;
+export class PendingState {
+  schema: ModelSchemaReader;
+  state: EntityState;
+  selectors: Selectors;
+  ops: OpsBatch;
 
-  constructor(schema: ModelSchemaReader<S>, state: S, selectors: Selectors<S>) {
+  constructor(schema: ModelSchemaReader, state: EntityState, selectors: Selectors) {
     this.schema = schema;
     this.state = state;
     this.selectors = selectors;
-    this.ops = new OpsBatch<S>(schema);
+    this.ops = new OpsBatch(schema);
   }
 
   getOps() {

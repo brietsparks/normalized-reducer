@@ -1,24 +1,24 @@
 import { ModelSchemaReader } from './schema';
 import {
-  AbstractState,
+  EntitiesState,
   OpAction,
   ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
   RemoveAction,
-  Selectors, BatchAction, Action, EditAction
+  Selectors, BatchAction, Action, EditAction, EntityState
 } from './types';
 import { PendingState } from './state';
 import { makeMoveAttachedOp } from './ops';
 
 // makeActionTransformer is a selector that should be used to
 // intercept an action before it gets handled by the entity reducer(s)
-export const makeActionTransformer = <S extends AbstractState> (
-  schema: ModelSchemaReader<S>,
+export const makeActionTransformer = (
+  schema: ModelSchemaReader,
   actionTypes: ActionTypes,
-  selectors: Selectors<S>
-): DeriveActionWithOps<S> => {
-  const transformAction = (state: S, action: Action, pending?: PendingState<S>): OpAction => {
-    const pendingState = pending || new PendingState<S>(schema, state, selectors);
+  selectors: Selectors
+): DeriveActionWithOps => {
+  const transformAction = (state: EntityState, action: Action, pending?: PendingState): OpAction => {
+    const pendingState = pending || new PendingState(schema, state, selectors);
 
     if (action.type === actionTypes.BATCH) {
       const batchAction = action as BatchAction;
