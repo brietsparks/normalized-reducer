@@ -1,5 +1,5 @@
 import {
-  EntitiesState,
+  ResourcesByEntityState,
   Cardinalities,
   Selectors, State,
 } from './types';

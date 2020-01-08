@@ -1,5 +1,5 @@
 import {
-  EntitiesState,
+  ResourcesByEntityState,
   AddRelIdOp,
   AddResourceOp,
   Cardinalities,

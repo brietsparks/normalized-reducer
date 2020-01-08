@@ -7,10 +7,10 @@ import {
   ActionCreators,
   RemoveAction,
   InvalidRelHandler,
-  EntitiesState,
+  ResourcesByEntityState,
   ResourceState,
   RelDataState,
-  EntityState, ConcreteOpAction, EditAction,
+  ResourcesState, ConcreteOpAction, EditAction,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -198,9 +198,9 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
     };
   };
 
-  const setState = (state: EntityState) => ({ type: SET_STATE, state });
+  const setState = (state: ResourcesState) => ({ type: SET_STATE, state });
 
-  const setEntityState = (entity: string, state: EntityState) => {
+  const setEntityState = (entity: string, state: ResourcesState) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }

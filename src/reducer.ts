@@ -1,6 +1,6 @@
 import {
   State,
-  EntityState,
+  ResourcesState,
   OpAction,
   ActionTypes,
   AddRelIdOp,
@@ -16,10 +16,10 @@ import {
   RemoveResourceOp,
   Action,
   EditResourceOp,
-  IdsState,
+  IdsByEntityState,
   MoveResourceOp,
   EntityIdsReducers,
-  EntityIdsReducer, EntitiesState,
+  EntityIdsReducer, ResourcesByEntityState,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
 import { arrayMove, arrayPut, deepFreeze } from './util';
@@ -29,8 +29,8 @@ export const makeReducer = (
   actionTypes: ActionTypes,
   transformAction: DeriveActionWithOps
 ) => {
-  const idsReducer = makeIdsReducer(schema);
-  const entitiesReducer = makeEntitiesReducer(schema);
+  const idsByEntityReducer = makeIdsByEntityReducer(schema);
+  const resourcesByEntityReducer = makeResourcesByEntityReducer(schema);
 
   return (state: State = schema.getEmptyState(), anyAction: Action) => {
     deepFreeze(state);
@@ -43,22 +43,22 @@ export const makeReducer = (
     const actionWithOps = transformAction(state, opAction);
 
     return ({
-      ids: idsReducer(state.ids, actionWithOps),
-      entities: entitiesReducer(state.entities, actionWithOps),
+      ids: idsByEntityReducer(state.ids, actionWithOps),
+      resources: resourcesByEntityReducer(state.resources, actionWithOps),
     })
   }
 };
 
-export const makeIdsReducer = (schema: ModelSchemaReader) => {
+export const makeIdsByEntityReducer = (schema: ModelSchemaReader) => {
   const entities = schema.getEntities();
 
   const idsReducers = entities.reduce<EntityIdsReducers>((reducers, entity)  =>{
-    reducers[entity] = makeEntityIdsReducer(schema.entity(entity));
+    reducers[entity] = makeIdsReducer(schema.entity(entity));
     return reducers;
   }, {});
 
-  return (state: IdsState = schema.getEmptyIdsState(), action: OpAction) => {
-    return Object.keys(idsReducers).reduce((reducedState: IdsState, entity: string) => {
+  return (state: IdsByEntityState = schema.getEmptyIdsByEntityState(), action: OpAction) => {
+    return Object.keys(idsReducers).reduce((reducedState: IdsByEntityState, entity: string) => {
       const newReducedState = {...reducedState};
       const entityReducer = idsReducers[entity];
       newReducedState[entity] = entityReducer(newReducedState[entity], action.ops || []);
@@ -67,7 +67,7 @@ export const makeIdsReducer = (schema: ModelSchemaReader) => {
   };
 };
 
-export const makeEntityIdsReducer = (schema: EntitySchemaReader) => {
+export const makeIdsReducer = (schema: EntitySchemaReader) => {
   return (state: string[] = [], ops: Op[] = []) => {
     return ops.reduce((state, op) => {
       if (op.entity !== schema.getEntity()) {
@@ -98,18 +98,18 @@ export const makeEntityIdsReducer = (schema: EntitySchemaReader) => {
   };
 };
 
-export const makeEntitiesReducer = (schema: ModelSchemaReader) => {
+export const makeResourcesByEntityReducer = (schema: ModelSchemaReader) => {
   const entities = schema.getEntities();
 
-  const entityReducers = entities.reduce<EntityReducers>((reducers, entity) => {
-    reducers[entity] = makeEntityReducer(schema.entity(entity));
+  const resourcesReducers = entities.reduce<EntityReducers>((reducers, entity) => {
+    reducers[entity] = makeResourcesReducer(schema.entity(entity));
     return reducers;
   }, {});
 
-  return (state: EntitiesState = schema.getEmptyEntitiesState(), action: OpAction) => {
-    return Object.keys(entityReducers).reduce((reducedState: EntitiesState, entity: string) => {
+  return (state: ResourcesByEntityState = schema.getEmptyResourcesByEntityState(), action: OpAction) => {
+    return Object.keys(resourcesReducers).reduce((reducedState: ResourcesByEntityState, entity: string) => {
       const newReducedState = {...reducedState};
-      const entityReducer = entityReducers[entity];
+      const entityReducer = resourcesReducers[entity];
       newReducedState[entity] = entityReducer(newReducedState[entity], action.ops || []);
       return newReducedState;
     }, state)
@@ -117,7 +117,8 @@ export const makeEntitiesReducer = (schema: ModelSchemaReader) => {
 };
 
 
-export const makeEntityReducer = (schema: EntitySchemaReader): EntityReducer => {
+export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer => {
+  // the state is all the resources of a given entity
   return (state= {}, ops: Op[] = []) => {
     return ops.reduce((state, op) => {
       if (op.entity !== schema.getEntity()) {

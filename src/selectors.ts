@@ -1,13 +1,13 @@
 import {
   Cardinalities,
-  EntitiesState,
+  ResourcesByEntityState,
   InvalidEntityHandler,
   InvalidRelHandler,
   InvalidRelDataHandler,
   NonexistentResourceHandler,
   ActionCreators,
   ActionTypes,
-  Selectors, EntityState, State,
+  Selectors, ResourcesState, State,
 } from './types';
 import { ModelSchemaReader } from './schema';
 import { noop } from './util';
@@ -29,7 +29,7 @@ export const makeSelectors = (
     onInvalidRelData = noop
   }: Opts = {}
 ): Selectors => {
-  const getEntitiesState = (state: State) => state.entities;
+  const getEntitiesState = (state: State) => state.resources;
   const getIdsState = (state: State) => state.ids;
 
   const getEntityState = (state: State, args: { entity: string }) => {

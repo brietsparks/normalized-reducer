@@ -37,7 +37,7 @@ describe('schema', () => {
     const result = blogModelSchemaReader.getEmptyState();
 
     const expected = {
-      entities: {
+      resources: {
         author: {},
         article: {},
       },

@@ -71,7 +71,7 @@ export const forumSchema = {
 };
 
 export interface ForumState extends State {
-  entities: {
+  resources: {
     account: {
       [id: string]: {
         profileId?: string

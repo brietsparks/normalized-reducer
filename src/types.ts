@@ -147,13 +147,13 @@ export interface BatchAction extends Action {
 
 export interface SetStateAction {
   type: string,
-  state: EntitiesState
+  state: ResourcesByEntityState
 }
 
 export interface SetEntityState {
   type: string,
   entity: string,
-  state: EntityState
+  state: ResourcesState
 }
 
 export interface SetResourceState {
@@ -180,8 +180,8 @@ export type AttachActionCreator = (entity: string, id: string, rel: string, relI
 export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
 export type MoveAttachedActionCreator = (entity: string, id: string, rel: string, src: number, dest: number) => MoveAttachedAction;
 export type BatchActionCreator = (...actions: ConcreteOpAction[]) => BatchAction;
-export type SetStateActionCreator = (state: EntitiesState) => SetStateAction;
-export type SetEntityStateCreator = (entity: string, state: EntityState) => SetEntityState;
+export type SetStateActionCreator = (state: ResourcesByEntityState) => SetStateAction;
+export type SetEntityStateCreator = (entity: string, state: ResourcesState) => SetEntityState;
 export type SetResourceStateCreator = (entity: string, id: string, state: ResourceState) => SetResourceState;
 export type SetRelStateCreator = (entity: string, id: string, rel: string, state: RelDataState) => SetRelState;
 
@@ -244,10 +244,10 @@ export enum Cardinalities {
 // state types
 //
 
-export type State = { entities: EntitiesState, ids: IdsState };
-export type IdsState = { [entity: string]: string[] };
-export type EntitiesState = { [entity: string]: EntityState };
-export type EntityState = { [id: string]: ResourceState };
+export type State = { resources: ResourcesByEntityState, ids: IdsByEntityState };
+export type IdsByEntityState = { [entity: string]: string[] };
+export type ResourcesByEntityState = { [entity: string]: ResourcesState };
+export type ResourcesState = { [id: string]: ResourceState };
 export type ResourceState = { [attr: string]: RelDataState | any };
 export type RelDataState = undefined | string | string[];
 
@@ -279,7 +279,7 @@ export interface EntityIdsReducers {
   [entity: string]: EntityIdsReducer
 }
 
-export type EntityReducer = (state: EntityState, ops: Op[]) => EntityState;
+export type EntityReducer = (state: ResourcesState, ops: Op[]) => ResourcesState;
 export interface EntityReducers {
   [entity: string]: EntityReducer
 }

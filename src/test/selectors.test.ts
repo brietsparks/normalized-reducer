@@ -31,8 +31,8 @@ describe('selectors', () => {
   test('getEntityAttachedArr', () => {
     // note: this is not actually valid state
     const state = {
-      entities: {
-        ...forumEmptyState.entities,
+      resources: {
+        ...forumEmptyState.resources,
         profile: {
           p1: {
             accountId: 'a1',

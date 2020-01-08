@@ -41,8 +41,8 @@ describe('index', () => {
         );
 
         const expected: ForumState = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': {}
             },
@@ -58,8 +58,8 @@ describe('index', () => {
 
       test('if id exists, then do not create the resource', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: undefined }
             }
@@ -87,8 +87,8 @@ describe('index', () => {
         );
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { email: 'a@b.c' }
             }
@@ -109,8 +109,8 @@ describe('index', () => {
         );
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': {}
             }
@@ -129,8 +129,8 @@ describe('index', () => {
       describe('rel of one-cardinality', () => {
         test('if attachable resource does not exist, then do nothing', () => {
           const state = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               account: {
                 'a1': { profileId: undefined }
               }
@@ -154,8 +154,8 @@ describe('index', () => {
 
         describe('a single attachable', () => {
           const expected = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               account: {
                 'a1': { profileId: 'p1' }
               },
@@ -172,8 +172,8 @@ describe('index', () => {
 
           test('set rel value to attachable id', () => {
             const state = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 profile: {
                   'p1': { accountId: undefined }
                 }
@@ -197,8 +197,8 @@ describe('index', () => {
 
           test('if no reciprocal rel key on attachable resource, then set key and value', () => {
             const state = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 profile: {
                   'p1': {}
                 }
@@ -222,8 +222,8 @@ describe('index', () => {
 
           test('ignore index', () => {
             const state = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 profile: {
                   'p1': { accountId: undefined }
                 },
@@ -250,8 +250,8 @@ describe('index', () => {
 
         test('multiple attachables: overwrite each time', () => {
           const state = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               profile: {
                 'p1': { accountId: undefined },
                 'p2': { accountId: undefined },
@@ -273,8 +273,8 @@ describe('index', () => {
           );
 
           const expected = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               account: {
                 'a1': { profileId: 'p2' }
               },
@@ -298,8 +298,8 @@ describe('index', () => {
         describe('a single attachable', () => {
           test('if no reciprocal index, then append to attachable', () => {
             const state = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 post: {
                   'o1': {
                     profileId: undefined,
@@ -325,8 +325,8 @@ describe('index', () => {
             );
 
             const expected = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 post: {
                   'o1': {
                     profileId: undefined,
@@ -350,8 +350,8 @@ describe('index', () => {
 
           test('if reciprocal index, then insert in attachable', () => {
             const state = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 post: {
                   'o1': {
                     profileId: undefined,
@@ -378,8 +378,8 @@ describe('index', () => {
             );
 
             const expected = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 post: {
                   'o1': {
                     profileId: undefined,
@@ -404,8 +404,8 @@ describe('index', () => {
 
           test('if no reciprocal rel key on attachable resource, then set key and value', () => {
             const state = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 post: {
                   'o1': {
                     profileId: undefined,
@@ -425,8 +425,8 @@ describe('index', () => {
             );
 
             const expected = {
-              entities: {
-                ...forumEmptyState.entities,
+              resources: {
+                ...forumEmptyState.resources,
                 post: {
                   'o1': {
                     profileId: undefined,
@@ -450,8 +450,8 @@ describe('index', () => {
 
         test('multiple attachables: append/insert each', () => {
           const state = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -483,8 +483,8 @@ describe('index', () => {
           );
 
           const expected = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               post: {
                 'o1': {
                   profileId: undefined,
@@ -527,8 +527,8 @@ describe('index', () => {
 
     describe('without attached', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           account: {
             'a1': { profileId: undefined }
           }
@@ -561,8 +561,8 @@ describe('index', () => {
     describe('detach all existing attached resources', () => {
       test('detach resource of reciprocal one-cardinality', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               a1: { profileId: 'p1' }
             },
@@ -591,8 +591,8 @@ describe('index', () => {
         );
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               a1: { profileId: undefined }
             },
@@ -619,8 +619,8 @@ describe('index', () => {
 
       test('detach resource of reciprocal many-cardinality', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             profile: {
               p1: { postIds: ['o1', 'o2', 'o3'] }
             },
@@ -647,8 +647,8 @@ describe('index', () => {
         );
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             profile: {
               p1: { postIds: ['o1', 'o3'] }
             },
@@ -680,8 +680,8 @@ describe('index', () => {
     */
 
     const state = {
-      entities: {
-        ...forumEmptyState.entities,
+      resources: {
+        ...forumEmptyState.resources,
         profile: {
           'p1': {
             postIds: ['o1']
@@ -721,8 +721,8 @@ describe('index', () => {
       ));
 
       const expected = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           profile: {
             'p1': {
               postIds: ['o1']
@@ -789,8 +789,8 @@ describe('index', () => {
     describe('rel of one-cardinality', () => {
       test('set rel value to id', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: undefined }
             },
@@ -813,8 +813,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: 'p1' }
             },
@@ -834,8 +834,8 @@ describe('index', () => {
 
       test('if no resource rel key, then set key and value', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': {}
             },
@@ -858,8 +858,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: 'p1' }
             },
@@ -879,8 +879,8 @@ describe('index', () => {
 
       test('ignore index', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: undefined }
             },
@@ -904,8 +904,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: 'p1' }
             },
@@ -927,8 +927,8 @@ describe('index', () => {
     describe('rel of many-cardinality', () => {
       test('if no index, then append', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1'] }
             },
@@ -952,8 +952,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1', 'c2'] }
             },
@@ -974,8 +974,8 @@ describe('index', () => {
 
       test('if index, then insert', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1', 'c2'] },
             },
@@ -1001,8 +1001,8 @@ describe('index', () => {
           ))
         ].forEach(result => {
           const expected = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               post: {
                 'o1': { categoryIds: ['c1', 'c3', 'c2'] },
               },
@@ -1025,8 +1025,8 @@ describe('index', () => {
 
       test('if no resource rel key, then set key and value', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': {}
             },
@@ -1049,8 +1049,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1'] }
             },
@@ -1070,8 +1070,8 @@ describe('index', () => {
 
       test('if already attached, then do nothing', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1'] }
             },
@@ -1099,8 +1099,8 @@ describe('index', () => {
 
     test('if either resource does not exist, then do nothing', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           account: {
             'a1': { profileId: undefined }
           },
@@ -1127,8 +1127,8 @@ describe('index', () => {
 
     test('if partially attached (invalid state), then fix the attachment', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           account: {
             'a1': { profileId: 'p1' }
           },
@@ -1152,8 +1152,8 @@ describe('index', () => {
         )),
       ].forEach(result => {
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: 'p1' }
             },
@@ -1191,8 +1191,8 @@ describe('index', () => {
     describe('basic', () => {
       test('one-cardinality', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: 'p1' }
             },
@@ -1216,8 +1216,8 @@ describe('index', () => {
           )),
         ].forEach(result => {
           const expected = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               account: {
                 'a1': { profileId: undefined }
               },
@@ -1239,8 +1239,8 @@ describe('index', () => {
 
       test('many-cardinality', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1', 'c2', 'c3'] }
             },
@@ -1263,8 +1263,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1', 'c3'] }
             },
@@ -1285,8 +1285,8 @@ describe('index', () => {
 
     test('if resource does not exist, then do nothing', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           account: {
             'a1': { profileId: 'p1' }
           },
@@ -1315,8 +1315,8 @@ describe('index', () => {
 
     test('if attachment does not exist then do nothing', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           account: {
             'a1': { profileId: 'p1' },
             'a200': { profileId: undefined }
@@ -1347,8 +1347,8 @@ describe('index', () => {
     describe('if partially attached (invalid state), then still remove it completely', () => {
       test('when only one resource exists', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1'] }
             },
@@ -1368,8 +1368,8 @@ describe('index', () => {
           )),
         ].forEach(result => {
           const expected = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               post: {
                 'o1': { categoryIds: [] }
               },
@@ -1386,8 +1386,8 @@ describe('index', () => {
 
       test('when both exist but only one is attached', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1'] }
             },
@@ -1411,8 +1411,8 @@ describe('index', () => {
           )),
         ].forEach(result => {
           const expected = {
-            entities: {
-              ...forumEmptyState.entities,
+            resources: {
+              ...forumEmptyState.resources,
               post: {
                 'o1': { categoryIds: [] }
               },
@@ -1443,8 +1443,8 @@ describe('index', () => {
 
     test('move attached id', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           post: {
             'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
           },
@@ -1471,8 +1471,8 @@ describe('index', () => {
       ));
 
       const expected =  {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           post: {
             'o1': { categoryIds: ['c1', 'c3', 'c4', 'c2', 'c5'] }
           },
@@ -1496,8 +1496,8 @@ describe('index', () => {
 
     test('if resource does not exist or does not have rel key, then ignore', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           post: {
             'o1': {}
           }
@@ -1520,8 +1520,8 @@ describe('index', () => {
 
     test('if rel is cardinality of one, then ignore', () => {
       const state = {
-        entities: {
-          ...forumEmptyState.entities,
+        resources: {
+          ...forumEmptyState.resources,
           account: {
             'a1': { profileId: 'p1' }
           },
@@ -1642,8 +1642,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: undefined },
               'a2': { profileId: undefined }
@@ -1660,8 +1660,8 @@ describe('index', () => {
 
       test('remove-actions', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': {},
               'a2': {},
@@ -1683,8 +1683,8 @@ describe('index', () => {
 
       test('attach-actions', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': {},
             },
@@ -1709,8 +1709,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: 'p1' },
             },
@@ -1734,8 +1734,8 @@ describe('index', () => {
 
       test('detach-actions', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: 'p1' },
             },
@@ -1760,8 +1760,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             account: {
               'a1': { profileId: undefined },
             },
@@ -1785,8 +1785,8 @@ describe('index', () => {
 
       test('move-attached actions', () => {
         const state = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
             },
@@ -1811,8 +1811,8 @@ describe('index', () => {
         ));
 
         const expected = {
-          entities: {
-            ...forumEmptyState.entities,
+          resources: {
+            ...forumEmptyState.resources,
             post: {
               'o1': { categoryIds: ['c3', 'c1', 'c4', 'c2', 'c5'] }
             },

@@ -48,7 +48,7 @@ describe('middleware', () => {
 
       test('with attached', () => {
         const state: BlogState = {
-          entities: {
+          resources: {
             author: {
               'a1': { articleIds: [] }
             },
@@ -110,7 +110,7 @@ describe('middleware', () => {
 
       test('with attached displacing existing attached', () => {
         const state: BlogState = {
-          entities: {
+          resources: {
             author: {
               'a1': { articleIds: ['r1'] },
               'a2': { articleIds: ['r2'] },

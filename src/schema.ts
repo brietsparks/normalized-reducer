@@ -4,8 +4,8 @@ import {
   RelSchema,
   Cardinalities,
   ResourceState,
-  EntitiesState,
-  IdsState,
+  ResourcesByEntityState,
+  IdsByEntityState,
   State,
 } from './types';
 
@@ -25,24 +25,24 @@ export class ModelSchemaReader {
     );
   }
 
-  getEmptyEntitiesState() {
+  getEmptyResourcesByEntityState() {
     return this.getEntities().reduce((emptyState, entity) => {
       emptyState[entity] = {};
       return emptyState;
-    }, {} as EntitiesState);
+    }, {} as ResourcesByEntityState);
   }
 
-  getEmptyIdsState() {
+  getEmptyIdsByEntityState() {
     return this.getEntities().reduce((idsState, entity) => {
       idsState[entity] = [];
       return idsState;
-    }, {} as IdsState);
+    }, {} as IdsByEntityState);
   }
 
   getEmptyState<S extends State>(): S {
     return {
-      entities: this.getEmptyEntitiesState(),
-      ids: this.getEmptyIdsState(),
+      resources: this.getEmptyResourcesByEntityState(),
+      ids: this.getEmptyIdsByEntityState(),
     } as S;
   }
 

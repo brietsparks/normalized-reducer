@@ -52,7 +52,7 @@ describe('pendingState', () => {
 
     test('attach then detach', () => {
       const blogState: BlogState = {
-        entities: {
+        resources: {
           author: {
             'a1': { articleIds: [] }
           },
@@ -100,7 +100,7 @@ describe('pendingState', () => {
 
     test('attach and displace occupant resources', () => {
       const blogState: BlogState = {
-        entities: {
+        resources: {
           author: {
             'a1': { articleIds: ['r1'] },
             'a2': { articleIds: [] }
