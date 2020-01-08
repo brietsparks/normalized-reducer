@@ -12,7 +12,7 @@ describe('pendingState', () => {
 
     // modify the cache
     expect(pendingState.checkExistence('author', 'a9000')).toEqual(false);
-    pendingState.addResource('author', 'a9000');
+    pendingState.addResource('author', 'a9000', {});
     expect(pendingState.checkExistence('author', 'a9000')).toEqual(true);
   });
 

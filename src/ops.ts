@@ -11,7 +11,6 @@ import {
 } from './types';
 import { ModelSchemaReader } from './schema';
 
-
 export const makeAddResourceOp = (entity: string, id: string, data?: object): AddResourceOp => {
   return {
     opType: OpTypes.ADD_RESOURCE,
@@ -84,19 +83,16 @@ export class OpsBatch<S extends AbstractState> {
   //
   // addResource
   //
-  putAddResource(entity: string, id: string) {
+  putAddResource(entity: string, id: string, data?: object) {
     const key = concat(entity, id);
-    this.ops[key] = makeAddResourceOp(entity, id);
+    this.ops[key] = makeAddResourceOp(entity, id, data);
   }
   getAddResource(entity: string, id: string) {
     const key = concat(entity, id);
     return this.ops[key];
   }
   deleteAddResource(entity: string, id: string) {
-    const key = concat(entity, id);
-    if (key) {
-      delete this.ops[key];
-    }
+    throw new Error('deleteAddResource not implemented');
   }
 
   //
@@ -107,14 +103,10 @@ export class OpsBatch<S extends AbstractState> {
     this.ops[key] = makeRemoveResourceOp(entity, id);
   }
   getRemoveResource(entity: string, id: string) {
-    const key = concat(entity, id);
-    return this.ops[key];
+    throw new Error('getRemoveResource not implemented');
   }
   deleteRemoveResource(entity: string, id: string) {
-    const key = concat(entity, id);
-    if (key) {
-      delete this.ops[key];
-    }
+    throw new Error('deleteRemoveResource not implemented');
   }
 
   //
@@ -144,10 +136,13 @@ export class OpsBatch<S extends AbstractState> {
   // moveRelId
   //
   putMoveRelId() {
+    throw new Error('putMoveRelId not implemented');
   }
   getMoveRelId() {
+    throw new Error('getMoveRelId not implemented');
   }
   deleteMoveRelId() {
+    throw new Error('deleteMoveRelId not implemented');
   }
 
   //
@@ -158,6 +153,7 @@ export class OpsBatch<S extends AbstractState> {
     this.ops[key] = makeRemoveRelIdOp(entity, id, rel, relId);
   }
   getRemoveRelId(entity: string, id: string, rel: string, relId: string) {
+    throw new Error('getRemoveRelId not implemented');
   }
   deleteRemoveRelId(entity: string, id: string, rel: string, relId: string) {
     const key = concat(entity, id, rel, relId);

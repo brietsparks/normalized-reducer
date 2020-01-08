@@ -207,7 +207,7 @@ export enum Cardinalities {
 
 export type AbstractState = { [entity: string]: AbstractEntityState }
 export type AbstractEntityState = { [id: string]: AbstractResourceState }
-export type AbstractResourceState = { [rel: string]: AbstractRelDataState }
+export type AbstractResourceState = { [attr: string]: AbstractRelDataState | any }
 export type AbstractRelDataState = undefined | string | string[]
 
 

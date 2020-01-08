@@ -32,8 +32,8 @@ export class PendingState<S extends AbstractState> {
     );
   }
 
-  addResource(entity: string, id: string) {
-    this.ops.putAddResource(entity, id);
+  addResource(entity: string, id: string, data?: object) {
+    this.ops.putAddResource(entity, id, data);
   }
 
   removeResource(entity: string, id: string) {

@@ -32,7 +32,6 @@ export const makeReducer = <S extends AbstractState>(
     //
     // handle state setter actions
     //
-
     if (anyAction.type === actionTypes.SET_STATE) {
       const action = anyAction as SetStateAction<S>;
       return action.state;
@@ -124,7 +123,7 @@ export const makeEntityReducer = <S extends AbstractState> (schema: EntitySchema
 
         return {
           ...state,
-          [addResourceOp.id]: schema.getEmptyResourceState()
+          [addResourceOp.id]: addResourceOp.data || schema.getEmptyResourceState()
         }
       }
 

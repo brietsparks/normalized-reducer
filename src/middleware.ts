@@ -38,14 +38,14 @@ export const makeActionTransformer = <S extends AbstractState> (
 
     if (action.type === actionTypes.ADD) {
       const addAction = action as AddAction;
-      const { entity, id } = addAction;
+      const { entity, id, data } = addAction;
 
       if (selectors.checkResource(state, { entity, id })) {
         addAction.ops = [];
         return addAction;
       }
 
-      pendingState.addResource(entity, id);
+      pendingState.addResource(entity, id, data);
 
       if (addAction.attach) {
         addAction.attach.forEach(attachable => {

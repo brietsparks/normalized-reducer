@@ -7,6 +7,10 @@ describe('index', () => {
       if id does not exist, then create the resource
       if id exists, do not create the resource
 
+    with attribute data
+      add resource with non-rel attribute data
+      ignore rel attribute data
+
     with attachables
       rel of one-cardinality
         if attachable resource does not exist, then do nothing
@@ -55,6 +59,40 @@ describe('index', () => {
         );
 
         expect(result).toEqual(state);
+      });
+    });
+
+    describe('with attribute data', () => {
+      test('add resource with non-rel attribute data', () => {
+        const result = forumReducer(
+          forumEmptyState,
+          forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', { email: 'a@b.c' })
+        );
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': { email: 'a@b.c' }
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('ignore rel attribute data', () => {
+        const result = forumReducer(
+          forumEmptyState,
+          forumActionCreators.add(ForumEntities.ACCOUNT, 'a1', { 'profileId': 'invalidData!' })
+        );
+
+        const expected = {
+          ...forumEmptyState,
+          account: {
+            'a1': {}
+          }
+        };
+
+        expect(result).toEqual(expected);
       });
     });
 
