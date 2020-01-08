@@ -66,7 +66,7 @@ export const makeRemoveRelIdOp = (entity: string, id: string, rel: string, relId
 
 const concat = (...strings: (string|undefined)[]) => strings.filter(s => s !== undefined).join('.');
 
-export const makeMoveAttachedOp = (entity: string, id: string, rel: string, src: number, dest:number): MoveRelIdOp => {
+export const makeMoveRelIdOp = (entity: string, id: string, rel: string, src: number, dest:number): MoveRelIdOp => {
   return {
     opType: OpTypes.MOVE_REL_ID,
     entity,
@@ -93,11 +93,11 @@ export class OpsBatch {
   // addResource
   //
   putAddResource(entity: string, id: string, data?: object) {
-    const key = concat(entity, id);
+    const key = concat(OpTypes.ADD_RESOURCE, entity, id);
     this.ops[key] = makeAddResourceOp(entity, id, data);
   }
   getAddResource(entity: string, id: string) {
-    const key = concat(entity, id);
+    const key = concat(OpTypes.ADD_RESOURCE, entity, id);
     return this.ops[key];
   }
   deleteAddResource(entity: string, id: string) {
@@ -108,7 +108,7 @@ export class OpsBatch {
   // removeResource
   //
   putRemoveResource(entity: string, id: string) {
-    const key = concat(entity, id);
+    const key = concat(OpTypes.REMOVE_RESOURCE, entity, id);
     this.ops[key] = makeRemoveResourceOp(entity, id);
   }
   getRemoveResource(entity: string, id: string) {
@@ -122,7 +122,7 @@ export class OpsBatch {
   // editResource
   //
   putEditResource(entity: string, id: string, data: object) {
-    const key = concat(entity, id);
+    const key = concat(OpTypes.EDIT_RESOURCE, entity, id);
     this.ops[key] = makeEditResourceOp(entity, id, data);
   }
 
@@ -146,14 +146,15 @@ export class OpsBatch {
   }
   private makeAddRelIdKey(entity: string, id: string, rel: string, relId?: string) {
     const isSingular = this.schema.entity(entity).getCardinality(rel) === Cardinalities.ONE;
-    return concat(entity, id, rel, isSingular ? undefined : relId);
+    return concat(OpTypes.ADD_REL_ID, entity, id, rel, isSingular ? undefined : relId);
   }
 
   //
   // moveRelId
   //
-  putMoveRelId() {
-    throw new Error('putMoveRelId not implemented');
+  putMoveRelId(entity: string, id: string, rel: string, src: number, dest: number) {
+    const key = concat(OpTypes.MOVE_REL_ID, entity, id, rel, String(src), String(dest));
+    this.ops[key] = makeMoveRelIdOp(entity, id, rel, src, dest);
   }
   getMoveRelId() {
     throw new Error('getMoveRelId not implemented');

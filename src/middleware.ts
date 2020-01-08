@@ -7,7 +7,6 @@ import {
   Selectors, BatchAction, Action, EditAction, State
 } from './types';
 import { PendingState } from './state';
-import { makeMoveAttachedOp } from './ops';
 
 // makeActionTransformer is a selector that should be used to
 // intercept an action before it gets handled by the entity reducer(s)
@@ -22,15 +21,8 @@ export const makeActionTransformer = (
     if (action.type === actionTypes.BATCH) {
       const batchAction = action as BatchAction;
 
-      batchAction.ops = batchAction.actions.reduce((ops, action) => {
-        const transformedAction = transformAction(state, action, pendingState);
-
-        if (transformedAction.ops) {
-          ops.push(...transformedAction.ops);
-        }
-
-        return ops;
-      }, [] as Op[]);
+      batchAction.actions.forEach(action => transformAction(state, action, pendingState));
+      batchAction.ops = pendingState.getOps();
 
       return batchAction;
     }
@@ -122,7 +114,9 @@ export const makeActionTransformer = (
       const moveAttachedAction = action as MoveAttachedAction;
       const { entity, id, rel, src, dest } = moveAttachedAction;
 
-      moveAttachedAction.ops = [makeMoveAttachedOp(entity, id, rel, src, dest)];
+      pendingState.moveAttachedResource(entity, id, rel, src, dest);
+
+      moveAttachedAction.ops = pendingState.getOps();
 
       return moveAttachedAction;
     }

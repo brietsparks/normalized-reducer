@@ -97,6 +97,10 @@ export class PendingState {
     this.ops.putRemoveRelId(relEntity, relId, reciprocalRel, id);
   }
 
+  moveAttachedResource(entity: string, id: string, rel: string, src: number, dest: number) {
+    this.ops.putMoveRelId(entity, id, rel, src, dest);
+  }
+
   private detachOccupant(entity: string, id: string, rel: string) {
     const entitySchema = this.schema.entity(entity);
     const relEntity = entitySchema.getRelEntity(rel);
