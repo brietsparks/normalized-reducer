@@ -1,7 +1,7 @@
 import {
   EntitiesState,
   Cardinalities,
-  Selectors, EntityState,
+  Selectors, State,
 } from './types';
 
 import { OpsBatch } from './ops';
@@ -9,11 +9,11 @@ import { ModelSchemaReader } from './schema';
 
 export class PendingState {
   schema: ModelSchemaReader;
-  state: EntityState;
+  state: State;
   selectors: Selectors;
   ops: OpsBatch;
 
-  constructor(schema: ModelSchemaReader, state: EntityState, selectors: Selectors) {
+  constructor(schema: ModelSchemaReader, state: State, selectors: Selectors) {
     this.schema = schema;
     this.state = state;
     this.selectors = selectors;

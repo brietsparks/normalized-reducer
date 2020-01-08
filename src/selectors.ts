@@ -7,7 +7,7 @@ import {
   NonexistentResourceHandler,
   ActionCreators,
   ActionTypes,
-  Selectors, EntityState,
+  Selectors, EntityState, State,
 } from './types';
 import { ModelSchemaReader } from './schema';
 import { noop } from './util';
@@ -29,16 +29,25 @@ export const makeSelectors = (
     onInvalidRelData = noop
   }: Opts = {}
 ): Selectors => {
-  const getEntityState = (state: EntityState, args: { entity: string }) => {
+  const getEntitiesState = (state: State) => state.entities;
+  const getIdsState = (state: State) => state.ids;
+
+  const getEntityState = (state: State, args: { entity: string }) => {
+    const entityState = getEntitiesState(state);
+
+    if (typeof entityState !== 'object') {
+      return undefined;
+    }
+
     if (!schema.entityExists(args.entity)) {
       onInvalidEntity(args.entity);
       return undefined;
     }
 
-    return state[args.entity];
+    return entityState[args.entity];
   };
 
-  const checkResource = (state: EntityState, args: { entity: string, id: string }) => {
+  const checkResource = (state: State, args: { entity: string, id: string }) => {
     const entityState = getEntityState(state, { entity: args.entity });
 
     if (!entityState) {
@@ -48,7 +57,7 @@ export const makeSelectors = (
     return !!entityState[args.id];
   };
 
-  const getResourceState = (state: EntityState, args: { entity: string, id: string }) => {
+  const getResourceState = (state: State, args: { entity: string, id: string }) => {
     const entityState = getEntityState(state, { entity: args.entity });
 
     if (!entityState) {
@@ -65,7 +74,7 @@ export const makeSelectors = (
     return resource;
   };
 
-  const getAttached = (state: EntityState, args: { entity: string, id: string, rel: string }) => {
+  const getAttached = (state: State, args: { entity: string, id: string, rel: string }) => {
     const resource = getResourceState(state, {
       entity: args.entity,
       id: args.id,
@@ -92,7 +101,7 @@ export const makeSelectors = (
   };
 
   const getAttachedArr = (
-    state: EntityState,
+    state: State,
     args: {
       entity: string,
       id: string,
@@ -108,7 +117,7 @@ export const makeSelectors = (
     return relState ? [relState] as string[] : [] as string[];
   };
 
-  const getEntityAttachedArr = (state: EntityState, args: { entity: string, id: string }) => {
+  const getEntityAttachedArr = (state: State, args: { entity: string, id: string }) => {
     const result: { [rel: string]: string[] } = {};
 
     if (!schema.entityExists(args.entity)) {

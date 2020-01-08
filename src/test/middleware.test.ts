@@ -48,12 +48,18 @@ describe('middleware', () => {
 
       test('with attached', () => {
         const state: BlogState = {
-          author: {
-            'a1': { articleIds: [] }
+          entities: {
+            author: {
+              'a1': { articleIds: [] }
+            },
+            article: {
+              'r1': { authorId: undefined },
+              'r2': { authorId: undefined },
+            }
           },
-          article: {
-            'r1': { authorId: undefined },
-            'r2': { authorId: undefined },
+          ids: {
+            author: ['a1'],
+            article: ['r1', 'r2']
           }
         };
 
@@ -104,13 +110,19 @@ describe('middleware', () => {
 
       test('with attached displacing existing attached', () => {
         const state: BlogState = {
-          author: {
-            'a1': { articleIds: ['r1'] },
-            'a2': { articleIds: ['r2'] },
+          entities: {
+            author: {
+              'a1': { articleIds: ['r1'] },
+              'a2': { articleIds: ['r2'] },
+            },
+            article: {
+              'r1': { authorId: 'a1' },
+              'r2': { authorId: 'a2' },
+            }
           },
-          article: {
-            'r1': { authorId: 'a1' },
-            'r2': { authorId: 'a2' },
+          ids: {
+            author: ['a1', 'a2'],
+            article: ['r1', 'r2']
           }
         };
 

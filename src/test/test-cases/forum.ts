@@ -1,7 +1,7 @@
 import {
   Cardinalities,
   EntitySchema,
-  EntitiesState,
+  State,
 } from '../../types';
 
 import makeModule from '../..';
@@ -70,28 +70,36 @@ export const forumSchema = {
   category: categorySchema,
 };
 
-export interface ForumState extends EntitiesState {
-  account: {
-    [id: string]: {
-      profileId?: string
+export interface ForumState extends State {
+  entities: {
+    account: {
+      [id: string]: {
+        profileId?: string
+      }
     }
-  }
-  profile: {
-    [id: string]: {
-      accountId?: string,
-      postIds?: string[],
+    profile: {
+      [id: string]: {
+        accountId?: string,
+        postIds?: string[],
+      }
     }
-  }
-  post: {
-    [id: string]: {
-      profileId?: string,
-      categoryIds?: string[],
+    post: {
+      [id: string]: {
+        profileId?: string,
+        categoryIds?: string[],
+      }
     }
-  }
-  category: {
-    [id: string]: {
-      postIds?: string[],
+    category: {
+      [id: string]: {
+        postIds?: string[],
+      }
     }
+  },
+  ids: {
+    account: string[],
+    profile: string[],
+    post: string[],
+    category: string[],
   }
 }
 
@@ -102,4 +110,4 @@ export const {
   transformAction: forumTransformAction,
   selectors: forumSelectors,
   actionTypes: forumActionTypes,
-} = makeModule(forumSchema);
+} = makeModule<ForumState>(forumSchema);

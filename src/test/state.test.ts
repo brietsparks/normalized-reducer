@@ -52,13 +52,19 @@ describe('pendingState', () => {
 
     test('attach then detach', () => {
       const blogState: BlogState = {
-        author: {
-          'a1': { articleIds: [] }
+        entities: {
+          author: {
+            'a1': { articleIds: [] }
+          },
+          article: {
+            'r1': { authorId: undefined },
+            'r2': { authorId: undefined },
+          },
         },
-        article: {
-          'r1': { authorId: undefined },
-          'r2': { authorId: undefined },
-        },
+        ids: {
+          author: ['a1'],
+          article: ['r1', 'r2']
+        }
       };
 
       const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
@@ -94,12 +100,18 @@ describe('pendingState', () => {
 
     test('attach and displace occupant resources', () => {
       const blogState: BlogState = {
-        author: {
-          'a1': { articleIds: ['r1'] },
-          'a2': { articleIds: [] }
+        entities: {
+          author: {
+            'a1': { articleIds: ['r1'] },
+            'a2': { articleIds: [] }
+          },
+          article: {
+            'r1': { authorId: 'a1' }
+          }
         },
-        article: {
-          'r1': { authorId: 'a1' }
+        ids: {
+          author: ['a1'],
+          article: ['r1', 'r2']
         }
       };
 

@@ -15,30 +15,34 @@ export enum OpTypes {
 export interface Op {
   opType: string,
   entity: string,
-  id: string,
 }
 
 export interface AddResourceOp extends Op {
+  id: string,
   opType: OpTypes.ADD_RESOURCE,
   data?: object,
+  index?: number,
 }
 
 export interface RemoveResourceOp extends Op {
+  id: string,
   opType: OpTypes.REMOVE_RESOURCE,
 }
 
 export interface EditResourceOp extends Op {
+  id: string,
   opType: OpTypes.EDIT_RESOURCE,
   data: { [key: string]: any },
 }
 
-export interface MoveResourceOp extends Omit<Op, 'id'> {
+export interface MoveResourceOp extends Op {
   opType: OpTypes.MOVE_RESOURCE,
   src: number,
   dest: number,
 }
 
 export interface AddRelIdOp extends Op {
+  id: string,
   rel: string,
   relId: string,
   index?: number,
@@ -46,11 +50,13 @@ export interface AddRelIdOp extends Op {
 }
 
 export interface RemoveRelIdOp extends Op {
+  id: string,
   rel: string,
   relId?: string,
 }
 
 export interface MoveRelIdOp extends Op {
+  id: string,
   rel: string,
   src: number,
   dest: number,
@@ -238,21 +244,23 @@ export enum Cardinalities {
 // state types
 //
 
-export type EntitiesState = { [entity: string]: EntityState }
-export type EntityState = { [id: string]: ResourceState }
-export type ResourceState = { [attr: string]: RelDataState | any }
-export type RelDataState = undefined | string | string[]
+export type State = { entities: EntitiesState, ids: IdsState };
+export type IdsState = { [entity: string]: string[] };
+export type EntitiesState = { [entity: string]: EntityState };
+export type EntityState = { [id: string]: ResourceState };
+export type ResourceState = { [attr: string]: RelDataState | any };
+export type RelDataState = undefined | string | string[];
 
 
 //
 // selector types
 //
 
-export type DeriveActionWithOps = (state: EntitiesState, action: OpAction) => OpAction;
-export type CheckResource = (state: EntitiesState, args: { entity: string, id: string }) => boolean;
-export type GetAttached = (state: EntitiesState, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
-export type GetArr = (state: EntitiesState, args: { entity: string, id: string, rel: string }) => string[]
-export type GetEntityAttachedArr = (state: EntitiesState, args: { entity: string, id: string }) => { [rel: string]: string[] };
+export type DeriveActionWithOps = (state: State, action: OpAction) => OpAction;
+export type CheckResource = (state: State, args: { entity: string, id: string }) => boolean;
+export type GetAttached = (state: State, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
+export type GetArr = (state: State, args: { entity: string, id: string, rel: string }) => string[]
+export type GetEntityAttachedArr = (state: State, args: { entity: string, id: string }) => { [rel: string]: string[] };
 
 export interface Selectors {
   checkResource: CheckResource,
@@ -265,6 +273,11 @@ export interface Selectors {
 //
 // reducer types
 //
+
+export type EntityIdsReducer = (state: string[], ops: Op[]) => string[];
+export interface EntityIdsReducers {
+  [entity: string]: EntityIdsReducer
+}
 
 export type EntityReducer = (state: EntityState, ops: Op[]) => EntityState;
 export interface EntityReducers {

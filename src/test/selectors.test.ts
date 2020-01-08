@@ -31,13 +31,19 @@ describe('selectors', () => {
   test('getEntityAttachedArr', () => {
     // note: this is not actually valid state
     const state = {
-      ...forumEmptyState,
-      profile: {
-        p1: {
-          accountId: 'a1',
-          postIds: ['o1', 'o2']
+      entities: {
+        ...forumEmptyState.entities,
+        profile: {
+          p1: {
+            accountId: 'a1',
+            postIds: ['o1', 'o2']
+          },
         },
       },
+      ids: {
+        ...forumEmptyState.ids,
+        profile: ['p1']
+      }
     };
 
     const result = forumSelectors.getEntityAttachedArr(state, { entity: 'profile', id: 'p1' });

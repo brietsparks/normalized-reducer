@@ -2,7 +2,8 @@ import {
   ModelSchema,
   Namespaced,
   InvalidEntityHandler,
-  InvalidRelHandler, EntitiesState,
+  InvalidRelHandler,
+  State,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -24,7 +25,7 @@ export interface Options {
 
 export * from './types';
 
-export default function (
+export default function <S extends State> (
   schema: ModelSchema,
   options: Options = {
     namespaced: defaultNamespaced,
@@ -37,7 +38,7 @@ export default function (
   const selectors = makeSelectors(schemaReader, creators, options);
   const transformAction = makeActionTransformer(schemaReader, types, selectors);
   const reducer = makeReducer(schemaReader, types, transformAction);
-  const emptyState = schemaReader.getEmptyState();
+  const emptyState = schemaReader.getEmptyState<S>();
 
   return {
     reducer,

@@ -37,8 +37,14 @@ describe('schema', () => {
     const result = blogModelSchemaReader.getEmptyState();
 
     const expected = {
-      author: {},
-      article: {}
+      entities: {
+        author: {},
+        article: {},
+      },
+      ids: {
+        author: [],
+        article: [],
+      }
     };
 
     expect(result).toEqual(expected);

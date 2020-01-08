@@ -1,11 +1,10 @@
 import { ModelSchemaReader } from './schema';
 import {
-  EntitiesState,
   OpAction,
   ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
   RemoveAction,
-  Selectors, BatchAction, Action, EditAction, EntityState
+  Selectors, BatchAction, Action, EditAction, State
 } from './types';
 import { PendingState } from './state';
 import { makeMoveAttachedOp } from './ops';
@@ -17,7 +16,7 @@ export const makeActionTransformer = (
   actionTypes: ActionTypes,
   selectors: Selectors
 ): DeriveActionWithOps => {
-  const transformAction = (state: EntityState, action: Action, pending?: PendingState): OpAction => {
+  const transformAction = (state: State, action: Action, pending?: PendingState): OpAction => {
     const pendingState = pending || new PendingState(schema, state, selectors);
 
     if (action.type === actionTypes.BATCH) {

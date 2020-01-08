@@ -1,4 +1,9 @@
-import { ForumEntities, forumReducer, forumActionCreators, forumEmptyState } from './test-cases/forum';
+import {
+  ForumEntities,
+  forumReducer,
+  forumActionCreators,
+  forumEmptyState, ForumState,
+} from './test-cases/forum';
 
 describe('index', () => {
   describe('add', () => {
@@ -35,10 +40,16 @@ describe('index', () => {
           forumActionCreators.add(ForumEntities.ACCOUNT, 'a1')
         );
 
-        const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: undefined }
+        const expected: ForumState = {
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': {}
+            },
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1']
           }
         };
 
@@ -47,9 +58,15 @@ describe('index', () => {
 
       test('if id exists, then do not create the resource', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: undefined }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: undefined }
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1']
           }
         };
 
@@ -70,9 +87,15 @@ describe('index', () => {
         );
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { email: 'a@b.c' }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { email: 'a@b.c' }
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1']
           }
         };
 
@@ -86,9 +109,15 @@ describe('index', () => {
         );
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': {}
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': {}
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1']
           }
         };
 
@@ -100,9 +129,15 @@ describe('index', () => {
       describe('rel of one-cardinality', () => {
         test('if attachable resource does not exist, then do nothing', () => {
           const state = {
-            ...forumEmptyState,
-            account: {
-              'a1': { profileId: undefined }
+            entities: {
+              ...forumEmptyState.entities,
+              account: {
+                'a1': { profileId: undefined }
+              }
+            },
+            ids: {
+              ...forumEmptyState.ids,
+              account: ['a1']
             }
           };
 
@@ -119,20 +154,33 @@ describe('index', () => {
 
         describe('a single attachable', () => {
           const expected = {
-            ...forumEmptyState,
-            account: {
-              'a1': { profileId: 'p1' }
+            entities: {
+              ...forumEmptyState.entities,
+              account: {
+                'a1': { profileId: 'p1' }
+              },
+              profile: {
+                'p1': { accountId: 'a1' }
+              }
             },
-            profile: {
-              'p1': { accountId: 'a1' }
+            ids: {
+              ...forumEmptyState.ids,
+              account: ['a1'],
+              profile: ['p1']
             }
           };
 
           test('set rel value to attachable id', () => {
             const state = {
-              ...forumEmptyState,
-              profile: {
-                'p1': { accountId: undefined }
+              entities: {
+                ...forumEmptyState.entities,
+                profile: {
+                  'p1': { accountId: undefined }
+                }
+              },
+              ids: {
+                ...forumEmptyState.ids,
+                profile: ['p1']
               }
             };
 
@@ -149,10 +197,16 @@ describe('index', () => {
 
           test('if no reciprocal rel key on attachable resource, then set key and value', () => {
             const state = {
-              ...forumEmptyState,
-              profile: {
-                'p1': {}
-              }
+              entities: {
+                ...forumEmptyState.entities,
+                profile: {
+                  'p1': {}
+                }
+              },
+              ids: {
+                ...forumEmptyState.ids,
+                profile: ['p1']
+              },
             };
 
             const result = forumReducer(
@@ -168,9 +222,15 @@ describe('index', () => {
 
           test('ignore index', () => {
             const state = {
-              ...forumEmptyState,
-              profile: {
-                'p1': { accountId: undefined }
+              entities: {
+                ...forumEmptyState.entities,
+                profile: {
+                  'p1': { accountId: undefined }
+                },
+              },
+              ids: {
+                ...forumEmptyState.ids,
+                profile: ['p1'],
               }
             };
 
@@ -190,11 +250,18 @@ describe('index', () => {
 
         test('multiple attachables: overwrite each time', () => {
           const state = {
-            ...forumEmptyState,
-            profile: {
-              'p1': { accountId: undefined },
-              'p2': { accountId: undefined },
+            entities: {
+              ...forumEmptyState.entities,
+              profile: {
+                'p1': { accountId: undefined },
+                'p2': { accountId: undefined },
+              }
+            },
+            ids: {
+              ...forumEmptyState.ids,
+              profile: ['p1', 'p2']
             }
+
           };
 
           const result = forumReducer(
@@ -206,13 +273,20 @@ describe('index', () => {
           );
 
           const expected = {
-            ...forumEmptyState,
-            account: {
-              'a1': { profileId: 'p2' }
+            entities: {
+              ...forumEmptyState.entities,
+              account: {
+                'a1': { profileId: 'p2' }
+              },
+              profile: {
+                'p1': { accountId: undefined },
+                'p2': { accountId: 'a1' },
+              }
             },
-            profile: {
-              'p1': { accountId: undefined },
-              'p2': { accountId: 'a1' },
+            ids: {
+              ...forumEmptyState.ids,
+              account: ['a1'],
+              profile: ['p1', 'p2']
             }
           };
 
@@ -224,15 +298,22 @@ describe('index', () => {
         describe('a single attachable', () => {
           test('if no reciprocal index, then append to attachable', () => {
             const state = {
-              ...forumEmptyState,
-              post: {
-                'o1': {
-                  profileId: undefined,
-                  categoryIds: ['c1']
-                }
+              entities: {
+                ...forumEmptyState.entities,
+                post: {
+                  'o1': {
+                    profileId: undefined,
+                    categoryIds: ['c1']
+                  }
+                },
+                category: {
+                  'c1': { postIds: ['o1'] }
+                },
               },
-              category: {
-                'c1': { postIds: ['o1'] }
+              ids: {
+                ...forumEmptyState.ids,
+                post: ['o1'],
+                category: ['c1']
               }
             };
 
@@ -244,16 +325,23 @@ describe('index', () => {
             );
 
             const expected = {
-              ...forumEmptyState,
-              post: {
-                'o1': {
-                  profileId: undefined,
-                  categoryIds: ['c1','c200']
+              entities: {
+                ...forumEmptyState.entities,
+                post: {
+                  'o1': {
+                    profileId: undefined,
+                    categoryIds: ['c1','c200']
+                  }
+                },
+                category: {
+                  'c1': { postIds: ['o1'] },
+                  'c200': { postIds: ['o1'] }
                 }
               },
-              category: {
-                'c1': { postIds: ['o1'] },
-                'c200': { postIds: ['o1'] }
+              ids: {
+                ...forumEmptyState.ids,
+                post: ['o1'],
+                category: ['c1', 'c200']
               }
             };
 
@@ -262,16 +350,23 @@ describe('index', () => {
 
           test('if reciprocal index, then insert in attachable', () => {
             const state = {
-              ...forumEmptyState,
-              post: {
-                'o1': {
-                  profileId: undefined,
-                  categoryIds: ['c1','c2']
+              entities: {
+                ...forumEmptyState.entities,
+                post: {
+                  'o1': {
+                    profileId: undefined,
+                    categoryIds: ['c1','c2']
+                  }
+                },
+                category: {
+                  'c1': { postIds: ['o1'] },
+                  'c2': { postIds: ['o1'] }
                 }
               },
-              category: {
-                'c1': { postIds: ['o1'] },
-                'c2': { postIds: ['o1'] }
+              ids: {
+                ...forumEmptyState.ids,
+                post: ['o1'],
+                category: ['c1', 'c2']
               }
             };
 
@@ -283,17 +378,24 @@ describe('index', () => {
             );
 
             const expected = {
-              ...forumEmptyState,
-              post: {
-                'o1': {
-                  profileId: undefined,
-                  categoryIds: ['c1', 'c200', 'c2']
+              entities: {
+                ...forumEmptyState.entities,
+                post: {
+                  'o1': {
+                    profileId: undefined,
+                    categoryIds: ['c1', 'c200', 'c2']
+                  }
+                },
+                category: {
+                  'c1': { postIds: ['o1'] },
+                  'c2': { postIds: ['o1'] },
+                  'c200': { postIds: ['o1'] }
                 }
               },
-              category: {
-                'c1': { postIds: ['o1'] },
-                'c2': { postIds: ['o1'] },
-                'c200': { postIds: ['o1'] }
+              ids: {
+                ...forumEmptyState.ids,
+                post: ['o1'],
+                category: ['c1', 'c2', 'c200']
               }
             };
 
@@ -302,12 +404,17 @@ describe('index', () => {
 
           test('if no reciprocal rel key on attachable resource, then set key and value', () => {
             const state = {
-              ...forumEmptyState,
-              post: {
-                'o1': {
-                  profileId: undefined,
-                }
+              entities: {
+                ...forumEmptyState.entities,
+                post: {
+                  'o1': {
+                    profileId: undefined,
+                  }
+                },
               },
+              ids: {
+                post: ['o1']
+              }
             };
 
             const result = forumReducer(
@@ -318,15 +425,22 @@ describe('index', () => {
             );
 
             const expected = {
-              ...forumEmptyState,
-              post: {
-                'o1': {
-                  profileId: undefined,
-                  categoryIds: ['c1']
+              entities: {
+                ...forumEmptyState.entities,
+                post: {
+                  'o1': {
+                    profileId: undefined,
+                    categoryIds: ['c1']
+                  }
+                },
+                category: {
+                  'c1': { postIds: ['o1'] },
                 }
               },
-              category: {
-                'c1': { postIds: ['o1'] },
+              ids: {
+                ...forumEmptyState.ids,
+                post: ['o1'],
+                category: ['c1']
               }
             };
 
@@ -336,20 +450,27 @@ describe('index', () => {
 
         test('multiple attachables: append/insert each', () => {
           const state = {
-            ...forumEmptyState,
-            post: {
-              'o1': {
-                profileId: undefined,
-                categoryIds: []
+            entities: {
+              ...forumEmptyState.entities,
+              post: {
+                'o1': {
+                  profileId: undefined,
+                  categoryIds: []
+                },
+                'o2': {
+                  profileId: undefined,
+                  categoryIds: ['c1', 'c2']
+                }
               },
-              'o2': {
-                profileId: undefined,
-                categoryIds: ['c1', 'c2']
+              category: {
+                'c1': { postIds: ['o2'] },
+                'c2': { postIds: ['o2'] }
               }
             },
-            category: {
-              'c1': { postIds: ['o2'] },
-              'c2': { postIds: ['o2'] }
+            ids: {
+              ...forumEmptyState.ids,
+              post: ['o1', 'o2'],
+              category: ['c1', 'c2']
             }
           };
 
@@ -362,21 +483,28 @@ describe('index', () => {
           );
 
           const expected = {
-            ...forumEmptyState,
-            post: {
-              'o1': {
-                profileId: undefined,
-                categoryIds: ['c200']
+            entities: {
+              ...forumEmptyState.entities,
+              post: {
+                'o1': {
+                  profileId: undefined,
+                  categoryIds: ['c200']
+                },
+                'o2': {
+                  profileId: undefined,
+                  categoryIds: ['c1', 'c200', 'c2']
+                }
               },
-              'o2': {
-                profileId: undefined,
-                categoryIds: ['c1', 'c200', 'c2']
+              category: {
+                'c1': { postIds: ['o2'] },
+                'c2': { postIds: ['o2'] },
+                'c200': { postIds: ['o2', 'o1'] }
               }
             },
-            category: {
-              'c1': { postIds: ['o2'] },
-              'c2': { postIds: ['o2'] },
-              'c200': { postIds: ['o2', 'o1'] }
+            ids: {
+              ...forumEmptyState.ids,
+              post: ['o1', 'o2'],
+              category: ['c1', 'c2', 'c200']
             }
           };
 
@@ -399,9 +527,15 @@ describe('index', () => {
 
     describe('without attached', () => {
       const state = {
-        ...forumEmptyState,
-        account: {
-          'a1': { profileId: undefined }
+        entities: {
+          ...forumEmptyState.entities,
+          account: {
+            'a1': { profileId: undefined }
+          }
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1']
         }
       };
 
@@ -427,19 +561,27 @@ describe('index', () => {
     describe('detach all existing attached resources', () => {
       test('detach resource of reciprocal one-cardinality', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            a1: { profileId: 'p1' }
-          },
-          profile: {
-            p1: {
-              accountId: 'a1',
-              postIds: ['o1', 'o2']
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              a1: { profileId: 'p1' }
+            },
+            profile: {
+              p1: {
+                accountId: 'a1',
+                postIds: ['o1', 'o2']
+              }
+            },
+            post: {
+              o1: { profileId: 'p1', categoryIds: [] },
+              o2: { profileId: 'p1', categoryIds: [] },
             }
           },
-          post: {
-            o1: { profileId: 'p1', categoryIds: [] },
-            o2: { profileId: 'p1', categoryIds: [] },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1'],
+            post: ['o1', 'o2']
           }
         };
 
@@ -449,19 +591,26 @@ describe('index', () => {
         );
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            a1: { profileId: undefined }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              a1: { profileId: undefined }
+            },
+            post: {
+              o1: {
+                profileId: undefined,
+                categoryIds: [],
+              },
+              o2: {
+                profileId: undefined,
+                categoryIds: [],
+              },
+            }
           },
-          post: {
-            o1: {
-              profileId: undefined,
-              categoryIds: [],
-            },
-            o2: {
-              profileId: undefined,
-              categoryIds: [],
-            },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            post: ['o1', 'o2']
           }
         };
 
@@ -470,17 +619,25 @@ describe('index', () => {
 
       test('detach resource of reciprocal many-cardinality', () => {
         const state = {
-          ...forumEmptyState,
-          profile: {
-            p1: { postIds: ['o1', 'o2', 'o3'] }
+          entities: {
+            ...forumEmptyState.entities,
+            profile: {
+              p1: { postIds: ['o1', 'o2', 'o3'] }
+            },
+            post: {
+              o1: { profileId: 'p1', categoryIds: [] },
+              o2: { profileId: 'p1', categoryIds: ['c1'] },
+              o3: { profileId: 'p1', categoryIds: [] },
+            },
+            category: {
+              c1: { postIds: ['o2'] }
+            }
           },
-          post: {
-            o1: { profileId: 'p1', categoryIds: [] },
-            o2: { profileId: 'p1', categoryIds: ['c1'] },
-            o3: { profileId: 'p1', categoryIds: [] },
-          },
-          category: {
-            c1: { postIds: ['o2'] }
+          ids: {
+            ...forumEmptyState.ids,
+            profile: ['p1'],
+            post: ['o1', 'o2', 'o3'],
+            category: ['c1']
           }
         };
 
@@ -490,16 +647,24 @@ describe('index', () => {
         );
 
         const expected = {
-          ...forumEmptyState,
-          profile: {
-            p1: { postIds: ['o1', 'o3'] }
+          entities: {
+            ...forumEmptyState.entities,
+            profile: {
+              p1: { postIds: ['o1', 'o3'] }
+            },
+            post: {
+              o1: { profileId: 'p1', categoryIds: [] },
+              o3: { profileId: 'p1', categoryIds: [] },
+            },
+            category: {
+              c1: { postIds: [] }
+            }
           },
-          post: {
-            o1: { profileId: 'p1', categoryIds: [] },
-            o3: { profileId: 'p1', categoryIds: [] },
-          },
-          category: {
-            c1: { postIds: [] }
+          ids: {
+            ...forumEmptyState.ids,
+            profile: ['p1'],
+            post: ['o1', 'o3'],
+            category: ['c1']
           }
         };
 
@@ -515,22 +680,30 @@ describe('index', () => {
     */
 
     const state = {
-      ...forumEmptyState,
-      profile: {
-        'p1': {
-          postIds: ['o1']
+      entities: {
+        ...forumEmptyState.entities,
+        profile: {
+          'p1': {
+            postIds: ['o1']
+          }
+        },
+        post: {
+          'o1': {
+            title: 'Foo',
+            body: 'Lorem ipsum',
+            profileId: 'p1',
+            postIds: ['o1']
+          }
+        },
+        category: {
+          'c1': { postIds: ['o1'] }
         }
       },
-      post: {
-        'o1': {
-          title: 'Foo',
-          body: 'Lorem ipsum',
-          profileId: 'p1',
-          postIds: ['o1']
-        }
-      },
-      category: {
-        'c1': { postIds: ['o1'] }
+      ids: {
+        ...forumEmptyState.ids,
+        profile: ['p1'],
+        post: ['o1'],
+        category: ['c1'],
       }
     };
 
@@ -548,23 +721,31 @@ describe('index', () => {
       ));
 
       const expected = {
-        ...forumEmptyState,
-        profile: {
-          'p1': {
-            postIds: ['o1']
+        entities: {
+          ...forumEmptyState.entities,
+          profile: {
+            'p1': {
+              postIds: ['o1']
+            }
+          },
+          post: {
+            'o1': {
+              title: 'Bar',
+              caption: 'Foobar',
+              body: undefined,
+              profileId: 'p1',
+              postIds: ['o1']
+            }
+          },
+          category: {
+            'c1': { postIds: ['o1'] }
           }
         },
-        post: {
-          'o1': {
-            title: 'Bar',
-            caption: 'Foobar',
-            body: undefined,
-            profileId: 'p1',
-            postIds: ['o1']
-          }
-        },
-        category: {
-          'c1': { postIds: ['o1'] }
+        ids: {
+          ...forumEmptyState.ids,
+          profile: ['p1'],
+          post: ['o1'],
+          category: ['c1'],
         }
       };
 
@@ -608,12 +789,19 @@ describe('index', () => {
     describe('rel of one-cardinality', () => {
       test('set rel value to id', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: undefined }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: undefined }
+            },
+            profile: {
+              'p1': { accountId: undefined }
+            }
           },
-          profile: {
-            'p1': { accountId: undefined }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -625,12 +813,19 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: 'p1' }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: 'p1' }
+            },
+            profile: {
+              'p1': { accountId: 'a1' }
+            }
           },
-          profile: {
-            'p1': { accountId: 'a1' }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -639,12 +834,19 @@ describe('index', () => {
 
       test('if no resource rel key, then set key and value', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': {}
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': {}
+            },
+            profile: {
+              'p1': {}
+            }
           },
-          profile: {
-            'p1': {}
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -656,12 +858,19 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: 'p1' }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: 'p1' }
+            },
+            profile: {
+              'p1': { accountId: 'a1' }
+            }
           },
-          profile: {
-            'p1': { accountId: 'a1' }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -670,12 +879,19 @@ describe('index', () => {
 
       test('ignore index', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: undefined }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: undefined }
+            },
+            profile: {
+              'p1': { accountId: undefined }
+            }
           },
-          profile: {
-            'p1': { accountId: undefined }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -688,12 +904,19 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: 'p1' }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: 'p1' }
+            },
+            profile: {
+              'p1': { accountId: 'a1' }
+            }
           },
-          profile: {
-            'p1': { accountId: 'a1' }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -704,13 +927,20 @@ describe('index', () => {
     describe('rel of many-cardinality', () => {
       test('if no index, then append', () => {
         const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1'] }
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+              'c2': { postIds: [] }
+            }
           },
-          category: {
-            'c1': { postIds: ['o1'] },
-            'c2': { postIds: [] }
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1', 'c2']
           }
         };
 
@@ -722,13 +952,20 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1', 'c2'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1', 'c2'] }
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+              'c2': { postIds: ['o1'] }
+            }
           },
-          category: {
-            'c1': { postIds: ['o1'] },
-            'c2': { postIds: ['o1'] }
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1', 'c2']
           }
         };
 
@@ -737,14 +974,21 @@ describe('index', () => {
 
       test('if index, then insert', () => {
         const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1', 'c2'] },
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1', 'c2'] },
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+              'c2': { postIds: ['o1'] },
+              'c3': { postIds: [] },
+            }
           },
-          category: {
-            'c1': { postIds: ['o1'] },
-            'c2': { postIds: ['o1'] },
-            'c3': { postIds: [] },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1', 'c2', 'c3']
           }
         };
 
@@ -757,14 +1001,21 @@ describe('index', () => {
           ))
         ].forEach(result => {
           const expected = {
-            ...forumEmptyState,
-            post: {
-              'o1': { categoryIds: ['c1', 'c3', 'c2'] },
+            entities: {
+              ...forumEmptyState.entities,
+              post: {
+                'o1': { categoryIds: ['c1', 'c3', 'c2'] },
+              },
+              category: {
+                'c1': { postIds: ['o1'] },
+                'c2': { postIds: ['o1'] },
+                'c3': { postIds: ['o1'] },
+              }
             },
-            category: {
-              'c1': { postIds: ['o1'] },
-              'c2': { postIds: ['o1'] },
-              'c3': { postIds: ['o1'] },
+            ids: {
+              ...forumEmptyState.ids,
+              post: ['o1'],
+              category: ['c1', 'c2', 'c3']
             }
           };
 
@@ -774,12 +1025,19 @@ describe('index', () => {
 
       test('if no resource rel key, then set key and value', () => {
         const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': {}
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': {}
+            },
+            category: {
+              'c1': {},
+            }
           },
-          category: {
-            'c1': {},
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1']
           }
         };
 
@@ -791,12 +1049,19 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1'] }
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+            }
           },
-          category: {
-            'c1': { postIds: ['o1'] },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1']
           }
         };
 
@@ -805,12 +1070,19 @@ describe('index', () => {
 
       test('if already attached, then do nothing', () => {
         const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1'] }
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+            }
           },
-          category: {
-            'c1': { postIds: ['o1'] },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1']
           }
         };
 
@@ -827,12 +1099,19 @@ describe('index', () => {
 
     test('if either resource does not exist, then do nothing', () => {
       const state = {
-        ...forumEmptyState,
-        account: {
-          'a1': { profileId: undefined }
+        entities: {
+          ...forumEmptyState.entities,
+          account: {
+            'a1': { profileId: undefined }
+          },
+          profile: {
+            'p1': { accountId: undefined }
+          }
         },
-        profile: {
-          'p1': { accountId: undefined }
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1'],
+          profile: ['p1']
         }
       };
 
@@ -848,12 +1127,19 @@ describe('index', () => {
 
     test('if partially attached (invalid state), then fix the attachment', () => {
       const state = {
-        ...forumEmptyState,
-        account: {
-          'a1': { profileId: 'p1' }
+        entities: {
+          ...forumEmptyState.entities,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: undefined }
+          }
         },
-        profile: {
-          'p1': { accountId: undefined }
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1'],
+          profile: ['p1']
         }
       };
 
@@ -866,12 +1152,19 @@ describe('index', () => {
         )),
       ].forEach(result => {
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: 'p1' }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: 'p1' }
+            },
+            profile: {
+              'p1': { accountId: 'a1' }
+            }
           },
-          profile: {
-            'p1': { accountId: 'a1' }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -898,12 +1191,19 @@ describe('index', () => {
     describe('basic', () => {
       test('one-cardinality', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: 'p1' }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: 'p1' }
+            },
+            profile: {
+              'p1': { accountId: 'a1' }
+            }
           },
-          profile: {
-            'p1': { accountId: 'a1' }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1']
           }
         };
 
@@ -916,12 +1216,19 @@ describe('index', () => {
           )),
         ].forEach(result => {
           const expected = {
-            ...forumEmptyState,
-            account: {
-              'a1': { profileId: undefined }
+            entities: {
+              ...forumEmptyState.entities,
+              account: {
+                'a1': { profileId: undefined }
+              },
+              profile: {
+                'p1': { accountId: undefined }
+              }
             },
-            profile: {
-              'p1': { accountId: undefined }
+            ids: {
+              ...forumEmptyState.ids,
+              account: ['a1'],
+              profile: ['p1']
             }
           };
 
@@ -932,12 +1239,19 @@ describe('index', () => {
 
       test('many-cardinality', () => {
         const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1', 'c2', 'c3'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1', 'c2', 'c3'] }
+            },
+            category: {
+              'c2': { postIds: ['o1'] }
+            }
           },
-          category: {
-            'c2': { postIds: ['o1'] }
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c2'],
           }
         };
 
@@ -949,12 +1263,19 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1', 'c3'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1', 'c3'] }
+            },
+            category: {
+              'c2': { postIds: [] }
+            }
           },
-          category: {
-            'c2': { postIds: [] }
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c2'],
           }
         };
 
@@ -964,12 +1285,19 @@ describe('index', () => {
 
     test('if resource does not exist, then do nothing', () => {
       const state = {
-        ...forumEmptyState,
-        account: {
-          'a1': { profileId: 'p1' }
+        entities: {
+          ...forumEmptyState.entities,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
         },
-        profile: {
-          'p1': { accountId: 'a1' }
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1'],
+          profile: ['p1']
         }
       };
 
@@ -987,13 +1315,20 @@ describe('index', () => {
 
     test('if attachment does not exist then do nothing', () => {
       const state = {
-        ...forumEmptyState,
-        account: {
-          'a1': { profileId: 'p1' },
-          'a200': { profileId: undefined }
+        entities: {
+          ...forumEmptyState.entities,
+          account: {
+            'a1': { profileId: 'p1' },
+            'a200': { profileId: undefined }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
         },
-        profile: {
-          'p1': { accountId: 'a1' }
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1', 'a200'],
+          profile: ['p1'],
         }
       };
 
@@ -1012,39 +1347,15 @@ describe('index', () => {
     describe('if partially attached (invalid state), then still remove it completely', () => {
       test('when only one resource exists', () => {
         const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1'] }
-          },
-        };
-
-        [
-          forumReducer(state, forumActionCreators.detach(
-            ForumEntities.POST, 'o1', 'categoryIds', 'c1'
-          )),
-          forumReducer(state, forumActionCreators.detach(
-            ForumEntities.CATEGORY, 'c1', 'postIds', 'o1'
-          )),
-        ].forEach(result => {
-          const expected = {
-            ...forumEmptyState,
+          entities: {
+            ...forumEmptyState.entities,
             post: {
-              'o1': { categoryIds: [] }
+              'o1': { categoryIds: ['c1'] }
             },
-          };
-
-          expect(result).toEqual(expected);
-        });
-      });
-
-      test('when both exist but only one is attached', () => {
-        const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1'] }
           },
-          category: {
-            'c1': { postIds: [] }
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1']
           }
         };
 
@@ -1057,12 +1368,62 @@ describe('index', () => {
           )),
         ].forEach(result => {
           const expected = {
-            ...forumEmptyState,
+            entities: {
+              ...forumEmptyState.entities,
+              post: {
+                'o1': { categoryIds: [] }
+              },
+            },
+            ids: {
+              ...forumEmptyState.ids,
+              post: ['o1']
+            }
+          };
+
+          expect(result).toEqual(expected);
+        });
+      });
+
+      test('when both exist but only one is attached', () => {
+        const state = {
+          entities: {
+            ...forumEmptyState.entities,
             post: {
-              'o1': { categoryIds: [] }
+              'o1': { categoryIds: ['c1'] }
             },
             category: {
               'c1': { postIds: [] }
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1']
+          }
+        };
+
+        [
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.POST, 'o1', 'categoryIds', 'c1'
+          )),
+          forumReducer(state, forumActionCreators.detach(
+            ForumEntities.CATEGORY, 'c1', 'postIds', 'o1'
+          )),
+        ].forEach(result => {
+          const expected = {
+            entities: {
+              ...forumEmptyState.entities,
+              post: {
+                'o1': { categoryIds: [] }
+              },
+              category: {
+                'c1': { postIds: [] }
+              }
+            },
+            ids: {
+              ...forumEmptyState.ids,
+              post: ['o1'],
+              category: ['c1']
             }
           };
 
@@ -1082,16 +1443,23 @@ describe('index', () => {
 
     test('move attached id', () => {
       const state = {
-        ...forumEmptyState,
-        post: {
-          'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
+        entities: {
+          ...forumEmptyState.entities,
+          post: {
+            'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+            'c2': { postIds: ['o1'] },
+            'c3': { postIds: ['o1'] },
+            'c4': { postIds: ['o1'] },
+            'c5': { postIds: ['o1'] },
+          }
         },
-        category: {
-          'c1': { postIds: ['o1'] },
-          'c2': { postIds: ['o1'] },
-          'c3': { postIds: ['o1'] },
-          'c4': { postIds: ['o1'] },
-          'c5': { postIds: ['o1'] },
+        ids: {
+          ...forumEmptyState.ids,
+          post: ['o1'],
+          category: ['c1','c2','c3','c4','c5']
         }
       };
 
@@ -1103,16 +1471,23 @@ describe('index', () => {
       ));
 
       const expected =  {
-        ...forumEmptyState,
-        post: {
-          'o1': { categoryIds: ['c1', 'c3', 'c4', 'c2', 'c5'] }
+        entities: {
+          ...forumEmptyState.entities,
+          post: {
+            'o1': { categoryIds: ['c1', 'c3', 'c4', 'c2', 'c5'] }
+          },
+          category: {
+            'c1': { postIds: ['o1'] },
+            'c2': { postIds: ['o1'] },
+            'c3': { postIds: ['o1'] },
+            'c4': { postIds: ['o1'] },
+            'c5': { postIds: ['o1'] },
+          }
         },
-        category: {
-          'c1': { postIds: ['o1'] },
-          'c2': { postIds: ['o1'] },
-          'c3': { postIds: ['o1'] },
-          'c4': { postIds: ['o1'] },
-          'c5': { postIds: ['o1'] },
+        ids: {
+          ...forumEmptyState.ids,
+          post: ['o1'],
+          category: ['c1','c2','c3','c4','c5']
         }
       };
 
@@ -1121,9 +1496,15 @@ describe('index', () => {
 
     test('if resource does not exist or does not have rel key, then ignore', () => {
       const state = {
-        ...forumEmptyState,
-        post: {
-          'o1': {}
+        entities: {
+          ...forumEmptyState.entities,
+          post: {
+            'o1': {}
+          }
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          post: ['o1']
         }
       };
 
@@ -1139,12 +1520,19 @@ describe('index', () => {
 
     test('if rel is cardinality of one, then ignore', () => {
       const state = {
-        ...forumEmptyState,
-        account: {
-          'a1': { profileId: 'p1' }
+        entities: {
+          ...forumEmptyState.entities,
+          account: {
+            'a1': { profileId: 'p1' }
+          },
+          profile: {
+            'p1': { accountId: 'a1' }
+          }
         },
-        profile: {
-          'p1': { accountId: 'a1' }
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1'],
+          profile: ['p1']
         }
       };
 
@@ -1156,94 +1544,94 @@ describe('index', () => {
     });
   });
 
-  test('set state', () => {
-    const state = {
-      ...forumEmptyState,
-      account: {
-        'a1': { profileId: 'p1' }
-      },
-      profile: {
-        'p1': { accountId: 'a1' }
-      }
-    };
+  // test('set state', () => {
+  //   const state = {
+  //     ...forumEmptyState,
+  //     account: {
+  //       'a1': { profileId: 'p1' }
+  //     },
+  //     profile: {
+  //       'p1': { accountId: 'a1' }
+  //     }
+  //   };
+  //
+  //   const result = forumReducer(undefined, forumActionCreators.setState(state));
+  //
+  //   expect(result).toEqual(state);
+  // });
 
-    const result = forumReducer(undefined, forumActionCreators.setState(state));
+  // test('set entity state', () => {
+  //   [undefined, forumEmptyState].forEach(state => {
+  //     const entityState = {
+  //       'a1': { profileId: 'p1' }
+  //     };
+  //
+  //     const result = forumReducer(state, forumActionCreators.setEntityState(
+  //       ForumEntities.ACCOUNT, entityState
+  //     ));
+  //
+  //     const expected = {
+  //       ...forumEmptyState,
+  //       account: {
+  //         'a1': { profileId: 'p1' }
+  //       },
+  //     };
+  //
+  //     expect(result).toEqual(expected);
+  //   });
+  // });
 
-    expect(result).toEqual(state);
-  });
+  // test('set resource state', () => {
+  //   [undefined, forumEmptyState].forEach(state => {
+  //     const resourceState = {
+  //       profileId: 'p200', categoryIds: ['c1']
+  //     };
+  //
+  //     const result = forumReducer(state, forumActionCreators.setResourceState(
+  //       ForumEntities.POST, 'o1', resourceState
+  //     ));
+  //
+  //     const expected = {
+  //       ...forumEmptyState,
+  //       post: {
+  //         'o1': { profileId: 'p200', categoryIds: ['c1'] }
+  //       }
+  //     };
+  //
+  //     expect(result).toEqual(expected);
+  //   });
+  // });
 
-  test('set entity state', () => {
-    [undefined, forumEmptyState].forEach(state => {
-      const entityState = {
-        'a1': { profileId: 'p1' }
-      };
+  // test('set rel state', () => {
+  //   [undefined, forumEmptyState].forEach(state => {
+  //     const result = forumReducer(state, forumActionCreators.setRelState(
+  //       ForumEntities.POST, 'o1', 'categoryIds', ['c1']
+  //     ));
+  //
+  //     const expected = {
+  //       ...forumEmptyState,
+  //       post: {
+  //         'o1': { categoryIds: ['c1'] }
+  //       }
+  //     };
+  //
+  //     expect(result).toEqual(expected);
+  //   });
+  // });
 
-      const result = forumReducer(state, forumActionCreators.setEntityState(
-        ForumEntities.ACCOUNT, entityState
-      ));
-
-      const expected = {
-        ...forumEmptyState,
-        account: {
-          'a1': { profileId: 'p1' }
-        },
-      };
-
-      expect(result).toEqual(expected);
-    });
-  });
-
-  test('set resource state', () => {
-    [undefined, forumEmptyState].forEach(state => {
-      const resourceState = {
-        profileId: 'p200', categoryIds: ['c1']
-      };
-
-      const result = forumReducer(state, forumActionCreators.setResourceState(
-        ForumEntities.POST, 'o1', resourceState
-      ));
-
-      const expected = {
-        ...forumEmptyState,
-        post: {
-          'o1': { profileId: 'p200', categoryIds: ['c1'] }
-        }
-      };
-
-      expect(result).toEqual(expected);
-    });
-  });
-
-  test('set rel state', () => {
-    [undefined, forumEmptyState].forEach(state => {
-      const result = forumReducer(state, forumActionCreators.setRelState(
-        ForumEntities.POST, 'o1', 'categoryIds', ['c1']
-      ));
-
-      const expected = {
-        ...forumEmptyState,
-        post: {
-          'o1': { categoryIds: ['c1'] }
-        }
-      };
-
-      expect(result).toEqual(expected);
-    });
-  });
-
-  test('state setters: if entity is invalid, then ignore', () => {
-    [
-      forumReducer(forumEmptyState, forumActionCreators.setEntityState(
-        'chicken', { 'k1': { profileId: 'p1' } }
-      )),
-      forumReducer(forumEmptyState, forumActionCreators.setResourceState(
-        'chicken', 'k1', { profileId: 'p200', categoryIds: ['c1'] }
-      )),
-      forumReducer(forumEmptyState, forumActionCreators.setRelState(
-        'chicken', 'k1', 'categoryIds', ['c1'],
-      )),
-    ].forEach(result => expect(result).toEqual(forumEmptyState));
-  });
+  // test('state setters: if entity is invalid, then ignore', () => {
+  //   [
+  //     forumReducer(forumEmptyState, forumActionCreators.setEntityState(
+  //       'chicken', { 'k1': { profileId: 'p1' } }
+  //     )),
+  //     forumReducer(forumEmptyState, forumActionCreators.setResourceState(
+  //       'chicken', 'k1', { profileId: 'p200', categoryIds: ['c1'] }
+  //     )),
+  //     forumReducer(forumEmptyState, forumActionCreators.setRelState(
+  //       'chicken', 'k1', 'categoryIds', ['c1'],
+  //     )),
+  //   ].forEach(result => expect(result).toEqual(forumEmptyState));
+  // });
 
   describe('batched actions', () => {
     describe('basic', () => {
@@ -1254,10 +1642,16 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: undefined },
-            'a2': { profileId: undefined }
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: undefined },
+              'a2': { profileId: undefined }
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1', 'a2']
           }
         };
 
@@ -1266,10 +1660,16 @@ describe('index', () => {
 
       test('remove-actions', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': {},
-            'a2': {},
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': {},
+              'a2': {},
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1', 'a2']
           }
         };
 
@@ -1283,15 +1683,23 @@ describe('index', () => {
 
       test('attach-actions', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': {},
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': {},
+            },
+            profile: {
+              'p1': {},
+            },
+            post: {
+              'o1': {}
+            }
           },
-          profile: {
-            'p1': {},
-          },
-          post: {
-            'o1': {}
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1'],
+            post: ['o1'],
           }
         };
 
@@ -1301,15 +1709,23 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: 'p1' },
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: 'p1' },
+            },
+            profile: {
+              'p1': { accountId: 'a1', postIds: ['o1'] },
+            },
+            post: {
+              'o1': { profileId: 'p1' }
+            }
           },
-          profile: {
-            'p1': { accountId: 'a1', postIds: ['o1'] },
-          },
-          post: {
-            'o1': { profileId: 'p1' }
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1'],
+            post: ['o1'],
           }
         };
 
@@ -1318,15 +1734,23 @@ describe('index', () => {
 
       test('detach-actions', () => {
         const state = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: 'p1' },
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: 'p1' },
+            },
+            profile: {
+              'p1': { accountId: 'a1', postIds: ['o1'] },
+            },
+            post: {
+              'o1': { profileId: 'p1' },
+            }
           },
-          profile: {
-            'p1': { accountId: 'a1', postIds: ['o1'] },
-          },
-          post: {
-            'o1': { profileId: 'p1' },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1'],
+            post: ['o1'],
           }
         };
 
@@ -1336,15 +1760,23 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          account: {
-            'a1': { profileId: undefined },
+          entities: {
+            ...forumEmptyState.entities,
+            account: {
+              'a1': { profileId: undefined },
+            },
+            profile: {
+              'p1': { accountId: undefined, postIds: [] },
+            },
+            post: {
+              'o1': { profileId: undefined },
+            }
           },
-          profile: {
-            'p1': { accountId: undefined, postIds: [] },
-          },
-          post: {
-            'o1': { profileId: undefined },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1'],
+            profile: ['p1'],
+            post: ['o1'],
           }
         };
 
@@ -1353,16 +1785,23 @@ describe('index', () => {
 
       test('move-attached actions', () => {
         const state = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c1', 'c2', 'c3', 'c4', 'c5'] }
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+              'c2': { postIds: ['o1'] },
+              'c3': { postIds: ['o1'] },
+              'c4': { postIds: ['o1'] },
+              'c5': { postIds: ['o1'] },
+            }
           },
-          category: {
-            'c1': { postIds: ['o1'] },
-            'c2': { postIds: ['o1'] },
-            'c3': { postIds: ['o1'] },
-            'c4': { postIds: ['o1'] },
-            'c5': { postIds: ['o1'] },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1', 'c2', 'c3', 'c4', 'c5']
           }
         };
 
@@ -1372,16 +1811,23 @@ describe('index', () => {
         ));
 
         const expected = {
-          ...forumEmptyState,
-          post: {
-            'o1': { categoryIds: ['c3', 'c1', 'c4', 'c2', 'c5'] }
+          entities: {
+            ...forumEmptyState.entities,
+            post: {
+              'o1': { categoryIds: ['c3', 'c1', 'c4', 'c2', 'c5'] }
+            },
+            category: {
+              'c1': { postIds: ['o1'] },
+              'c2': { postIds: ['o1'] },
+              'c3': { postIds: ['o1'] },
+              'c4': { postIds: ['o1'] },
+              'c5': { postIds: ['o1'] },
+            }
           },
-          category: {
-            'c1': { postIds: ['o1'] },
-            'c2': { postIds: ['o1'] },
-            'c3': { postIds: ['o1'] },
-            'c4': { postIds: ['o1'] },
-            'c5': { postIds: ['o1'] },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1'],
+            category: ['c1', 'c2', 'c3', 'c4', 'c5']
           }
         };
 
@@ -1396,7 +1842,6 @@ describe('index', () => {
     });
   });
 
-  describe('actions on self referencing schema', () => {
-
-  });
+  // describe('actions on self referencing schema', () => {
+  // });
 });

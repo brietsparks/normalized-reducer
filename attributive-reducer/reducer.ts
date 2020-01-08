@@ -1,5 +1,5 @@
 import { Action, ActionTypes, AddAction, ChangeAction, MoveAction, RemoveAction, State } from './types';
-import { arrayPut, arrayMove } from '../util';
+import { arrayPut, arrayMove } from '../src/util';
 
 export const makeReducer = <T>(actionTypes: ActionTypes) => {
   const dataReducer = <T>(state: Record<string, T> = {}, action: Action) => {

@@ -39,21 +39,33 @@ export const blogSchema: ModelSchema = {
 };
 
 export interface BlogState extends EntitiesState {
-  author: {
-    [id: string]: { articleIds: RelDataState }
+  entities: {
+    author: {
+      [id: string]: { articleIds: RelDataState }
+    },
+    article: {
+      [id: string]: { authorId: RelDataState }
+    },
   },
-  article: {
-    [id: string]: { authorId: RelDataState }
-  },
+  ids: {
+    author: string[],
+    article: string[],
+  }
 }
 
 export const blogState: BlogState = {
-  author: {
-    'a1': { articleIds: ['r1', 'r2'] }
+  entities: {
+    author: {
+      'a1': { articleIds: ['r1', 'r2'] }
+    },
+    article: {
+      'r1': { authorId: 'a1' },
+      'r2': { authorId: 'a1' },
+    }
   },
-  article: {
-    'r1': { authorId: 'a1' },
-    'r2': { authorId: 'a1' },
+  ids: {
+    author: ['a1'],
+    article: ['r1', 'r2']
   }
 };
 

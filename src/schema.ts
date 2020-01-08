@@ -5,7 +5,8 @@ import {
   Cardinalities,
   ResourceState,
   EntitiesState,
-  EntityState
+  IdsState,
+  State,
 } from './types';
 
 export class ModelSchemaReader {
@@ -24,11 +25,25 @@ export class ModelSchemaReader {
     );
   }
 
-  getEmptyState(): EntityState {
+  getEmptyEntitiesState() {
     return this.getEntities().reduce((emptyState, entity) => {
       emptyState[entity] = {};
       return emptyState;
     }, {} as EntitiesState);
+  }
+
+  getEmptyIdsState() {
+    return this.getEntities().reduce((idsState, entity) => {
+      idsState[entity] = [];
+      return idsState;
+    }, {} as IdsState);
+  }
+
+  getEmptyState<S extends State>(): S {
+    return {
+      entities: this.getEmptyEntitiesState(),
+      ids: this.getEmptyIdsState(),
+    } as S;
   }
 
   entityExists(entity: string) {

@@ -16,7 +16,9 @@ describe('reducer', () => {
     describe('add-resource operation', () => {
       test('if resource already exists', () => {
         const state = {
-          'a1': { articleIds: [] }
+          entities: {
+            'a1': { articleIds: [] }
+          }
         };
 
         const result = authorsReducer(state, [
