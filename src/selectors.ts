@@ -8,6 +8,7 @@ import {
   ActionCreators,
   ActionTypes,
   Selectors, ResourcesState, State,
+  SelectorTreeSchema
 } from './types';
 import { ModelSchemaReader } from './schema';
 import { noop } from './util';
@@ -118,6 +119,10 @@ export const makeSelectors = (
   const getAttachedArr = (state: State, args: { entity: string, id: string, rel: string }): string[] => {
     const relState = getAttached(state, args);
 
+    if (relState === undefined) {
+      return [];
+    }
+
     if (schema.entity(args.entity).getCardinality(args.rel) === Cardinalities.MANY) {
       return relState as string[];
     }
@@ -141,6 +146,30 @@ export const makeSelectors = (
     }, result);
   };
 
+  const getResourceTree = (
+    state: State, args: {
+      entity: string,
+      id: string,
+      schema: SelectorTreeSchema,
+      tree?: { id: string, entity: string, resource: object }[]
+    }): any => {
+    const { entity, id } = args;
+
+    if (!schema.entityExists(entity)) {
+      return undefined;
+    }
+
+    const rootResource = getResource(state, { entity, id });
+
+    if (!rootResource) {
+      return undefined;
+    }
+
+    const rels = schema.entity(entity).getRels();
+
+
+  };
+
   return {
     getAllIds,
     getAllResources,
@@ -151,5 +180,6 @@ export const makeSelectors = (
     getAttached,
     getAttachedArr,
     getAllAttachedArr,
+    getResourceTree,
   }
 };

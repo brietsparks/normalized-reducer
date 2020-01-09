@@ -1,5 +1,5 @@
 import { blogSelectors, blogState } from './test-cases/blog';
-import { forumSelectors, forumEmptyState } from './test-cases/forum';
+import { forumSelectors, forumEmptyState, ForumState } from './test-cases/forum';
 
 describe('selectors', () => {
   describe('getAttachedArr', () => {
@@ -54,5 +54,71 @@ describe('selectors', () => {
     };
 
     expect(result).toEqual(expected);
+  });
+
+  describe('getTree', () => {
+    test('basic', () => {
+      const state: ForumState = {
+        resources: {
+          account: {
+            'a1': { profileId: 'p1' },
+            'a2': { profileId: 'p2' }
+          },
+          profile: {
+            'p1': { accountId: 'p1', postIds: ['o1', 'o2'] },
+            'p2': { accountId: 'p2', postIds: ['o3'] },
+          },
+          post: {
+            'o1': { profileId: 'p1', categoryIds: ['c1'], tagIds: ['t1'] },
+            'o2': { profileId: 'p1', categoryIds: ['c1', 'c2'] },
+            'o3': { profileId: 'p2', categoryIds: ['c2', 'c3'] }
+          },
+          tag: {
+            't1': { postIds: ['o1'] }
+          },
+          category: {
+            'c1': { postIds: ['o1', 'o2'] },
+            'c2': { postIds: ['o2', 'o3'] },
+            'c3': { postIds: ['o3'] }
+          }
+        },
+        ids: {
+          account: ['a1', 'a2'],
+          profile: ['p1', 'p2'],
+          post: ['o1', 'o2', 'o3'],
+          tag: ['t1'],
+          category: ['c1', 'c2', 'c3']
+        }
+      };
+
+      const schema = {
+        profileId: {
+          postIds: {
+            categoryIds: {}
+          }
+        }
+      };
+
+      const result = forumSelectors.getResourceTree(state, {
+        entity: 'account',
+        id: 'a1',
+        schema
+      });
+
+      const expected = [
+        { entity: 'account', id: 'a1', resource: { profileId: 'p1' } },
+        { entity: 'profile', id: 'p1', resource: { accountId: 'p1', postIds: ['o1', 'o2'] } },
+        { entity: 'post', id: 'o1', resource: { profileId: 'p1', categoryIds: ['c1'] } },
+        { entity: 'post', id: 'o2', resource: { profileId: 'p1', categoryIds: ['c1', 'c2'] } },
+        { entity: 'category', id: 'c1', resource: { postIds: ['o1', 'o2'] } },
+        { entity: 'category', id: 'c2', resource: { postIds: ['o2', 'o3'] } },
+      ];
+
+      // expect(result).toEqual(expected);
+    });
+
+    test('self-referencing', () => {
+
+    });
   });
 });

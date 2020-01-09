@@ -266,6 +266,7 @@ export type GetResource = (state: State, args: { entity: string, id: string }) =
 export type GetAttached = (state: State, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
 export type GetAttachedArr = (state: State, args: { entity: string, id: string, rel: string }) => string[]
 export type GetAllAttachedArr = (state: State, args: { entity: string, id: string }) => { [rel: string]: string[] };
+export type GetResourceTree = (state: State, args: { entity: string, id: string, schema: SelectorTreeSchema }) => any;
 
 export interface Selectors {
   getAllIds: GetAllIds,
@@ -277,8 +278,10 @@ export interface Selectors {
   getAttached: GetAttached,
   getAttachedArr: GetAttachedArr,
   getAllAttachedArr: GetAllAttachedArr,
+  getResourceTree: GetResourceTree,
 }
 
+export type SelectorTreeSchema = { [rel: string]: SelectorTreeSchema } | (() => SelectorTreeSchema)
 
 //
 // reducer types

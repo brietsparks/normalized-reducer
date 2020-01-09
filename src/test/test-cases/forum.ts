@@ -13,61 +13,67 @@ export enum ForumEntities {
   PROFILE = 'profile',
   POST = 'post',
   CATEGORY = 'category',
+  TAG = 'tag',
 }
 
 /*
 
 account ---- profile ---< post >--< category
+                               >--< tag
 
 */
 
-export const accountSchema: EntitySchema = {
-  profileId: {
-    entity: ForumEntities.PROFILE,
-    cardinality: Cardinalities.ONE,
-    reciprocal: 'accountId'
-  }
-};
-
-export const profileSchema = {
-  accountId: {
-    entity: ForumEntities.ACCOUNT,
-    cardinality: Cardinalities.ONE,
-    reciprocal: 'profileId'
-  },
-  postIds: {
-    entity: ForumEntities.POST,
-    cardinality: Cardinalities.MANY,
-    reciprocal: 'profileId'
-  }
-};
-
-export const postSchema = {
-  profileId: {
-    entity: ForumEntities.PROFILE,
-    cardinality: Cardinalities.ONE,
-    reciprocal: 'postIds'
-  },
-  categoryIds: {
-    entity: ForumEntities.CATEGORY,
-    cardinality: Cardinalities.MANY,
-    reciprocal: 'postIds'
-  }
-};
-
-export const categorySchema = {
-  postIds: {
-    entity: ForumEntities.POST,
-    cardinality: Cardinalities.MANY,
-    reciprocal: 'categoryIds'
-  }
-};
-
 export const forumSchema = {
-  account: accountSchema,
-  profile: profileSchema,
-  post: postSchema,
-  category: categorySchema,
+  account: {
+    profileId: {
+      entity: ForumEntities.PROFILE,
+      cardinality: Cardinalities.ONE,
+      reciprocal: 'accountId'
+    }
+  },
+  profile: {
+    accountId: {
+      entity: ForumEntities.ACCOUNT,
+      cardinality: Cardinalities.ONE,
+      reciprocal: 'profileId'
+    },
+    postIds: {
+      entity: ForumEntities.POST,
+      cardinality: Cardinalities.MANY,
+      reciprocal: 'profileId'
+    }
+  },
+  post: {
+    profileId: {
+      entity: ForumEntities.PROFILE,
+      cardinality: Cardinalities.ONE,
+      reciprocal: 'postIds'
+    },
+    categoryIds: {
+      entity: ForumEntities.CATEGORY,
+      cardinality: Cardinalities.MANY,
+      reciprocal: 'postIds'
+    },
+    tagIds: {
+      entity: ForumEntities.TAG,
+      cardinality: Cardinalities.MANY,
+      reciprocal: 'postIds',
+    }
+  },
+  category: {
+    postIds: {
+      entity: ForumEntities.POST,
+      cardinality: Cardinalities.MANY,
+      reciprocal: 'categoryIds'
+    }
+  },
+  tag: {
+    postIds: {
+      entity: ForumEntities.POST,
+      cardinality: Cardinalities.MANY,
+      reciprocal: 'tagIds'
+    }
+  },
 };
 
 export interface ForumState extends State {
@@ -87,9 +93,15 @@ export interface ForumState extends State {
       [id: string]: {
         profileId?: string,
         categoryIds?: string[],
+        tagIds?: string[]
       }
     }
     category: {
+      [id: string]: {
+        postIds?: string[],
+      }
+    },
+    tag: {
       [id: string]: {
         postIds?: string[],
       }
@@ -100,6 +112,7 @@ export interface ForumState extends State {
     profile: string[],
     post: string[],
     category: string[],
+    tag: string[]
   }
 }
 
