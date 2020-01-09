@@ -2,6 +2,10 @@ import { blogSelectors, blogState } from './test-cases/blog';
 import { forumSelectors, forumEmptyState, ForumState } from './test-cases/forum';
 
 describe('selectors', () => {
+  describe('getAllIds', () => {
+
+  });
+
   describe('getAttachedArr', () => {
     test('cardinality of one', () => {
       const result = blogSelectors.getAttachedArr(blogState, {
@@ -94,6 +98,7 @@ describe('selectors', () => {
       const schema = {
         profileId: {
           postIds: {
+            tagIds: {},
             categoryIds: {}
           }
         }
@@ -108,13 +113,14 @@ describe('selectors', () => {
       const expected = [
         { entity: 'account', id: 'a1', resource: { profileId: 'p1' } },
         { entity: 'profile', id: 'p1', resource: { accountId: 'p1', postIds: ['o1', 'o2'] } },
-        { entity: 'post', id: 'o1', resource: { profileId: 'p1', categoryIds: ['c1'] } },
-        { entity: 'post', id: 'o2', resource: { profileId: 'p1', categoryIds: ['c1', 'c2'] } },
+        { entity: 'post', id: 'o1', resource: { profileId: 'p1', categoryIds: ['c1'], tagIds: ['t1'] } },
+        { entity: 'tag', id: 't1', resource: { postIds: ['o1'] } },
         { entity: 'category', id: 'c1', resource: { postIds: ['o1', 'o2'] } },
+        { entity: 'post', id: 'o2', resource: { profileId: 'p1', categoryIds: ['c1', 'c2'] } },
         { entity: 'category', id: 'c2', resource: { postIds: ['o2', 'o3'] } },
       ];
 
-      // expect(result).toEqual(expected);
+      expect(result).toEqual(expected);
     });
 
     test('self-referencing', () => {

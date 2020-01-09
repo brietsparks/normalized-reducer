@@ -260,7 +260,7 @@ export type DeriveActionWithOps = (state: State, action: OpAction) => OpAction;
 export type GetAllIds = (state: State) => IdsByEntityState;
 export type GetAllResources = (state: State) => ResourcesByEntityState;
 export type GetIds = (state: State, args: { entity: string }) => string[];
-export type GetResources = (state: State, args: { entity: string }) => ResourcesState | undefined;
+export type GetResources = (state: State, args: { entity: string }) => ResourcesState;
 export type CheckResource = (state: State, args: { entity: string, id: string }) => boolean;
 export type GetResource = (state: State, args: { entity: string, id: string }) => ResourceState | undefined;
 export type GetAttached = (state: State, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
@@ -282,6 +282,7 @@ export interface Selectors {
 }
 
 export type SelectorTreeSchema = { [rel: string]: SelectorTreeSchema } | (() => SelectorTreeSchema)
+export type ResourceTreeNode = { id: string, entity: string, resource: object };
 
 //
 // reducer types

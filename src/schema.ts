@@ -13,6 +13,11 @@ export class ModelSchemaReader {
   schema: ModelSchema;
   entitySchemaReaders: Record<string, EntitySchemaReader>;
 
+  // singleton values
+  private emptyState?: State;
+  private emptyResourcesByEntityState?: ResourcesByEntityState;
+  private emptyIdsByEntityState?: IdsByEntityState;
+
   constructor(schema: ModelSchema) {
     this.schema = schema;
 
@@ -26,24 +31,36 @@ export class ModelSchemaReader {
   }
 
   getEmptyResourcesByEntityState() {
-    return this.getEntities().reduce((emptyState, entity) => {
-      emptyState[entity] = {};
-      return emptyState;
-    }, {} as ResourcesByEntityState);
+    if (!this.emptyResourcesByEntityState) {
+      this.emptyResourcesByEntityState = this.getEntities().reduce((emptyState, entity) => {
+        emptyState[entity] = {};
+        return emptyState;
+      }, {} as ResourcesByEntityState);
+    }
+
+    return this.emptyResourcesByEntityState;
   }
 
   getEmptyIdsByEntityState() {
-    return this.getEntities().reduce((idsState, entity) => {
-      idsState[entity] = [];
-      return idsState;
-    }, {} as IdsByEntityState);
+    if (!this.emptyIdsByEntityState) {
+      this.emptyIdsByEntityState = this.getEntities().reduce((idsState, entity) => {
+        idsState[entity] = [];
+        return idsState;
+      }, {} as IdsByEntityState);
+    }
+
+    return this.emptyIdsByEntityState;
   }
 
   getEmptyState<S extends State>(): S {
-    return {
-      resources: this.getEmptyResourcesByEntityState(),
-      ids: this.getEmptyIdsByEntityState(),
-    } as S;
+    if (!this.emptyState) {
+      this.emptyState = {
+        resources: this.getEmptyResourcesByEntityState(),
+        ids: this.getEmptyIdsByEntityState(),
+      } as S;
+    }
+
+    return this.emptyState as S;
   }
 
   entityExists(entity: string) {

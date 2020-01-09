@@ -8,7 +8,7 @@ import {
   ActionCreators,
   ActionTypes,
   Selectors, ResourcesState, State,
-  SelectorTreeSchema
+  SelectorTreeSchema, ResourceTreeNode
 } from './types';
 import { ModelSchemaReader } from './schema';
 import { noop } from './util';
@@ -20,6 +20,9 @@ export interface Opts {
   onInvalidRelData?: InvalidRelDataHandler
 }
 
+const emptyIds: string[] = [];
+const emptyResources: ResourcesState = {};
+
 export const makeSelectors = (
   schema: ModelSchemaReader,
   actionCreators: ActionCreators,
@@ -30,19 +33,35 @@ export const makeSelectors = (
     onInvalidRelData = noop
   }: Opts = {}
 ): Selectors => {
-  const getAllIds = (state: State) => state.ids;
-  const getAllResources = (state: State) => state.resources;
+  const getAllIds = (state: State) => {
+    const allIds = state.ids;
+
+    if (!allIds) {
+      return schema.getEmptyIdsByEntityState();
+    }
+
+    return allIds;
+  };
+  const getAllResources = (state: State) => {
+    const allResources = state.resources;
+
+    if (!allResources) {
+      return schema.getEmptyResourcesByEntityState();
+    }
+
+    return allResources;
+  };
 
   const getIds = (state: State, args: { entity: string }) => {
     const idsByEntity = getAllIds(state);
 
     if (!schema.entityExists(args.entity)) {
       onInvalidEntity(args.entity);
-      return [];
+      return emptyIds;
     }
 
-    if (typeof idsByEntity !== 'object') {
-      return [];
+    if (!idsByEntity) {
+      return emptyIds;
     }
 
     return idsByEntity[args.entity];
@@ -53,11 +72,11 @@ export const makeSelectors = (
 
     if (!schema.entityExists(args.entity)) {
       onInvalidEntity(args.entity);
-      return undefined;
+      return emptyResources;
     }
 
-    if (typeof resourcesByEntity !== 'object') {
-      return undefined;
+    if (!resourcesByEntity) {
+      return emptyResources;
     }
 
     return resourcesByEntity[args.entity];
@@ -147,27 +166,53 @@ export const makeSelectors = (
   };
 
   const getResourceTree = (
-    state: State, args: {
-      entity: string,
-      id: string,
-      schema: SelectorTreeSchema,
-      tree?: { id: string, entity: string, resource: object }[]
-    }): any => {
-    const { entity, id } = args;
+    state: State,
+    args: { entity: string, id: string, schema: SelectorTreeSchema }
+  ): ResourceTreeNode[] => {
+    const { entity, id, schema: selectorSchema } = args;
 
     if (!schema.entityExists(entity)) {
-      return undefined;
+      return [];
     }
 
     const rootResource = getResource(state, { entity, id });
 
     if (!rootResource) {
-      return undefined;
+      return [];
     }
 
-    const rels = schema.entity(entity).getRels();
+    const nodes = recursivelyGetNodes(state, entity, id, selectorSchema);
 
+    return Object.values(nodes);
+  };
 
+  const recursivelyGetNodes = (
+    state: State,
+    entity: string,
+    id: string,
+    selectorSchema: SelectorTreeSchema,
+    nodes: Record<string, ResourceTreeNode> = {},
+  ): Record<string, ResourceTreeNode> => {
+    const resource = getResource(state, { entity, id });
+
+    if (!resource) {
+      return nodes;
+    }
+
+    nodes[`${entity}.${id}`] = { id, entity, resource };
+
+    for (let [rel, nestedSelectorSchema] of Object.entries(selectorSchema)) {
+      const relEntity = schema.entity(entity).getRelEntity(rel);
+
+      if (relEntity) {
+        const relIds = getAttachedArr(state, { entity, id, rel });
+        for (let relId of relIds) {
+          recursivelyGetNodes(state, relEntity, relId, nestedSelectorSchema, nodes);
+        }
+      }
+    }
+
+    return nodes;
   };
 
   return {

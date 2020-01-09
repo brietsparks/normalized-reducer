@@ -1,12 +1,6 @@
-import {
-  Cardinalities,
-  EntitySchema,
-  State,
-} from '../../types';
+import { Cardinalities, State, } from '../../types';
 
 import makeModule from '../..';
-
-import { ModelSchemaReader } from '../../schema';
 
 export enum ForumEntities {
   ACCOUNT = 'account',
@@ -58,6 +52,16 @@ export const forumSchema = {
       entity: ForumEntities.TAG,
       cardinality: Cardinalities.MANY,
       reciprocal: 'postIds',
+    },
+    parentId: {
+      entity: ForumEntities.POST,
+      cardinality: Cardinalities.ONE,
+      reciprocal: 'childIds'
+    },
+    childIds: {
+      entity: ForumEntities.POST,
+      cardinality: Cardinalities.MANY,
+      reciprocal: 'parentId'
     }
   },
   category: {
@@ -93,7 +97,9 @@ export interface ForumState extends State {
       [id: string]: {
         profileId?: string,
         categoryIds?: string[],
-        tagIds?: string[]
+        tagIds?: string[],
+        parentId?: string,
+        childIds?: string[],
       }
     }
     category: {
