@@ -201,6 +201,10 @@ export const makeSelectors = (
 
     nodes[`${entity}.${id}`] = { id, entity, resource };
 
+    if (typeof selectorSchema === 'function') {
+      selectorSchema = selectorSchema();
+    }
+
     for (let [rel, nestedSelectorSchema] of Object.entries(selectorSchema)) {
       const relEntity = schema.entity(entity).getRelEntity(rel);
 

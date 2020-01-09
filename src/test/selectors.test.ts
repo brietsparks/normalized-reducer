@@ -3,7 +3,6 @@ import { forumSelectors, forumEmptyState, ForumState } from './test-cases/forum'
 
 describe('selectors', () => {
   describe('getAllIds', () => {
-
   });
 
   describe('getAttachedArr', () => {
@@ -124,7 +123,41 @@ describe('selectors', () => {
     });
 
     test('self-referencing', () => {
+      const state: ForumState = {
+        resources: {
+          ...forumEmptyState.resources,
+          post: {
+            'p1': { childIds: ['p1.1', 'p1.2'] },
+            'p1.1': { parentId: 'p1', childIds: ['p1.1.1', 'p1.1.2'] },
+            'p1.1.1': { parentId: 'p1.1' },
+            'p1.1.2': { parentId: 'p1.1' },
+            'p1.2': { parentId: 'p1' },
+            'p2': {}
+          }
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          post: ['p1', 'p1.1', 'p1.1.1', 'p1.1.2', 'p1.2', 'p2']
+        }
+      };
 
+      const schema = () => ({ childIds: schema });
+
+      const result = forumSelectors.getResourceTree(state, {
+        entity: 'post',
+        id: 'p1',
+        schema
+      });
+
+      const expected = [
+        { entity: 'post', id: 'p1', resource: { childIds: ['p1.1', 'p1.2'] }},
+        { entity: 'post', id: 'p1.1', resource: { parentId: 'p1', childIds: ['p1.1.1', 'p1.1.2'] }},
+        { entity: 'post', id: 'p1.1.1', resource: { parentId: 'p1.1' }},
+        { entity: 'post', id: 'p1.1.2', resource: { parentId: 'p1.1' }},
+        { entity: 'post', id: 'p1.2', resource: { parentId: 'p1' }},
+      ];
+
+      expect(result).toEqual(expected);
     });
   });
 });
