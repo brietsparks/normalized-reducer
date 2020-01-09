@@ -127,17 +127,17 @@ describe('selectors', () => {
         resources: {
           ...forumEmptyState.resources,
           post: {
-            'p1': { childIds: ['p1.1', 'p1.2'] },
-            'p1.1': { parentId: 'p1', childIds: ['p1.1.1', 'p1.1.2'] },
-            'p1.1.1': { parentId: 'p1.1' },
-            'p1.1.2': { parentId: 'p1.1' },
-            'p1.2': { parentId: 'p1' },
-            'p2': {}
+            'o1': { childIds: ['o1.1', 'o1.2'] },
+            'o1.1': { parentId: 'o1', childIds: ['o1.1.1', 'o1.1.2'] },
+            'o1.1.1': { parentId: 'o1.1' },
+            'o1.1.2': { parentId: 'o1.1' },
+            'o1.2': { parentId: 'o1' },
+            'o2': {}
           }
         },
         ids: {
           ...forumEmptyState.ids,
-          post: ['p1', 'p1.1', 'p1.1.1', 'p1.1.2', 'p1.2', 'p2']
+          post: ['o1', 'o1.1', 'o1.1.1', 'o1.1.2', 'o1.2', 'o2']
         }
       };
 
@@ -145,16 +145,16 @@ describe('selectors', () => {
 
       const result = forumSelectors.getResourceTree(state, {
         entity: 'post',
-        id: 'p1',
+        id: 'o1',
         schema
       });
 
       const expected = [
-        { entity: 'post', id: 'p1', resource: { childIds: ['p1.1', 'p1.2'] }},
-        { entity: 'post', id: 'p1.1', resource: { parentId: 'p1', childIds: ['p1.1.1', 'p1.1.2'] }},
-        { entity: 'post', id: 'p1.1.1', resource: { parentId: 'p1.1' }},
-        { entity: 'post', id: 'p1.1.2', resource: { parentId: 'p1.1' }},
-        { entity: 'post', id: 'p1.2', resource: { parentId: 'p1' }},
+        { entity: 'post', id: 'o1', resource: { childIds: ['o1.1', 'o1.2'] }},
+        { entity: 'post', id: 'o1.1', resource: { parentId: 'o1', childIds: ['o1.1.1', 'o1.1.2'] }},
+        { entity: 'post', id: 'o1.1.1', resource: { parentId: 'o1.1' }},
+        { entity: 'post', id: 'o1.1.2', resource: { parentId: 'o1.1' }},
+        { entity: 'post', id: 'o1.2', resource: { parentId: 'o1' }},
       ];
 
       expect(result).toEqual(expected);

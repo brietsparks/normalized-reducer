@@ -523,6 +523,10 @@ describe('index', () => {
     detach all existing attached resources
       detach resource of reciprocal one-cardinality
       detach resource of reciprocal many-cardinality
+
+    with removal schema
+      basic
+      self-referencing
     */
 
     describe('without attached', () => {
@@ -665,6 +669,124 @@ describe('index', () => {
             profile: ['p1'],
             post: ['o1', 'o3'],
             category: ['c1']
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+    });
+
+    describe('with removal schema', () => {
+      test('basic', () => {
+        const state = {
+          resources: {
+            account: {
+              'a1': { profileId: 'p1' },
+              'a2': { profileId: 'p2' },
+            },
+            profile: {
+              'p1': { postIds: ['o1', 'o2'] },
+              'p2': { postIds: ['o3'] }
+            },
+            post: {
+              'o1': { profileId: 'p1', tagIds: ['t1'], categoryIds: ['c1'] },
+              'o2': { profileId: 'p1', categoryIds: ['c1'] },
+              'o3': { profileId: 'p2', tagIds: ['t2'], categoryIds: ['c1'] }
+            },
+            tag: {
+              't1': { postIds: ['o1'] },
+              't2': { postIds: ['o3'] }
+            },
+            category: {
+              'c1': { postIds: ['o1', 'o2', 'o3'] }
+            }
+          },
+          ids: {
+            account: ['a1', 'a2'],
+            profile: ['p1', 'p2'],
+            post: ['o1', 'o2', 'o3'],
+            tag: ['t1', 't2'],
+            category: ['c1'],
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.remove(
+          ForumEntities.ACCOUNT,
+          'a1',
+          {
+            profileId: {
+              postIds: {
+                tagIds: {}
+              }
+            }
+          }
+        ));
+
+        const expected = {
+          resources: {
+            account: {
+              'a2': { profileId: 'p2' },
+            },
+            profile: {
+              'p2': { postIds: ['o3'] }
+            },
+            post: {
+              'o3': { profileId: 'p2', tagIds: ['t2'], categoryIds: ['c1'] }
+            },
+            tag: {
+              't2': { postIds: ['o3'] }
+            },
+            category: {
+              'c1': { postIds: [ 'o3'] }
+            }
+          },
+          ids: {
+            account: ['a2'],
+            profile: ['p2'],
+            post: ['o3'],
+            tag: ['t2'],
+            category: ['c1'],
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('self-referencing', () => {
+        const state = {
+          resources: {
+            ...forumEmptyState.resources,
+            post: {
+              'o1': { childIds: ['o1.1', 'o1.2'] },
+              'o1.1': { parentId: 'o1', childIds: ['o1.1.1', 'o1.1.2'] },
+              'o1.1.1': { parentId: 'o1.1' },
+              'o1.1.2': { parentId: 'o1.1' },
+              'o1.2': { parentId: 'o1' },
+              'o2': {}
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o1', 'o1.1', 'o1.1.1', 'o1.1.2', 'o1.2', 'o2']
+          }
+        };
+
+        const removalSchema = () => ({ childIds: removalSchema });
+
+        const result = forumReducer(state, forumActionCreators.remove(
+          ForumEntities.POST,
+          'o1',
+          removalSchema
+        ));
+
+        const expected = {
+          resources: {
+            ...forumEmptyState.resources,
+            post: { 'o2': {} }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            post: ['o2']
           }
         };
 

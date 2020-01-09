@@ -93,6 +93,7 @@ export interface AddAttachable {
 export interface RemoveAction extends OpAction {
   entity: string,
   id: string,
+  removalSchema?: SelectorTreeSchema,
 }
 
 export interface EditAction extends OpAction {
@@ -173,7 +174,7 @@ export interface SetRelState {
 
 // action creators
 export type AddActionCreator = (entity: string, id: string, data?: object, attach?: AddAttachable[], index?: number) => AddAction;
-export type RemoveActionCreator = (entity: string, id: string) => RemoveAction;
+export type RemoveActionCreator = (entity: string, id: string, removalSchema?: SelectorTreeSchema) => RemoveAction;
 export type EditActionCreator = (entity: string, id: string, data: object) => EditAction;
 export type MoveActionCreator = (entity: string, src: number, dest: number) => MoveAction;
 export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
@@ -266,7 +267,7 @@ export type GetResource = (state: State, args: { entity: string, id: string }) =
 export type GetAttached = (state: State, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
 export type GetAttachedArr = (state: State, args: { entity: string, id: string, rel: string }) => string[]
 export type GetAllAttachedArr = (state: State, args: { entity: string, id: string }) => { [rel: string]: string[] };
-export type GetResourceTree = (state: State, args: { entity: string, id: string, schema: SelectorTreeSchema }) => any;
+export type GetResourceTree = (state: State, args: { entity: string, id: string, schema: SelectorTreeSchema }) => ResourceTreeNode[];
 
 export interface Selectors {
   getAllIds: GetAllIds,

@@ -10,7 +10,7 @@ import {
   ResourcesByEntityState,
   ResourceState,
   RelDataState,
-  ResourcesState, ConcreteOpAction, EditAction,
+  ResourcesState, ConcreteOpAction, EditAction, SelectorTreeSchema,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -75,6 +75,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
   const remove = (
     entity: string,
     id: string,
+    removalSchema?: SelectorTreeSchema
   ): RemoveAction => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
@@ -83,7 +84,8 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
     return {
       type: REMOVE,
       entity,
-      id
+      id,
+      removalSchema,
     };
   };
 

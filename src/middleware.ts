@@ -58,11 +58,16 @@ export const makeActionTransformer = (
 
     if (action.type === actionTypes.REMOVE) {
       const removeAction = action as RemoveAction;
-      const { entity, id } = removeAction ;
+      const { entity, id, removalSchema } = removeAction ;
 
       if (!selectors.checkResource(state, { entity, id })) {
         removeAction.ops = [];
         return removeAction;
+      }
+
+      if (removalSchema) {
+        const removables = selectors.getResourceTree(state, { entity, id, schema: removalSchema });
+        removables.forEach(attached => pendingState.removeResource(attached.entity, attached.id));
       }
 
       pendingState.removeResource(entity, id);
