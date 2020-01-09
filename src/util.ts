@@ -13,6 +13,15 @@ export function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
   arr.splice(toIndex, 0, element);
 }
 
+export const isObjectLiteral = (v: any): v is object => {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    !Array.isArray(v) &&
+    typeof v !== 'function'
+  );
+};
+
 export const defaultNamespaced = (actionType: string) => `relational/${actionType}`;
 
 export const defaultInvalidEntityHandler = (entity: string) => {
@@ -21,19 +30,3 @@ export const defaultInvalidEntityHandler = (entity: string) => {
 export const defaultInvalidRelHandler = (entity: string, rel: string) => {
   // throw new Error(`invalid rel "${rel}" in entity "${entity}"`)
 };
-
-export function deepFreeze(o: any) {
-  Object.freeze(o);
-
-  Object.getOwnPropertyNames(o).forEach(function (prop) {
-    if (o.hasOwnProperty(prop)
-      && o[prop] !== null
-      && (typeof o[prop] === 'object' || typeof o[prop] === 'function')
-      && !Object.isFrozen(o[prop])
-    ) {
-      deepFreeze(o[prop]);
-    }
-  });
-
-  return o;
-}

@@ -9,6 +9,8 @@ import {
   State,
 } from './types';
 
+import { validateSchema } from './validator';
+
 export class ModelSchemaReader {
   schema: ModelSchema;
   entitySchemaReaders: Record<string, EntitySchemaReader>;
@@ -19,6 +21,8 @@ export class ModelSchemaReader {
   private emptyIdsByEntityState?: IdsByEntityState;
 
   constructor(schema: ModelSchema) {
+    validateSchema(schema);
+
     this.schema = schema;
 
     this.entitySchemaReaders = Object.entries(schema).reduce(

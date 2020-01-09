@@ -19,10 +19,11 @@ import {
   IdsByEntityState,
   MoveResourceOp,
   EntityIdsReducers,
-  EntityIdsReducer, ResourcesByEntityState,
+  EntityIdsReducer,
+  ResourcesByEntityState,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
-import { arrayMove, arrayPut, deepFreeze } from './util';
+import { arrayMove, arrayPut } from './util';
 
 export const makeReducer = (
   schema: ModelSchemaReader,
@@ -33,8 +34,6 @@ export const makeReducer = (
   const resourcesByEntityReducer = makeResourcesByEntityReducer(schema);
 
   return (state: State = schema.getEmptyState(), anyAction: Action) => {
-    deepFreeze(state);
-
     if (!Object.values(actionTypes).includes(anyAction.type)) {
       return state;
     }
