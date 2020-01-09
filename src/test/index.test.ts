@@ -887,8 +887,35 @@ describe('index', () => {
 
   describe('move', () => {
     /*
-
     */
+
+    test('move resource', () => {
+      const state = {
+        resources: {
+          ...forumEmptyState.resources,
+          account: { 'a1': {}, 'a200': {}, 'a3': {}, 'a4': {}, 'a5': {} }
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1', 'a200', 'a3', 'a4', 'a5']
+        }
+      };
+
+      const result = forumReducer(state, forumActionCreators.move(ForumEntities.ACCOUNT, 1, 3));
+
+      const expected = {
+        resources: {
+          ...forumEmptyState.resources,
+          account: { 'a1': {}, 'a200': {}, 'a3': {}, 'a4': {}, 'a5': {} }
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1', 'a3', 'a4', 'a200', 'a5']
+        }
+      };
+
+      expect(result).toEqual(expected);
+    });
   });
 
   describe('attach', () => {
@@ -1957,13 +1984,10 @@ describe('index', () => {
       });
     });
 
-    describe('opposing operations negate eachother', () => {
+    describe('opposing operations negate each other', () => {
       /*
       remove detaches resources that were attached previously in batch (add and attach)
       */
     });
   });
-
-  // describe('actions on self referencing schema', () => {
-  // });
 });

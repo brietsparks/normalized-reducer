@@ -37,6 +37,15 @@ export const makeEditResourceOp = (entity: string, id: string, data: object): Ed
   };
 };
 
+export const makeMoveResourceOp = (entity: string, src: number, dest: number) => {
+  return {
+    opType: OpTypes.MOVE_RESOURCE,
+    entity,
+    src,
+    dest
+  };
+};
+
 export const makeAddRelIdOp = (entity: string, id: string, rel: string, relId: string, index?: number): AddRelIdOp => {
   const op: AddRelIdOp = {
     opType: OpTypes.ADD_REL_ID,
@@ -124,6 +133,14 @@ export class OpsBatch {
   putEditResource(entity: string, id: string, data: object) {
     const key = concat(OpTypes.EDIT_RESOURCE, entity, id);
     this.ops[key] = makeEditResourceOp(entity, id, data);
+  }
+
+  //
+  // moveResource
+  //
+  putMoveResource(entity: string, src: number, dest: number) {
+    const key = concat(OpTypes.MOVE_RESOURCE, String(src), String(dest));
+    this.ops[key] = makeMoveResourceOp(entity, src, dest);
   }
 
   //

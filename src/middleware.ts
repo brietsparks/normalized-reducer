@@ -4,7 +4,7 @@ import {
   ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
   RemoveAction,
-  Selectors, BatchAction, Action, EditAction, State
+  Selectors, BatchAction, Action, EditAction, State, MoveAction
 } from './types';
 import { PendingState } from './state';
 
@@ -91,6 +91,13 @@ export const makeActionTransformer = (
       editAction.ops = pendingState.getOps();
 
       return editAction;
+    }
+
+    if (action.type === actionTypes.MOVE) {
+      const moveAction = action as MoveAction;
+      pendingState.moveResource(moveAction.entity, moveAction.src, moveAction.dest);
+      moveAction.ops = pendingState.getOps();
+      return moveAction;
     }
 
     if (action.type === actionTypes.ATTACH) {

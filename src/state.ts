@@ -52,6 +52,10 @@ export class PendingState {
     this.ops.putEditResource(entity, id, data);
   }
 
+  moveResource(entity: string, src: number, dest: number) {
+    this.ops.putMoveResource(entity, src, dest);
+  }
+
   attachResources(entity: string, id: string, rel: string, relId: string, index?: number, reciprocalIndex?: number) {
     const entitySchema = this.schema.entity(entity);
 
