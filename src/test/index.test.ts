@@ -26,7 +26,8 @@ describe('index', () => {
   describe('add', () => {
     /*
     basic
-      if id does not exist, then create the resource
+      create resource
+      create resource at index
       if id exists, do not create the resource
 
     with attribute data
@@ -51,7 +52,7 @@ describe('index', () => {
     */
 
     describe('basic', () => {
-      test('if id does not exist, then create the resource', () => {
+      test('create resource', () => {
         const result = forumReducer(
           forumEmptyState,
           forumActionCreators.add(ForumEntities.ACCOUNT, 'a1')
@@ -67,6 +68,43 @@ describe('index', () => {
           ids: {
             ...forumEmptyState.ids,
             account: ['a1']
+          }
+        };
+
+        expect(result).toEqual(expected);
+      });
+
+      test('create resource at index', () => {
+        const state = {
+          resources: {
+            ...forumEmptyState.resources,
+            account: {
+              'a1': {},
+              'a2': {},
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1', 'a2'],
+          }
+        };
+
+        const result = forumReducer(state, forumActionCreators.add(
+          ForumEntities.ACCOUNT, 'a3', {}, undefined, 1
+        ));
+
+        const expected = {
+          resources: {
+            ...forumEmptyState.resources,
+            account: {
+              'a1': {},
+              'a2': {},
+              'a3': {},
+            }
+          },
+          ids: {
+            ...forumEmptyState.ids,
+            account: ['a1', 'a3', 'a2'],
           }
         };
 

@@ -18,23 +18,26 @@ import {
 } from './util';
 
 export interface Options {
-  namespaced: Namespaced,
-  onInvalidEntity: InvalidEntityHandler,
-  onInvalidRel: InvalidRelHandler,
+  namespaced?: Namespaced,
+  onInvalidEntity?: InvalidEntityHandler,
+  onInvalidRel?: InvalidRelHandler,
 }
 
 export * from './types';
 
 export default function <S extends State> (
   schema: ModelSchema,
-  options: Options = {
-    namespaced: defaultNamespaced,
-    onInvalidEntity: defaultInvalidEntityHandler,
-    onInvalidRel: defaultInvalidRelHandler,
-  }) {
+  options?: Options
+) {
   const schemaReader = new ModelSchemaReader(schema);
 
-  const { types, creators } = makeActions(schemaReader, options);
+  const opts = {
+    namespaced: options?.namespaced || defaultNamespaced,
+    onInvalidEntity: options?.onInvalidEntity || defaultInvalidEntityHandler,
+    onInvalidRel: options?.onInvalidRel || defaultInvalidRelHandler,
+  };
+
+  const { types, creators } = makeActions(schemaReader, opts);
   const selectors = makeSelectors(schemaReader, creators, options);
   const transformAction = makeActionTransformer(schemaReader, types, selectors);
   const reducer = makeReducer(schemaReader, types, transformAction);

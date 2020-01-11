@@ -11,12 +11,13 @@ import {
 } from './types';
 import { ModelSchemaReader } from './schema';
 
-export const makeAddResourceOp = (entity: string, id: string, data?: object): AddResourceOp => {
+export const makeAddResourceOp = (entity: string, id: string, data?: object, index?: number): AddResourceOp => {
   return {
     opType: OpTypes.ADD_RESOURCE,
     entity,
     id,
     data,
+    index,
   };
 };
 
@@ -101,9 +102,9 @@ export class OpsBatch {
   //
   // addResource
   //
-  putAddResource(entity: string, id: string, data?: object) {
+  putAddResource(entity: string, id: string, data?: object, index?: number) {
     const key = concat(OpTypes.ADD_RESOURCE, entity, id);
-    this.ops[key] = makeAddResourceOp(entity, id, data);
+    this.ops[key] = makeAddResourceOp(entity, id, data, index);
   }
   getAddResource(entity: string, id: string) {
     const key = concat(OpTypes.ADD_RESOURCE, entity, id);

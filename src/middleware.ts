@@ -29,14 +29,14 @@ export const makeActionTransformer = (
 
     if (action.type === actionTypes.ADD) {
       const addAction = action as AddAction;
-      const { entity, id, data } = addAction;
+      const { entity, id, data, index } = addAction;
 
       if (selectors.checkResource(state, { entity, id })) {
         addAction.ops = [];
         return addAction;
       }
 
-      pendingState.addResource(entity, id, data);
+      pendingState.addResource(entity, id, data, index);
 
       if (addAction.attach) {
         addAction.attach.forEach(attachable => {
