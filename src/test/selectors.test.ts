@@ -1,25 +1,22 @@
-import { blogSelectors, blogState } from './test-cases/blog';
+import { blogSelectors, blogExampleState } from './test-cases/blog';
 import { forumSelectors, forumEmptyState, ForumState } from './test-cases/forum';
 
 describe('selectors', () => {
-  describe('getAllIds', () => {
-  });
-
   describe('getAttachedArr', () => {
     test('cardinality of one', () => {
-      const result = blogSelectors.getAttachedArr(blogState, {
+      const expected = ['r1', 'r2'];
+
+      const result = blogSelectors.getAttachedArr(blogExampleState, {
         entity: 'author',
         id: 'a1',
         rel: 'articleIds'
       });
 
-      const expected = ['r1', 'r2'];
-
       expect(result).toEqual(expected);
     });
 
     test('cardinality of many', () => {
-      const result = blogSelectors.getAttachedArr(blogState, {
+      const result = blogSelectors.getAttachedArr(blogExampleState, {
         entity: 'article',
         id: 'r1',
         rel: 'authorId'

@@ -1,11 +1,11 @@
 import { PendingState } from '../state';
 
-import { BlogState, blogState, blogModelSchemaReader, blogSelectors } from './test-cases/blog';
+import { BlogState, blogExampleState, blogModelSchemaReader, blogSelectors } from './test-cases/blog';
 import { makeAddRelIdOp, makeRemoveRelIdOp } from '../ops';
 
 describe('pendingState', () => {
   test('add-resource-op', () => {
-    const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
+    const pendingState = new PendingState(blogModelSchemaReader, blogExampleState, blogSelectors);
     // current state
     expect(pendingState.checkExistence('author', 'a1')).toEqual(true);
     expect(pendingState.checkExistence('article', 'r1')).toEqual(true);
@@ -18,7 +18,7 @@ describe('pendingState', () => {
 
   describe('attach/detach resources', () => {
     test('detach then attach', () => {
-      const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
+      const pendingState = new PendingState(blogModelSchemaReader, blogExampleState, blogSelectors);
 
       //
       // detach

@@ -51,10 +51,12 @@ export const validateSchema = (schema: ModelSchema) => {
   })
 };
 
+// returns entity data clean of that entity's rel keys
+// does not clean out keys that are rel entity names
 export const cleanData = (data: any, schema: ModelSchemaReader, entity: string) => {
   return typeof data === 'object'
     ? Object.keys(data).reduce((cleanData, key) => {
-      if (!schema.entity(entity).relExists(key)) {
+      if (!schema.entity(entity).relIsValid(key, false)) {
         cleanData[key] = data[key];
       }
       return cleanData;

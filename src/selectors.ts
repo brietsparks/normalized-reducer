@@ -1,24 +1,11 @@
 import {
   Cardinalities,
-  ResourcesByEntityState,
-  InvalidEntityHandler,
-  InvalidRelHandler,
-  InvalidRelDataHandler,
-  NonexistentResourceHandler,
   ActionCreators,
-  ActionTypes,
   Selectors, ResourcesState, State,
-  SelectorTreeSchema, ResourceTreeNode
+  SelectorTreeSchema, ResourceTreeNode,
+  Options
 } from './types';
 import { ModelSchemaReader } from './schema';
-import { noop } from './util';
-
-export interface Opts {
-  onInvalidEntity?: InvalidEntityHandler,
-  onNonexistentResource?: NonexistentResourceHandler,
-  onInvalidRel?: InvalidRelHandler,
-  onInvalidRelData?: InvalidRelDataHandler
-}
 
 const emptyIds: string[] = [];
 const emptyResources: ResourcesState = {};
@@ -26,13 +13,26 @@ const emptyResources: ResourcesState = {};
 export const makeSelectors = (
   schema: ModelSchemaReader,
   actionCreators: ActionCreators,
-  {
-    onInvalidEntity = noop,
-    onNonexistentResource = noop,
-    onInvalidRel = noop,
-    onInvalidRelData = noop
-  }: Opts = {}
+  options: Options,
 ): Selectors => {
+  const {
+    resolveRelFromEntity,
+    onInvalidRel,
+    onInvalidRelData,
+    onInvalidEntity,
+    onNonexistentResource,
+  } = options;
+
+  const resolveRel = (entity: string, rel: string) => {
+    const entitySchema = schema.entity(entity);
+
+    if (!entitySchema) {
+      return undefined;
+    }
+
+    return entitySchema.resolveRel(rel, resolveRelFromEntity);
+  };
+
   const getAllIds = (state: State) => {
     const allIds = state.ids;
 
@@ -109,14 +109,31 @@ export const makeSelectors = (
     return resource;
   };
 
+  const checkAttached = (state: State, args: { entity: string, id: string, rel: string, relId: string }) => {
+    const rel = resolveRel(args.entity, args.rel);
+
+    if (!rel) {
+      return false;
+    }
+
+    const attachedArr = getAttachedArr(state, { ...args, rel });
+    return attachedArr.includes(args.relId);
+  };
+
   const getAttached = (state: State, args: { entity: string, id: string, rel: string }) => {
+    const rel = resolveRel(args.entity, args.rel);
+
+    if (!rel) {
+      return undefined;
+    }
+
     const resource = getResource(state, {
       entity: args.entity,
       id: args.id,
     });
 
     const entitySchema = schema.entity(args.entity);
-    if (!entitySchema.relExists(args.rel)) {
+    if (!entitySchema.relIsValid(args.rel, resolveRelFromEntity)) {
       onInvalidRel(args.entity, args.rel);
       return undefined;
     }
@@ -136,6 +153,12 @@ export const makeSelectors = (
   };
 
   const getAttachedArr = (state: State, args: { entity: string, id: string, rel: string }): string[] => {
+    const rel = resolveRel(args.entity, args.rel);
+
+    if (!rel) {
+      return [];
+    }
+
     const relState = getAttached(state, args);
 
     if (relState === undefined) {
@@ -206,12 +229,16 @@ export const makeSelectors = (
     }
 
     for (let [rel, nestedSelectorSchema] of Object.entries(selectorSchema)) {
-      const relEntity = schema.entity(entity).getRelEntity(rel);
+      const resolvedRel = schema.entity(entity).resolveRel(rel, resolveRelFromEntity);
 
-      if (relEntity) {
-        const relIds = getAttachedArr(state, { entity, id, rel });
-        for (let relId of relIds) {
-          recursivelyGetNodes(state, relEntity, relId, nestedSelectorSchema, nodes);
+      if (resolvedRel) {
+        const relEntity = schema.entity(entity).getRelEntity(resolvedRel);
+
+        if (relEntity) {
+          const relIds = getAttachedArr(state, { entity, id, rel: resolvedRel });
+          for (let relId of relIds) {
+            recursivelyGetNodes(state, relEntity, relId, nestedSelectorSchema, nodes);
+          }
         }
       }
     }
@@ -230,5 +257,6 @@ export const makeSelectors = (
     getAttachedArr,
     getAllAttachedArr,
     getResourceTree,
+    checkAttached,
   }
 };

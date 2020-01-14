@@ -268,6 +268,7 @@ export type GetAttached = (state: State, args: { entity: string, id: string, rel
 export type GetAttachedArr = (state: State, args: { entity: string, id: string, rel: string }) => string[]
 export type GetAllAttachedArr = (state: State, args: { entity: string, id: string }) => { [rel: string]: string[] };
 export type GetResourceTree = (state: State, args: { entity: string, id: string, schema: SelectorTreeSchema }) => ResourceTreeNode[];
+export type CheckAttached = (state: State, args: { entity: string, id: string, rel: string, relId: string }) => boolean;
 
 export interface Selectors {
   getAllIds: GetAllIds,
@@ -280,6 +281,7 @@ export interface Selectors {
   getAttachedArr: GetAttachedArr,
   getAllAttachedArr: GetAllAttachedArr,
   getResourceTree: GetResourceTree,
+  checkAttached: CheckAttached
 }
 
 export type SelectorTreeSchema = { [rel: string]: SelectorTreeSchema } | (() => SelectorTreeSchema)
@@ -302,6 +304,15 @@ export interface EntityReducers {
 //
 // option types
 //
+
+export interface Options {
+  namespaced: Namespaced,
+  resolveRelFromEntity: boolean,
+  onInvalidEntity: InvalidEntityHandler,
+  onInvalidRel: InvalidRelHandler,
+  onInvalidRelData: InvalidRelDataHandler,
+  onNonexistentResource: NonexistentResourceHandler,
+}
 
 export type InvalidEntityHandler = (entity: string) => void;
 export type NonexistentResourceHandler = (entity: string, id: string) => void;

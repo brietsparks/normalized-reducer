@@ -1,6 +1,6 @@
 import { makeActionTransformer } from '../middleware';
 
-import { blogActionTypes, blogState, BlogState, transformBlogAction } from './test-cases/blog';
+import { blogActionTypes, blogExampleState, BlogState, transformBlogAction } from './test-cases/blog';
 import { AddAction, OpTypes } from '../types';
 
 describe('middleware', () => {
@@ -14,7 +14,7 @@ describe('middleware', () => {
           id: 'a1',
         };
 
-        const result = transformBlogAction(blogState, action);
+        const result = transformBlogAction(blogExampleState, action);
 
         const expected = {
           ...action,
@@ -31,7 +31,7 @@ describe('middleware', () => {
           id: 'a200',
         };
 
-        const result = transformBlogAction(blogState, action);
+        const result = transformBlogAction(blogExampleState, action);
 
         const expected = {
           ...action,

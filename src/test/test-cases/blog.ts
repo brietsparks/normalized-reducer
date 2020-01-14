@@ -3,11 +3,16 @@ import {
   ModelSchema,
   EntitySchema,
   Cardinalities,
-  ResourcesState,
   RelDataState
 } from '../../types';
 import { makeActions } from '../../actions';
-import { defaultInvalidEntityHandler, defaultInvalidRelHandler, defaultNamespaced } from '../../util';
+import {
+  defaultInvalidEntityHandler,
+  defaultInvalidRelHandler,
+  defaultInvalidRelDataHandler,
+  defaultNonExistentResourceHandler,
+  defaultNamespaced,
+} from '../../util';
 import { ModelSchemaReader } from '../../schema';
 import { makeSelectors } from '../../selectors';
 import { makeActionTransformer } from '../../middleware';
@@ -53,7 +58,7 @@ export interface BlogState extends ResourcesByEntityState {
   }
 }
 
-export const blogState: BlogState = {
+export const blogExampleState: BlogState = {
   resources: {
     author: {
       'a1': { articleIds: ['r1', 'r2'] }
@@ -71,18 +76,29 @@ export const blogState: BlogState = {
 
 export const blogModelSchemaReader = new ModelSchemaReader(blogSchema);
 
-export const {
-  creators: blogActionCreators,
-  types: blogActionTypes,
-} = makeActions(blogModelSchemaReader, {
+const options = {
+  resolveRelFromEntity: false,
   namespaced: defaultNamespaced,
   onInvalidEntity: defaultInvalidEntityHandler,
   onInvalidRel: defaultInvalidRelHandler,
-});
+  onInvalidRelData: defaultInvalidRelDataHandler,
+  onNonexistentResource: defaultNonExistentResourceHandler,
+};
+
+export const {
+  creators: blogActionCreators,
+  types: blogActionTypes,
+} = makeActions(blogModelSchemaReader, options);
 
 export const blogSelectors = makeSelectors(
   blogModelSchemaReader,
-  blogActionCreators
+  blogActionCreators,
+  options,
 );
 
-export const transformBlogAction = makeActionTransformer(blogModelSchemaReader, blogActionTypes, blogSelectors);
+export const transformBlogAction = makeActionTransformer(
+  blogModelSchemaReader,
+  blogActionTypes,
+  blogSelectors,
+  options
+);

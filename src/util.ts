@@ -30,3 +30,10 @@ export const defaultInvalidEntityHandler = (entity: string) => {
 export const defaultInvalidRelHandler = (entity: string, rel: string) => {
   // throw new Error(`invalid rel "${rel}" in entity "${entity}"`)
 };
+export const defaultInvalidRelDataHandler = (entity: string, rel: string, data: any) => {
+  // throw new Error(`invalid data for rel "${rel}" in entity "${entity}"`)
+};
+export const defaultNonExistentResourceHandler = (entity: string, id: string) => {
+  // throw new Error(`nonexistent resource of entity "${entity}" and id "${id}"`)
+};
+

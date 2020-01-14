@@ -114,8 +114,58 @@ export class EntitySchemaReader {
     return cardinality === Cardinalities.ONE ? undefined : [];
   }
 
-  relExists(rel: string) {
-    return this.getRels().includes(rel);
+  relIsValid(rel: string, resolve: boolean) {
+    const hasRel = this.getRels().includes(rel);
+
+    if (hasRel) {
+      return true;
+    }
+
+    if (!resolve) {
+      return false;
+    }
+
+    const entity = rel;
+
+    let hasEntity = false;
+    for (let relSchema of Object.values(this.schema)) {
+      if (relSchema.entity === entity) {
+        if (hasEntity) {
+          return false;
+        }
+
+        hasEntity = true;
+      }
+    }
+
+    return hasEntity;
+  }
+
+  resolveRel(entityOrRel: string, resolve: boolean) {
+    const hasRel = this.getRels().includes(entityOrRel);
+
+    if (hasRel) {
+      return entityOrRel;
+    }
+
+    if (!resolve) {
+      return undefined;
+    }
+
+    const entity = entityOrRel;
+
+    let found = undefined;
+    for (let [rel, relSchema] of Object.entries(this.schema)) {
+      if (relSchema.entity === entity) {
+        if (found) {
+          return undefined;
+        }
+
+        found = rel;
+      }
+    }
+
+    return found;
   }
 
   relDataIsValid(rel: string, data: any) {

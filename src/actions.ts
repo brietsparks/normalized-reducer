@@ -10,21 +10,19 @@ import {
   ResourcesByEntityState,
   ResourceState,
   RelDataState,
-  ResourcesState, ConcreteOpAction, EditAction, SelectorTreeSchema,
+  ResourcesState,
+  ConcreteOpAction,
+  EditAction,
+  SelectorTreeSchema,
+  Options
 } from './types';
 
 import { ModelSchemaReader } from './schema';
 
 import { cleanData } from './validator';
 
-interface Opts {
-  namespaced: Namespaced,
-  onInvalidEntity: InvalidEntityHandler,
-  onInvalidRel: InvalidRelHandler,
-}
-
-export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: ActionTypes, creators: ActionCreators } => {
-  const { namespaced, onInvalidEntity, onInvalidRel } = opts;
+export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: ActionTypes, creators: ActionCreators } => {
+  const { namespaced, resolveRelFromEntity, onInvalidEntity, onInvalidRel } = opts;
 
   const ADD = namespaced('ADD');
   const REMOVE = namespaced('REMOVE');
@@ -41,7 +39,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
   const SET_REL_STATE = namespaced('SET_REL_STATE');
 
   const entityExists = (entity: string) => schema.entityExists(entity);
-  const relExists = (entity: string, rel: string) => schema.entity(entity)?.relExists(rel);
+  const relIsValid = (entity: string, rel: string) => schema.entity(entity)?.relIsValid(rel, resolveRelFromEntity);
 
   const add = (
     entity: string,
@@ -55,7 +53,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
     }
 
     attach && attach.forEach(attachable => {
-      if (!relExists(entity, attachable.rel)) {
+      if (!relIsValid(entity, attachable.rel)) {
         onInvalidRel(entity, attachable.rel);
       }
     });
@@ -136,7 +134,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
       onInvalidEntity(entity);
     }
 
-    if (!relExists(entity, rel)) {
+    if (!relIsValid(entity, rel)) {
       onInvalidRel(entity, rel);
     }
 
@@ -161,7 +159,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
       onInvalidEntity(entity);
     }
 
-    if (!relExists(entity, rel)) {
+    if (!relIsValid(entity, rel)) {
       onInvalidRel(entity, rel);
     }
 
@@ -179,7 +177,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
       onInvalidEntity(entity);
     }
 
-    if (!relExists(entity, rel)) {
+    if (!relIsValid(entity, rel)) {
       onInvalidRel(entity, rel);
     }
 
@@ -232,7 +230,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Opts): { types: Act
       onInvalidEntity(entity);
     }
 
-    if (!relExists(entity, rel)) {
+    if (!relIsValid(entity, rel)) {
       onInvalidRel(entity, rel);
     }
 

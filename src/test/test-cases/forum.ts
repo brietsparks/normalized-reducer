@@ -1,6 +1,7 @@
 import { Cardinalities, State, } from '../../types';
 
 import makeModule from '../..';
+import { ModelSchemaReader } from '../../schema';
 
 export enum ForumEntities {
   ACCOUNT = 'account',
@@ -122,6 +123,8 @@ export interface ForumState extends State {
   }
 }
 
+export const forumModelSchemaReader = new ModelSchemaReader(forumSchema);
+
 export const {
   emptyState: forumEmptyState,
   actionCreators: forumActionCreators,
@@ -129,4 +132,4 @@ export const {
   transformAction: forumTransformAction,
   selectors: forumSelectors,
   actionTypes: forumActionTypes,
-} = makeModule<ForumState>(forumSchema);
+} = makeModule<ForumState>(forumSchema, { resolveRelFromEntity: true });

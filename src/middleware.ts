@@ -4,7 +4,7 @@ import {
   ActionTypes, AddAction, AttachAction,
   DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
   RemoveAction,
-  Selectors, BatchAction, Action, EditAction, State, MoveAction
+  Selectors, BatchAction, Action, EditAction, State, MoveAction, Options
 } from './types';
 import { PendingState } from './state';
 
@@ -13,7 +13,8 @@ import { PendingState } from './state';
 export const makeActionTransformer = (
   schema: ModelSchemaReader,
   actionTypes: ActionTypes,
-  selectors: Selectors
+  selectors: Selectors,
+  options: Options,
 ): DeriveActionWithOps => {
   const transformAction = (state: State, action: Action, pending?: PendingState): OpAction => {
     const pendingState = pending || new PendingState(schema, state, selectors);
@@ -40,14 +41,18 @@ export const makeActionTransformer = (
 
       if (addAction.attach) {
         addAction.attach.forEach(attachable => {
-          pendingState.attachResources(
-            entity,
-            id,
-            attachable.rel,
-            attachable.id,
-            attachable.index,
-            attachable.reciprocalIndex,
-          )
+          const rel = schema.entity(entity).resolveRel(attachable.rel, options.resolveRelFromEntity);
+
+          if (rel) {
+            pendingState.attachResources(
+              entity,
+              id,
+              rel,
+              attachable.id,
+              attachable.index,
+              attachable.reciprocalIndex,
+            )
+          }
         });
       }
 
@@ -104,7 +109,10 @@ export const makeActionTransformer = (
       const attachAction = action as AttachAction;
       const { entity, id, rel, relId, index, reciprocalIndex } = attachAction;
 
-      pendingState.attachResources(entity, id, rel, relId, index, reciprocalIndex);
+      const resolvedRel = schema.entity(entity).resolveRel(rel, options.resolveRelFromEntity);
+      if (resolvedRel) {
+        pendingState.attachResources(entity, id, resolvedRel, relId, index, reciprocalIndex);
+      }
 
       attachAction.ops = pendingState.getOps();
 
@@ -115,7 +123,10 @@ export const makeActionTransformer = (
       const detachAction = action as DetachAction;
       const { entity, id, rel, relId } = detachAction;
 
-      pendingState.detachResources(entity, id, rel, relId);
+      const resolvedRel = schema.entity(entity).resolveRel(rel, options.resolveRelFromEntity);
+      if (resolvedRel) {
+        pendingState.detachResources(entity, id, resolvedRel, relId);
+      }
 
       detachAction.ops = pendingState.getOps();
 
@@ -126,7 +137,10 @@ export const makeActionTransformer = (
       const moveAttachedAction = action as MoveAttachedAction;
       const { entity, id, rel, src, dest } = moveAttachedAction;
 
-      pendingState.moveAttachedResource(entity, id, rel, src, dest);
+      const resolvedRel = schema.entity(entity).resolveRel(rel, options.resolveRelFromEntity);
+      if (resolvedRel) {
+        pendingState.moveAttachedResource(entity, id, resolvedRel, src, dest);
+      }
 
       moveAttachedAction.ops = pendingState.getOps();
 
