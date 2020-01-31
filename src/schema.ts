@@ -3,9 +3,9 @@ import {
   EntitySchema,
   RelSchema,
   Cardinalities,
-  ResourceState,
-  ResourcesByEntityState,
-  IdsByEntityState,
+  Resource,
+  ResourcesByEntity,
+  IdsByEntity,
   State,
 } from './types';
 
@@ -17,8 +17,8 @@ export class ModelSchemaReader {
 
   // singleton values
   private emptyState?: State;
-  private emptyResourcesByEntityState?: ResourcesByEntityState;
-  private emptyIdsByEntityState?: IdsByEntityState;
+  private emptyResourcesByEntityState?: ResourcesByEntity;
+  private emptyIdsByEntityState?: IdsByEntity;
 
   constructor(schema: ModelSchema) {
     validateSchema(schema);
@@ -45,7 +45,7 @@ export class ModelSchemaReader {
           emptyState[entity] = {};
           return emptyState;
         },
-        {} as ResourcesByEntityState
+        {} as ResourcesByEntity
       );
     }
 
@@ -59,7 +59,7 @@ export class ModelSchemaReader {
           idsState[entity] = [];
           return idsState;
         },
-        {} as IdsByEntityState
+        {} as IdsByEntity
       );
     }
 
@@ -120,7 +120,7 @@ export class EntitySchemaReader {
       }
 
       return state;
-    }, {} as ResourceState);
+    }, {} as Resource);
   }
 
   getEmptyRelState(rel: string) {

@@ -15,10 +15,15 @@ import {
   RemoveResourceOp,
   Action,
   EditResourceOp,
-  IdsByEntityState,
+  IdsByEntity,
   MoveResourceOp,
   EntityIdsReducers,
-  ResourcesByEntityState,
+  ResourcesByEntity,
+  SetStateAction,
+  SetAllIdsAction,
+  SetIdsAction,
+  SetResourcesAction,
+  SetResourceAction,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';
 import { arrayMove, arrayPut } from './util';
@@ -34,6 +39,55 @@ export const makeReducer = (
   return (state: State = schema.getEmptyState(), anyAction: Action) => {
     if (!Object.values(actionTypes).includes(anyAction.type)) {
       return state;
+    }
+
+    if (anyAction.type === actionTypes.SET_STATE) {
+      const setterAction = anyAction as SetStateAction;
+      return setterAction.state;
+    }
+
+    if (anyAction.type === actionTypes.SET_ALL_IDS) {
+      const setterAction = anyAction as SetAllIdsAction;
+      return {
+        ...state,
+        ids: setterAction.state,
+      };
+    }
+
+    if (anyAction.type === actionTypes.SET_IDS) {
+      const setterAction = anyAction as SetIdsAction;
+      return {
+        ...state,
+        ids: {
+          ...state.ids,
+          [setterAction.entity]: setterAction.state,
+        },
+      };
+    }
+
+    if (anyAction.type === actionTypes.SET_RESOURCES) {
+      const setterAction = anyAction as SetResourcesAction;
+      return {
+        ...state,
+        resources: {
+          ...state.resources,
+          [setterAction.entity]: setterAction.state,
+        },
+      };
+    }
+
+    if (anyAction.type === actionTypes.SET_RESOURCE) {
+      const { entity, id, state: resource } = anyAction as SetResourceAction;
+      return {
+        ...state,
+        resources: {
+          ...state.resources,
+          [entity]: {
+            ...(state.resources ? state.resources[entity] : {}),
+            [id]: resource,
+          },
+        },
+      };
     }
 
     const opAction = anyAction as OpAction;
@@ -55,11 +109,11 @@ export const makeIdsByEntityReducer = (schema: ModelSchemaReader) => {
   }, {});
 
   return (
-    state: IdsByEntityState = schema.getEmptyIdsByEntityState(),
+    state: IdsByEntity = schema.getEmptyIdsByEntityState(),
     action: OpAction
   ) => {
     return Object.keys(idsReducers).reduce(
-      (reducedState: IdsByEntityState, entity: string) => {
+      (reducedState: IdsByEntity, entity: string) => {
         const newReducedState = { ...reducedState };
         const entityReducer = idsReducers[entity];
         newReducedState[entity] = entityReducer(
@@ -116,11 +170,11 @@ export const makeResourcesByEntityReducer = (schema: ModelSchemaReader) => {
   );
 
   return (
-    state: ResourcesByEntityState = schema.getEmptyResourcesByEntityState(),
+    state: ResourcesByEntity = schema.getEmptyResourcesByEntityState(),
     action: OpAction
   ) => {
     return Object.keys(resourcesReducers).reduce(
-      (reducedState: ResourcesByEntityState, entity: string) => {
+      (reducedState: ResourcesByEntity, entity: string) => {
         const newReducedState = { ...reducedState };
         const entityReducer = resourcesReducers[entity];
         newReducedState[entity] = entityReducer(

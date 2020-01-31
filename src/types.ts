@@ -148,28 +148,36 @@ export interface BatchAction extends Action {
 
 export interface SetStateAction {
   type: string;
-  state: ResourcesByEntityState;
+  state: State;
 }
 
-export interface SetEntityState {
+export interface SetAllIdsAction {
+  type: string;
+  state: IdsByEntity;
+}
+
+export interface SetAllResourcesAction {
+  type: string;
+  state: ResourcesByEntity;
+}
+
+export interface SetIdsAction {
   type: string;
   entity: string;
-  state: ResourcesState;
+  state: string[];
 }
 
-export interface SetResourceState {
+export interface SetResourcesAction {
+  type: string;
+  entity: string;
+  state: Resources;
+}
+
+export interface SetResourceAction {
   type: string;
   entity: string;
   id: string;
-  state: ResourceState;
-}
-
-export interface SetRelState {
-  type: string;
-  entity: string;
-  id: string;
-  rel: string;
-  state: RelDataState;
+  state: Resource;
 }
 
 // action creators
@@ -218,24 +226,24 @@ export type MoveAttachedActionCreator = (
 export type BatchActionCreator = (
   ...actions: ConcreteOpAction[]
 ) => BatchAction;
-export type SetStateActionCreator = (
-  state: ResourcesByEntityState
-) => SetStateAction;
-export type SetEntityStateCreator = (
+export type SetStateActionCreator = (state: State) => SetStateAction;
+export type SetAllIdsActionCreator = (state: IdsByEntity) => SetAllIdsAction;
+export type SetAllResourcesActionCreator = (
+  state: ResourcesByEntity
+) => SetAllResourcesAction;
+export type SetIdsActionCreator = (
   entity: string,
-  state: ResourcesState
-) => SetEntityState;
-export type SetResourceStateCreator = (
+  state: string[]
+) => SetIdsAction;
+export type SetResourcesActionCreator = (
+  entity: string,
+  state: Resources
+) => SetResourcesAction;
+export type SetResourceActionCreator = (
   entity: string,
   id: string,
-  state: ResourceState
-) => SetResourceState;
-export type SetRelStateCreator = (
-  entity: string,
-  id: string,
-  rel: string,
-  state: RelDataState
-) => SetRelState;
+  state: Resource
+) => SetResourceAction;
 
 export interface ActionTypes {
   ADD: string;
@@ -247,9 +255,11 @@ export interface ActionTypes {
   MOVE_ATTACHED: string;
   BATCH: string;
   SET_STATE: string;
-  SET_ENTITY_STATE: string;
-  SET_RESOURCE_STATE: string;
-  SET_REL_STATE: string;
+  SET_ALL_IDS: string;
+  SET_ALL_RESOURCES: string;
+  SET_IDS: string;
+  SET_RESOURCES: string;
+  SET_RESOURCE: string;
 }
 
 export interface ActionCreators {
@@ -262,9 +272,11 @@ export interface ActionCreators {
   moveAttached: MoveAttachedActionCreator;
   batch: BatchActionCreator;
   setState: SetStateActionCreator;
-  setEntityState: SetEntityStateCreator;
-  setResourceState: SetResourceStateCreator;
-  setRelState: SetRelStateCreator;
+  setAllIds: SetAllIdsActionCreator;
+  setAllResources: SetAllResourcesActionCreator;
+  setIds: SetIdsActionCreator;
+  setResources: SetResourcesActionCreator;
+  setResource: SetResourceActionCreator;
 }
 
 //
@@ -297,27 +309,27 @@ export enum Cardinalities {
 //
 
 export type State = {
-  resources: ResourcesByEntityState;
-  ids: IdsByEntityState;
+  resources: ResourcesByEntity;
+  ids: IdsByEntity;
 };
-export type IdsByEntityState = { [entity: string]: string[] };
-export type ResourcesByEntityState = { [entity: string]: ResourcesState };
-export type ResourcesState = { [id: string]: ResourceState };
-export type ResourceState = { [attr: string]: RelDataState | any };
-export type RelDataState = undefined | string | string[];
+export type IdsByEntity = { [entity: string]: string[] };
+export type ResourcesByEntity = { [entity: string]: Resources };
+export type Resources = { [id: string]: Resource };
+export type Resource = { [attr: string]: RelData | any };
+export type RelData = undefined | string | string[];
 
 //
 // selector types
 //
 
 export type DeriveActionWithOps = (state: State, action: OpAction) => OpAction;
-export type GetAllIds = (state: State) => IdsByEntityState;
-export type GetAllResources = (state: State) => ResourcesByEntityState;
+export type GetAllIds = (state: State) => IdsByEntity;
+export type GetAllResources = (state: State) => ResourcesByEntity;
 export type GetIds = (state: State, args: { entity: string }) => string[];
 export type GetResources = (
   state: State,
   args: { entity: string }
-) => ResourcesState;
+) => Resources;
 export type CheckResource = (
   state: State,
   args: { entity: string; id: string }
@@ -325,7 +337,7 @@ export type CheckResource = (
 export type GetResource = (
   state: State,
   args: { entity: string; id: string }
-) => ResourceState | undefined;
+) => Resource | undefined;
 export type GetAttached = (
   state: State,
   args: { entity: string; id: string; rel: string }
@@ -375,10 +387,7 @@ export interface EntityIdsReducers {
   [entity: string]: EntityIdsReducer;
 }
 
-export type EntityReducer = (
-  state: ResourcesState,
-  ops: Op[]
-) => ResourcesState;
+export type EntityReducer = (state: Resources, ops: Op[]) => Resources;
 export interface EntityReducers {
   [entity: string]: EntityReducer;
 }

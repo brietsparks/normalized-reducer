@@ -2310,94 +2310,130 @@ describe('index', () => {
     });
   });
 
-  // test('set state', () => {
-  //   const state = {
-  //     ...forumEmptyState,
-  //     account: {
-  //       'a1': { profileId: 'p1' }
-  //     },
-  //     profile: {
-  //       'p1': { accountId: 'a1' }
-  //     }
-  //   };
-  //
-  //   const result = forumReducer(undefined, forumActionCreators.setState(state));
-  //
-  //   expect(result).toEqual(state);
-  // });
+  test('set state', () => {
+    const state = {
+      resources: {
+        account: {
+          a1: { profileId: 'p1' },
+        },
+        profile: {
+          p1: { accountId: 'a1' },
+        },
+      },
+      ids: {
+        account: ['a1'],
+        profile: ['p1'],
+      },
+    };
 
-  // test('set entity state', () => {
-  //   [undefined, forumEmptyState].forEach(state => {
-  //     const entityState = {
-  //       'a1': { profileId: 'p1' }
-  //     };
-  //
-  //     const result = forumReducer(state, forumActionCreators.setEntityState(
-  //       ForumEntities.ACCOUNT, entityState
-  //     ));
-  //
-  //     const expected = {
-  //       ...forumEmptyState,
-  //       account: {
-  //         'a1': { profileId: 'p1' }
-  //       },
-  //     };
-  //
-  //     expect(result).toEqual(expected);
-  //   });
-  // });
+    const result = forumReducer(undefined, forumActionCreators.setState(state));
 
-  // test('set resource state', () => {
-  //   [undefined, forumEmptyState].forEach(state => {
-  //     const resourceState = {
-  //       profileId: 'p200', categoryIds: ['c1']
-  //     };
-  //
-  //     const result = forumReducer(state, forumActionCreators.setResourceState(
-  //       ForumEntities.POST, 'o1', resourceState
-  //     ));
-  //
-  //     const expected = {
-  //       ...forumEmptyState,
-  //       post: {
-  //         'o1': { profileId: 'p200', categoryIds: ['c1'] }
-  //       }
-  //     };
-  //
-  //     expect(result).toEqual(expected);
-  //   });
-  // });
+    expect(result).toEqual(state);
+  });
 
-  // test('set rel state', () => {
-  //   [undefined, forumEmptyState].forEach(state => {
-  //     const result = forumReducer(state, forumActionCreators.setRelState(
-  //       ForumEntities.POST, 'o1', 'categoryIds', ['c1']
-  //     ));
-  //
-  //     const expected = {
-  //       ...forumEmptyState,
-  //       post: {
-  //         'o1': { categoryIds: ['c1'] }
-  //       }
-  //     };
-  //
-  //     expect(result).toEqual(expected);
-  //   });
-  // });
+  test('set all ids', () => {
+    const idsByEntity = {
+      account: ['a1'],
+      profile: ['p1'],
+    };
 
-  // test('state setters: if entity is invalid, then ignore', () => {
-  //   [
-  //     forumReducer(forumEmptyState, forumActionCreators.setEntityState(
-  //       'chicken', { 'k1': { profileId: 'p1' } }
-  //     )),
-  //     forumReducer(forumEmptyState, forumActionCreators.setResourceState(
-  //       'chicken', 'k1', { profileId: 'p200', categoryIds: ['c1'] }
-  //     )),
-  //     forumReducer(forumEmptyState, forumActionCreators.setRelState(
-  //       'chicken', 'k1', 'categoryIds', ['c1'],
-  //     )),
-  //   ].forEach(result => expect(result).toEqual(forumEmptyState));
-  // });
+    const result = forumReducer(
+      undefined,
+      forumActionCreators.setAllIds(idsByEntity)
+    );
+
+    const expected = {
+      resources: forumEmptyState.resources,
+      ids: result.ids,
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('set all resources', () => {
+    const resourcesByEntity = {
+      account: {
+        a1: { profileId: 'p1' },
+      },
+      profile: {
+        p1: { accountId: 'a1' },
+      },
+    };
+
+    const result = forumReducer(
+      undefined,
+      forumActionCreators.setAllResources(resourcesByEntity)
+    );
+
+    const expected = {
+      ids: result.ids,
+      resources: forumEmptyState.resources,
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('set ids', () => {
+    const accountIds = ['a1', 'a2'];
+
+    const result = forumReducer(
+      undefined,
+      forumActionCreators.setIds(ForumEntities.ACCOUNT, accountIds)
+    );
+
+    const expected = {
+      ids: {
+        ...forumEmptyState.ids,
+        account: accountIds,
+      },
+      resources: forumEmptyState.resources,
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('set resources', () => {
+    const accountResources = {
+      a1: { name: 'a' },
+      a2: { name: 'b' },
+    };
+
+    const result = forumReducer(
+      undefined,
+      forumActionCreators.setResources(ForumEntities.ACCOUNT, accountResources)
+    );
+
+    const expected = {
+      resources: {
+        ...forumEmptyState.resources,
+        account: accountResources,
+      },
+      ids: forumEmptyState.ids,
+    };
+
+    expect(result).toEqual(expected);
+  });
+
+  test('set resource', () => {
+    const resource = { name: 'a' };
+
+    const result = forumReducer(
+      undefined,
+      forumActionCreators.setResource(ForumEntities.ACCOUNT, 'a1', resource)
+    );
+
+    const expected = {
+      resources: {
+        ...forumEmptyState.resources,
+        account: {
+          a1: resource,
+        },
+      },
+      ids: forumEmptyState.ids,
+    };
+
+    expect(result).toEqual(expected);
+  });
 
   describe('batched actions', () => {
     describe('basic', () => {

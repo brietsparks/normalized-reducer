@@ -4,12 +4,14 @@ import {
   ActionTypes,
   ActionCreators,
   RemoveAction,
-  ResourceState,
-  RelDataState,
-  ResourcesState,
+  Resource,
+  Resources,
   ConcreteOpAction,
   SelectorTreeSchema,
   Options,
+  State,
+  IdsByEntity,
+  ResourcesByEntity,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
@@ -37,9 +39,11 @@ export const makeActions = (
   const BATCH = namespaced('BATCH');
 
   const SET_STATE = namespaced('SET_STATE');
-  const SET_ENTITY_STATE = namespaced('SET_ENTITY_STATE');
-  const SET_RESOURCE_STATE = namespaced('SET_RESOURCE_STATE');
-  const SET_REL_STATE = namespaced('SET_REL_STATE');
+  const SET_ALL_IDS = namespaced('SET_ALL_IDS');
+  const SET_ALL_RESOURCES = namespaced('SET_ALL_RESOURCES');
+  const SET_IDS = namespaced('SET_IDS');
+  const SET_RESOURCES = namespaced('SET_RESOURCES');
+  const SET_RESOURCE = namespaced('SET_RESOURCE');
 
   const entityExists = (entity: string) => schema.entityExists(entity);
   const relIsValid = (entity: string, rel: string) =>
@@ -196,56 +200,48 @@ export const makeActions = (
     };
   };
 
-  const setState = (state: ResourcesState) => ({ type: SET_STATE, state });
+  const setState = (state: State) => ({ type: SET_STATE, state });
 
-  const setEntityState = (entity: string, state: ResourcesState) => {
+  const setAllIds = (state: IdsByEntity) => ({ type: SET_ALL_IDS, state });
+
+  const setAllResources = (state: ResourcesByEntity) => ({
+    type: SET_ALL_RESOURCES,
+    state,
+  });
+
+  const setIds = (entity: string, state: string[]) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
 
     return {
-      type: SET_ENTITY_STATE,
+      type: SET_IDS,
       entity,
       state,
     };
   };
 
-  const setResourceState = (
-    entity: string,
-    id: string,
-    state: ResourceState
-  ) => {
+  const setResources = (entity: string, state: Resources) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
 
     return {
-      type: SET_RESOURCE_STATE,
+      type: SET_RESOURCES,
       entity,
-      id,
       state,
     };
   };
 
-  const setRelState = (
-    entity: string,
-    id: string,
-    rel: string,
-    state: RelDataState
-  ) => {
+  const setResource = (entity: string, id: string, state: Resource) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
 
-    if (!relIsValid(entity, rel)) {
-      onInvalidRel(entity, rel);
-    }
-
     return {
-      type: SET_REL_STATE,
+      type: SET_RESOURCE,
       entity,
       id,
-      rel,
       state,
     };
   };
@@ -261,9 +257,11 @@ export const makeActions = (
       MOVE_ATTACHED,
       BATCH,
       SET_STATE,
-      SET_ENTITY_STATE,
-      SET_RESOURCE_STATE,
-      SET_REL_STATE,
+      SET_ALL_IDS,
+      SET_ALL_RESOURCES,
+      SET_IDS,
+      SET_RESOURCES,
+      SET_RESOURCE,
     },
     creators: {
       add,
@@ -275,9 +273,11 @@ export const makeActions = (
       moveAttached,
       batch,
       setState,
-      setEntityState,
-      setResourceState,
-      setRelState,
+      setAllIds,
+      setAllResources,
+      setIds,
+      setResources,
+      setResource,
     },
   };
 };

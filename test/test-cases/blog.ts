@@ -1,9 +1,9 @@
 import {
-  ResourcesByEntityState,
+  ResourcesByEntity,
   ModelSchema,
   EntitySchema,
   Cardinalities,
-  RelDataState,
+  RelData,
 } from '../../src';
 import { makeActions } from '../../src/actions';
 import {
@@ -43,13 +43,13 @@ export const blogSchema: ModelSchema = {
   [BlogEntities.ARTICLE]: articleSchema,
 };
 
-export interface BlogState extends ResourcesByEntityState {
+export interface BlogState extends ResourcesByEntity {
   resources: {
     author: {
-      [id: string]: { articleIds: RelDataState };
+      [id: string]: { articleIds: RelData };
     };
     article: {
-      [id: string]: { authorId: RelDataState };
+      [id: string]: { authorId: RelData };
     };
   };
   ids: {

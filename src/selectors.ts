@@ -2,7 +2,7 @@ import {
   Cardinalities,
   ActionCreators,
   Selectors,
-  ResourcesState,
+  Resources,
   State,
   SelectorTreeSchema,
   ResourceTreeNode,
@@ -11,7 +11,7 @@ import {
 import { ModelSchemaReader } from './schema';
 
 const emptyIds: string[] = [];
-const emptyResources: ResourcesState = {};
+const emptyResources: Resources = {};
 
 export const makeSelectors = (
   schema: ModelSchemaReader,
