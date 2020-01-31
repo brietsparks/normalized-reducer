@@ -27,7 +27,11 @@ export class ModelSchemaReader {
 
     this.entitySchemaReaders = Object.entries(schema).reduce(
       (entitySchemaReaders, [entity, entitySchema]) => {
-        entitySchemaReaders[entity] = new EntitySchemaReader(entity, entitySchema, this);
+        entitySchemaReaders[entity] = new EntitySchemaReader(
+          entity,
+          entitySchema,
+          this
+        );
         return entitySchemaReaders;
       },
       {} as Record<string, EntitySchemaReader>
@@ -36,10 +40,13 @@ export class ModelSchemaReader {
 
   getEmptyResourcesByEntityState() {
     if (!this.emptyResourcesByEntityState) {
-      this.emptyResourcesByEntityState = this.getEntities().reduce((emptyState, entity) => {
-        emptyState[entity] = {};
-        return emptyState;
-      }, {} as ResourcesByEntityState);
+      this.emptyResourcesByEntityState = this.getEntities().reduce(
+        (emptyState, entity) => {
+          emptyState[entity] = {};
+          return emptyState;
+        },
+        {} as ResourcesByEntityState
+      );
     }
 
     return this.emptyResourcesByEntityState;
@@ -47,10 +54,13 @@ export class ModelSchemaReader {
 
   getEmptyIdsByEntityState() {
     if (!this.emptyIdsByEntityState) {
-      this.emptyIdsByEntityState = this.getEntities().reduce((idsState, entity) => {
-        idsState[entity] = [];
-        return idsState;
-      }, {} as IdsByEntityState);
+      this.emptyIdsByEntityState = this.getEntities().reduce(
+        (idsState, entity) => {
+          idsState[entity] = [];
+          return idsState;
+        },
+        {} as IdsByEntityState
+      );
     }
 
     return this.emptyIdsByEntityState;
@@ -85,7 +95,11 @@ export class EntitySchemaReader {
   schema: EntitySchema;
   modelSchemaReader: ModelSchemaReader;
 
-  constructor(entity: string, schema: EntitySchema, modelSchemaReader: ModelSchemaReader) {
+  constructor(
+    entity: string,
+    schema: EntitySchema,
+    modelSchemaReader: ModelSchemaReader
+  ) {
     this.entity = entity;
     this.schema = schema;
     this.modelSchemaReader = modelSchemaReader;
@@ -106,7 +120,7 @@ export class EntitySchemaReader {
       }
 
       return state;
-    }, {} as ResourceState)
+    }, {} as ResourceState);
   }
 
   getEmptyRelState(rel: string) {
@@ -172,8 +186,10 @@ export class EntitySchemaReader {
     const cardinality = this.getCardinality(rel);
 
     return (
-      (cardinality === Cardinalities.MANY && (data === undefined || Array.isArray(data))) ||
-      (cardinality === Cardinalities.ONE && (data === undefined || typeof data === 'string'))
+      (cardinality === Cardinalities.MANY &&
+        (data === undefined || Array.isArray(data))) ||
+      (cardinality === Cardinalities.ONE &&
+        (data === undefined || typeof data === 'string'))
     );
   }
 
@@ -202,7 +218,7 @@ export class EntitySchemaReader {
     const reciprocalRel = this.getReciprocalRel(rel);
 
     if (!relEntity || !reciprocalRel) {
-      return undefined
+      return undefined;
     }
 
     return this.modelSchemaReader

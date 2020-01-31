@@ -21,15 +21,15 @@ describe('actions', () => {
           [
             {
               rel: 'articleIds',
-              id: 'r1'
+              id: 'r1',
             },
             {
               rel: 'articleIds',
               id: 'r1',
               index: 1,
               reciprocalIndex: 2,
-            }
-          ],
+            },
+          ]
         );
 
         const expected = {
@@ -40,14 +40,14 @@ describe('actions', () => {
           attach: [
             {
               rel: 'articleIds',
-              id: 'r1'
+              id: 'r1',
             },
             {
               rel: 'articleIds',
               id: 'r1',
               index: 1,
               reciprocalIndex: 2,
-            }
+            },
           ],
         };
 

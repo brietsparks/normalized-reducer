@@ -1,11 +1,20 @@
 import { PendingState } from '../src/state';
 
-import { BlogState, blogExampleState, blogModelSchemaReader, blogSelectors } from './test-cases/blog';
+import {
+  BlogState,
+  blogExampleState,
+  blogModelSchemaReader,
+  blogSelectors,
+} from './test-cases/blog';
 import { makeAddRelIdOp, makeRemoveRelIdOp } from '../src/ops';
 
 describe('pendingState', () => {
   test('add-resource-op', () => {
-    const pendingState = new PendingState(blogModelSchemaReader, blogExampleState, blogSelectors);
+    const pendingState = new PendingState(
+      blogModelSchemaReader,
+      blogExampleState,
+      blogSelectors
+    );
     // current state
     expect(pendingState.checkExistence('author', 'a1')).toEqual(true);
     expect(pendingState.checkExistence('article', 'r1')).toEqual(true);
@@ -18,7 +27,11 @@ describe('pendingState', () => {
 
   describe('attach/detach resources', () => {
     test('detach then attach', () => {
-      const pendingState = new PendingState(blogModelSchemaReader, blogExampleState, blogSelectors);
+      const pendingState = new PendingState(
+        blogModelSchemaReader,
+        blogExampleState,
+        blogSelectors
+      );
 
       //
       // detach
@@ -54,20 +67,24 @@ describe('pendingState', () => {
       const blogState: BlogState = {
         resources: {
           author: {
-            'a1': { articleIds: [] }
+            a1: { articleIds: [] },
           },
           article: {
-            'r1': { authorId: undefined },
-            'r2': { authorId: undefined },
+            r1: { authorId: undefined },
+            r2: { authorId: undefined },
           },
         },
         ids: {
           author: ['a1'],
-          article: ['r1', 'r2']
-        }
+          article: ['r1', 'r2'],
+        },
       };
 
-      const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
+      const pendingState = new PendingState(
+        blogModelSchemaReader,
+        blogState,
+        blogSelectors
+      );
 
       //
       // attach
@@ -75,7 +92,7 @@ describe('pendingState', () => {
       pendingState.attachResources('author', 'a1', 'articleIds', 'r1');
       expect(pendingState.getOps()).toEqual([
         makeAddRelIdOp('author', 'a1', 'articleIds', 'r1'),
-        makeAddRelIdOp('article', 'r1', 'authorId', 'a1')
+        makeAddRelIdOp('article', 'r1', 'authorId', 'a1'),
       ]);
 
       pendingState.attachResources('article', 'r2', 'authorId', 'a1');
@@ -94,7 +111,7 @@ describe('pendingState', () => {
         makeAddRelIdOp('article', 'r2', 'authorId', 'a1'),
         makeAddRelIdOp('author', 'a1', 'articleIds', 'r2'),
         makeRemoveRelIdOp('author', 'a1', 'articleIds', 'r1'),
-        makeRemoveRelIdOp('article', 'r1', 'authorId', 'a1')
+        makeRemoveRelIdOp('article', 'r1', 'authorId', 'a1'),
       ]);
     });
 
@@ -102,20 +119,24 @@ describe('pendingState', () => {
       const blogState: BlogState = {
         resources: {
           author: {
-            'a1': { articleIds: ['r1'] },
-            'a2': { articleIds: [] }
+            a1: { articleIds: ['r1'] },
+            a2: { articleIds: [] },
           },
           article: {
-            'r1': { authorId: 'a1' }
-          }
+            r1: { authorId: 'a1' },
+          },
         },
         ids: {
           author: ['a1'],
-          article: ['r1', 'r2']
-        }
+          article: ['r1', 'r2'],
+        },
       };
 
-      const pendingState = new PendingState(blogModelSchemaReader, blogState, blogSelectors);
+      const pendingState = new PendingState(
+        blogModelSchemaReader,
+        blogState,
+        blogSelectors
+      );
 
       pendingState.attachResources('author', 'a2', 'articleIds', 'r1');
       expect(pendingState.getOps()).toEqual([

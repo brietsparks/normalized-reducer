@@ -9,15 +9,23 @@ import {
   ResourcesState,
   ConcreteOpAction,
   SelectorTreeSchema,
-  Options
+  Options,
 } from './types';
 
 import { ModelSchemaReader } from './schema';
 
 import { cleanData } from './validator';
 
-export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: ActionTypes, creators: ActionCreators } => {
-  const { namespaced, resolveRelFromEntity, onInvalidEntity, onInvalidRel } = opts;
+export const makeActions = (
+  schema: ModelSchemaReader,
+  opts: Options
+): { types: ActionTypes; creators: ActionCreators } => {
+  const {
+    namespaced,
+    resolveRelFromEntity,
+    onInvalidEntity,
+    onInvalidRel,
+  } = opts;
 
   const ADD = namespaced('ADD');
   const REMOVE = namespaced('REMOVE');
@@ -34,24 +42,26 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
   const SET_REL_STATE = namespaced('SET_REL_STATE');
 
   const entityExists = (entity: string) => schema.entityExists(entity);
-  const relIsValid = (entity: string, rel: string) => schema.entity(entity)?.relIsValid(rel, resolveRelFromEntity);
+  const relIsValid = (entity: string, rel: string) =>
+    schema.entity(entity)?.relIsValid(rel, resolveRelFromEntity);
 
   const add = (
     entity: string,
     id: string,
     data?: { [key: string]: any },
     attach?: AddAttachable[],
-    index?: number,
+    index?: number
   ): AddAction => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
 
-    attach && attach.forEach(attachable => {
-      if (!relIsValid(entity, attachable.rel)) {
-        onInvalidRel(entity, attachable.rel);
-      }
-    });
+    attach &&
+      attach.forEach(attachable => {
+        if (!relIsValid(entity, attachable.rel)) {
+          onInvalidRel(entity, attachable.rel);
+        }
+      });
 
     const cleanedData = cleanData(data, schema, entity);
 
@@ -82,11 +92,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
     };
   };
 
-  const edit = (
-    entity: string,
-    id: string,
-    data: { [key: string]: any },
-  ) => {
+  const edit = (entity: string, id: string, data: { [key: string]: any }) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -101,11 +107,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
     };
   };
 
-  const move = (
-    entity: string,
-    src: number,
-    dest: number
-  ) => {
+  const move = (entity: string, src: number, dest: number) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -123,7 +125,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
     id: string,
     rel: string,
     relId: string,
-    options: { index?: number, reciprocalIndex?: number } = {}
+    options: { index?: number; reciprocalIndex?: number } = {}
   ) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
@@ -144,12 +146,7 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
     };
   };
 
-  const detach = (
-    entity: string,
-    id: string,
-    rel: string,
-    relId: string,
-  ) => {
+  const detach = (entity: string, id: string, rel: string, relId: string) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -164,10 +161,16 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
       id,
       rel,
       relId,
-    }
+    };
   };
 
-  const moveAttached = (entity: string, id: string, rel: string, src: number, dest: number) => {
+  const moveAttached = (
+    entity: string,
+    id: string,
+    rel: string,
+    src: number,
+    dest: number
+  ) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -182,14 +185,14 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
       id,
       rel,
       src,
-      dest
+      dest,
     };
   };
 
   const batch = (...actions: ConcreteOpAction[]) => {
     return {
       type: BATCH,
-      actions
+      actions,
     };
   };
 
@@ -203,11 +206,15 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
     return {
       type: SET_ENTITY_STATE,
       entity,
-      state
-    }
+      state,
+    };
   };
 
-  const setResourceState = (entity: string, id: string, state: ResourceState) => {
+  const setResourceState = (
+    entity: string,
+    id: string,
+    state: ResourceState
+  ) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -216,11 +223,16 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
       type: SET_RESOURCE_STATE,
       entity,
       id,
-      state
-    }
+      state,
+    };
   };
 
-  const setRelState = (entity: string, id: string, rel: string, state: RelDataState) => {
+  const setRelState = (
+    entity: string,
+    id: string,
+    rel: string,
+    state: RelDataState
+  ) => {
     if (!entityExists(entity)) {
       onInvalidEntity(entity);
     }
@@ -234,8 +246,8 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
       entity,
       id,
       rel,
-      state
-    }
+      state,
+    };
   };
 
   return {
@@ -266,6 +278,6 @@ export const makeActions = (schema: ModelSchemaReader, opts: Options): { types: 
       setEntityState,
       setResourceState,
       setRelState,
-    }
-  }
+    },
+  };
 };

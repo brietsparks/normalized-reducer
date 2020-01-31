@@ -3,7 +3,7 @@ import {
   ModelSchema,
   EntitySchema,
   Cardinalities,
-  RelDataState
+  RelDataState,
 } from '../../src';
 import { makeActions } from '../../src/actions';
 import {
@@ -26,7 +26,7 @@ export const authorSchema: EntitySchema = {
   articleIds: {
     cardinality: Cardinalities.MANY,
     entity: BlogEntities.ARTICLE,
-    reciprocal: 'authorId'
+    reciprocal: 'authorId',
   },
 };
 
@@ -34,8 +34,8 @@ export const articleSchema: EntitySchema = {
   authorId: {
     cardinality: Cardinalities.ONE,
     entity: BlogEntities.AUTHOR,
-    reciprocal: 'articleIds'
-  }
+    reciprocal: 'articleIds',
+  },
 };
 
 export const blogSchema: ModelSchema = {
@@ -46,32 +46,32 @@ export const blogSchema: ModelSchema = {
 export interface BlogState extends ResourcesByEntityState {
   resources: {
     author: {
-      [id: string]: { articleIds: RelDataState }
-    },
+      [id: string]: { articleIds: RelDataState };
+    };
     article: {
-      [id: string]: { authorId: RelDataState }
-    },
-  },
+      [id: string]: { authorId: RelDataState };
+    };
+  };
   ids: {
-    author: string[],
-    article: string[],
-  }
+    author: string[];
+    article: string[];
+  };
 }
 
 export const blogExampleState: BlogState = {
   resources: {
     author: {
-      'a1': { articleIds: ['r1', 'r2'] }
+      a1: { articleIds: ['r1', 'r2'] },
     },
     article: {
-      'r1': { authorId: 'a1' },
-      'r2': { authorId: 'a1' },
-    }
+      r1: { authorId: 'a1' },
+      r2: { authorId: 'a1' },
+    },
   },
   ids: {
     author: ['a1'],
-    article: ['r1', 'r2']
-  }
+    article: ['r1', 'r2'],
+  },
 };
 
 export const blogModelSchemaReader = new ModelSchemaReader(blogSchema);
@@ -93,7 +93,7 @@ export const {
 export const blogSelectors = makeSelectors(
   blogModelSchemaReader,
   blogActionCreators,
-  options,
+  options
 );
 
 export const transformBlogAction = makeActionTransformer(

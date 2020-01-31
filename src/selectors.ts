@@ -1,9 +1,12 @@
 import {
   Cardinalities,
   ActionCreators,
-  Selectors, ResourcesState, State,
-  SelectorTreeSchema, ResourceTreeNode,
-  Options
+  Selectors,
+  ResourcesState,
+  State,
+  SelectorTreeSchema,
+  ResourceTreeNode,
+  Options,
 } from './types';
 import { ModelSchemaReader } from './schema';
 
@@ -14,7 +17,7 @@ export const makeSelectors = (
   schema: ModelSchemaReader,
   // @ts-ignore
   actionCreators: ActionCreators,
-  options: Options,
+  options: Options
 ): Selectors => {
   const {
     resolveRelFromEntity,
@@ -83,7 +86,10 @@ export const makeSelectors = (
     return resourcesByEntity[args.entity];
   };
 
-  const checkResource = (state: State, args: { entity: string, id: string }) => {
+  const checkResource = (
+    state: State,
+    args: { entity: string; id: string }
+  ) => {
     const entityState = getResources(state, { entity: args.entity });
 
     if (!entityState) {
@@ -93,7 +99,7 @@ export const makeSelectors = (
     return !!entityState[args.id];
   };
 
-  const getResource = (state: State, args: { entity: string, id: string }) => {
+  const getResource = (state: State, args: { entity: string; id: string }) => {
     const entityState = getResources(state, { entity: args.entity });
 
     if (!entityState) {
@@ -110,7 +116,10 @@ export const makeSelectors = (
     return resource;
   };
 
-  const checkAttached = (state: State, args: { entity: string, id: string, rel: string, relId: string }) => {
+  const checkAttached = (
+    state: State,
+    args: { entity: string; id: string; rel: string; relId: string }
+  ) => {
     const rel = resolveRel(args.entity, args.rel);
 
     if (!rel) {
@@ -121,7 +130,10 @@ export const makeSelectors = (
     return attachedArr.includes(args.relId);
   };
 
-  const getAttached = (state: State, args: { entity: string, id: string, rel: string }) => {
+  const getAttached = (
+    state: State,
+    args: { entity: string; id: string; rel: string }
+  ) => {
     const rel = resolveRel(args.entity, args.rel);
 
     if (!rel) {
@@ -146,14 +158,17 @@ export const makeSelectors = (
     const relState = resource[args.rel];
 
     if (!entitySchema.relDataIsValid(args.rel, relState)) {
-      onInvalidRelData(args.entity, args.rel, relState);
+      onInvalidRelData(args.entity, args.rel);
       return undefined;
     }
 
     return relState;
   };
 
-  const getAttachedArr = (state: State, args: { entity: string, id: string, rel: string }): string[] => {
+  const getAttachedArr = (
+    state: State,
+    args: { entity: string; id: string; rel: string }
+  ): string[] => {
     const rel = resolveRel(args.entity, args.rel);
 
     if (!rel) {
@@ -166,14 +181,19 @@ export const makeSelectors = (
       return [];
     }
 
-    if (schema.entity(args.entity).getCardinality(args.rel) === Cardinalities.MANY) {
+    if (
+      schema.entity(args.entity).getCardinality(args.rel) === Cardinalities.MANY
+    ) {
       return relState as string[];
     }
 
-    return relState ? [relState] as string[] : [] as string[];
+    return relState ? ([relState] as string[]) : ([] as string[]);
   };
 
-  const getAllAttachedArr = (state: State, args: { entity: string, id: string }) => {
+  const getAllAttachedArr = (
+    state: State,
+    args: { entity: string; id: string }
+  ) => {
     const result: { [rel: string]: string[] } = {};
 
     if (!schema.entityExists(args.entity)) {
@@ -191,7 +211,7 @@ export const makeSelectors = (
 
   const getResourceTree = (
     state: State,
-    args: { entity: string, id: string, schema: SelectorTreeSchema }
+    args: { entity: string; id: string; schema: SelectorTreeSchema }
   ): ResourceTreeNode[] => {
     const { entity, id, schema: selectorSchema } = args;
 
@@ -215,7 +235,7 @@ export const makeSelectors = (
     entity: string,
     id: string,
     selectorSchema: SelectorTreeSchema,
-    nodes: Record<string, ResourceTreeNode> = {},
+    nodes: Record<string, ResourceTreeNode> = {}
   ): Record<string, ResourceTreeNode> => {
     const resource = getResource(state, { entity, id });
 
@@ -230,15 +250,27 @@ export const makeSelectors = (
     }
 
     for (let [rel, nestedSelectorSchema] of Object.entries(selectorSchema)) {
-      const resolvedRel = schema.entity(entity).resolveRel(rel, resolveRelFromEntity);
+      const resolvedRel = schema
+        .entity(entity)
+        .resolveRel(rel, resolveRelFromEntity);
 
       if (resolvedRel) {
         const relEntity = schema.entity(entity).getRelEntity(resolvedRel);
 
         if (relEntity) {
-          const relIds = getAttachedArr(state, { entity, id, rel: resolvedRel });
+          const relIds = getAttachedArr(state, {
+            entity,
+            id,
+            rel: resolvedRel,
+          });
           for (let relId of relIds) {
-            recursivelyGetNodes(state, relEntity, relId, nestedSelectorSchema, nodes);
+            recursivelyGetNodes(
+              state,
+              relEntity,
+              relId,
+              nestedSelectorSchema,
+              nodes
+            );
           }
         }
       }
@@ -259,5 +291,5 @@ export const makeSelectors = (
     getAllAttachedArr,
     getResourceTree,
     checkAttached,
-  }
+  };
 };

@@ -2,9 +2,7 @@ export const noop = () => {};
 
 export const arrayPut = <T>(array: T[], item: T, index?: number) => {
   // must check against undefined because index might === 0
-  index === undefined
-    ? array.push(item)
-    : array.splice(index, 0, item);
+  index === undefined ? array.push(item) : array.splice(index, 0, item);
 };
 
 export function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
@@ -22,25 +20,34 @@ export const isObjectLiteral = (v: any): v is object => {
   );
 };
 
-export const defaultNamespaced = (actionType: string) => `relational/${actionType}`;
+export const defaultNamespaced = (actionType: string) =>
+  `relational/${actionType}`;
 
-// @ts-ignore
 export const defaultInvalidEntityHandler = (entity: string) => {
-  // throw new Error(`invalid entity "${entity}"`);
+  if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    throw new Error(`invalid entity "${entity}"`);
+  }
 };
 
-// @ts-ignore
 export const defaultInvalidRelHandler = (entity: string, rel: string) => {
-  // throw new Error(`invalid rel "${rel}" in entity "${entity}"`)
+  if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    throw new Error(`invalid rel "${rel}" in entity "${entity}"`);
+  }
 };
 
-// @ts-ignore
-export const defaultInvalidRelDataHandler = (entity: string, rel: string, data: any) => {
-  // throw new Error(`invalid data for rel "${rel}" in entity "${entity}"`)
+export const defaultInvalidRelDataHandler = (entity: string, rel: string) => {
+  if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    throw new Error(`invalid data for rel "${rel}" in entity "${entity}"`);
+  }
 };
 
-// @ts-ignore
-export const defaultNonExistentResourceHandler = (entity: string, id: string) => {
-  // throw new Error(`nonexistent resource of entity "${entity}" and id "${id}"`)
+export const defaultNonExistentResourceHandler = (
+  entity: string,
+  id: string
+) => {
+  if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    throw new Error(
+      `nonexistent resource of entity "${entity}" and id "${id}"`
+    );
+  }
 };
-

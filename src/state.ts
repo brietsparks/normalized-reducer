@@ -1,7 +1,4 @@
-import {
-  Cardinalities,
-  Selectors, State,
-} from './types';
+import { Cardinalities, Selectors, State } from './types';
 
 import { OpsBatch } from './ops';
 import { ModelSchemaReader } from './schema';
@@ -38,12 +35,15 @@ export class PendingState {
   removeResource(entity: string, id: string) {
     this.ops.putRemoveResource(entity, id);
 
-    const attachedIdsByRel = this.selectors.getAllAttachedArr(this.state, { entity, id });
+    const attachedIdsByRel = this.selectors.getAllAttachedArr(this.state, {
+      entity,
+      id,
+    });
 
     Object.entries(attachedIdsByRel).forEach(([rel, attachedIds]) => {
       attachedIds.forEach(attachedId => {
         this.detachResources(entity, id, rel, attachedId);
-      })
+      });
     });
   }
 
@@ -55,7 +55,14 @@ export class PendingState {
     this.ops.putMoveResource(entity, src, dest);
   }
 
-  attachResources(entity: string, id: string, rel: string, relId: string, index?: number, reciprocalIndex?: number) {
+  attachResources(
+    entity: string,
+    id: string,
+    rel: string,
+    relId: string,
+    index?: number,
+    reciprocalIndex?: number
+  ) {
     const entitySchema = this.schema.entity(entity);
 
     const relEntity = entitySchema.getRelEntity(rel);
@@ -65,7 +72,10 @@ export class PendingState {
     }
 
     // both must exist
-    if (!this.checkExistence(entity, id) || !this.checkExistence(relEntity, relId)) {
+    if (
+      !this.checkExistence(entity, id) ||
+      !this.checkExistence(relEntity, relId)
+    ) {
       return;
     }
 
@@ -100,7 +110,13 @@ export class PendingState {
     this.ops.putRemoveRelId(relEntity, relId, reciprocalRel, id);
   }
 
-  moveAttachedResource(entity: string, id: string, rel: string, src: number, dest: number) {
+  moveAttachedResource(
+    entity: string,
+    id: string,
+    rel: string,
+    src: number,
+    dest: number
+  ) {
     this.ops.putMoveRelId(entity, id, rel, src, dest);
   }
 
@@ -117,7 +133,11 @@ export class PendingState {
 
     if (cardinality === Cardinalities.ONE) {
       // get attached from state
-      let occupantId = this.selectors.getAttached(this.state, { entity, id, rel }) as string;
+      let occupantId = this.selectors.getAttached(this.state, {
+        entity,
+        id,
+        rel,
+      }) as string;
 
       // get attached from batch
       if (!occupantId) {

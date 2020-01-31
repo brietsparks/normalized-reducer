@@ -6,11 +6,16 @@ import {
   MoveRelIdOp,
   OpTypes,
   RemoveRelIdOp,
-  RemoveResourceOp
+  RemoveResourceOp,
 } from './types';
 import { ModelSchemaReader } from './schema';
 
-export const makeAddResourceOp = (entity: string, id: string, data?: object, index?: number): AddResourceOp => {
+export const makeAddResourceOp = (
+  entity: string,
+  id: string,
+  data?: object,
+  index?: number
+): AddResourceOp => {
   return {
     opType: OpTypes.ADD_RESOURCE,
     entity,
@@ -20,33 +25,50 @@ export const makeAddResourceOp = (entity: string, id: string, data?: object, ind
   };
 };
 
-export const makeRemoveResourceOp = (entity: string, id: string): RemoveResourceOp => {
+export const makeRemoveResourceOp = (
+  entity: string,
+  id: string
+): RemoveResourceOp => {
   return {
     opType: OpTypes.REMOVE_RESOURCE,
     entity,
     id,
-  }
+  };
 };
 
-export const makeEditResourceOp = (entity: string, id: string, data: object): EditResourceOp => {
+export const makeEditResourceOp = (
+  entity: string,
+  id: string,
+  data: object
+): EditResourceOp => {
   return {
     opType: OpTypes.EDIT_RESOURCE,
     entity,
     id,
-    data
+    data,
   };
 };
 
-export const makeMoveResourceOp = (entity: string, src: number, dest: number) => {
+export const makeMoveResourceOp = (
+  entity: string,
+  src: number,
+  dest: number
+) => {
   return {
     opType: OpTypes.MOVE_RESOURCE,
     entity,
     src,
-    dest
+    dest,
   };
 };
 
-export const makeAddRelIdOp = (entity: string, id: string, rel: string, relId: string, index?: number): AddRelIdOp => {
+export const makeAddRelIdOp = (
+  entity: string,
+  id: string,
+  rel: string,
+  relId: string,
+  index?: number
+): AddRelIdOp => {
   const op: AddRelIdOp = {
     opType: OpTypes.ADD_REL_ID,
     entity,
@@ -63,7 +85,12 @@ export const makeAddRelIdOp = (entity: string, id: string, rel: string, relId: s
   return op;
 };
 
-export const makeRemoveRelIdOp = (entity: string, id: string, rel: string, relId?: string): RemoveRelIdOp => {
+export const makeRemoveRelIdOp = (
+  entity: string,
+  id: string,
+  rel: string,
+  relId?: string
+): RemoveRelIdOp => {
   return {
     opType: OpTypes.REMOVE_REL_ID,
     entity,
@@ -73,9 +100,16 @@ export const makeRemoveRelIdOp = (entity: string, id: string, rel: string, relId
   };
 };
 
-const concat = (...strings: (string|undefined)[]) => strings.filter(s => s !== undefined).join('.');
+const concat = (...strings: (string | undefined)[]) =>
+  strings.filter(s => s !== undefined).join('.');
 
-export const makeMoveRelIdOp = (entity: string, id: string, rel: string, src: number, dest:number): MoveRelIdOp => {
+export const makeMoveRelIdOp = (
+  entity: string,
+  id: string,
+  rel: string,
+  src: number,
+  dest: number
+): MoveRelIdOp => {
   return {
     opType: OpTypes.MOVE_REL_ID,
     entity,
@@ -146,10 +180,15 @@ export class OpsBatch {
   //
   // addRelId
   //
-  putAddRelId(entity: string, id: string, rel: string, relId: string, index?: number) {
+  putAddRelId(
+    entity: string,
+    id: string,
+    rel: string,
+    relId: string,
+    index?: number
+  ) {
     const key = this.makeAddRelIdKey(entity, id, rel, relId);
     this.ops[key] = makeAddRelIdOp(entity, id, rel, relId, index);
-
   }
   getAddRelId(entity: string, id: string, rel: string, relId?: string) {
     const key = this.makeAddRelIdKey(entity, id, rel, relId);
@@ -161,16 +200,41 @@ export class OpsBatch {
       delete this.ops[key];
     }
   }
-  private makeAddRelIdKey(entity: string, id: string, rel: string, relId?: string) {
-    const isSingular = this.schema.entity(entity).getCardinality(rel) === Cardinalities.ONE;
-    return concat(OpTypes.ADD_REL_ID, entity, id, rel, isSingular ? undefined : relId);
+  private makeAddRelIdKey(
+    entity: string,
+    id: string,
+    rel: string,
+    relId?: string
+  ) {
+    const isSingular =
+      this.schema.entity(entity).getCardinality(rel) === Cardinalities.ONE;
+    return concat(
+      OpTypes.ADD_REL_ID,
+      entity,
+      id,
+      rel,
+      isSingular ? undefined : relId
+    );
   }
 
   //
   // moveRelId
   //
-  putMoveRelId(entity: string, id: string, rel: string, src: number, dest: number) {
-    const key = concat(OpTypes.MOVE_REL_ID, entity, id, rel, String(src), String(dest));
+  putMoveRelId(
+    entity: string,
+    id: string,
+    rel: string,
+    src: number,
+    dest: number
+  ) {
+    const key = concat(
+      OpTypes.MOVE_REL_ID,
+      entity,
+      id,
+      rel,
+      String(src),
+      String(dest)
+    );
     this.ops[key] = makeMoveRelIdOp(entity, id, rel, src, dest);
   }
   getMoveRelId() {

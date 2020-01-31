@@ -1,10 +1,20 @@
 import { ModelSchemaReader } from './schema';
 import {
   OpAction,
-  ActionTypes, AddAction, AttachAction,
-  DeriveActionWithOps, DetachAction, MoveAttachedAction,
+  ActionTypes,
+  AddAction,
+  AttachAction,
+  DeriveActionWithOps,
+  DetachAction,
+  MoveAttachedAction,
   RemoveAction,
-  Selectors, BatchAction, Action, EditAction, State, MoveAction, Options
+  Selectors,
+  BatchAction,
+  Action,
+  EditAction,
+  State,
+  MoveAction,
+  Options,
 } from './types';
 import { PendingState } from './state';
 
@@ -14,15 +24,21 @@ export const makeActionTransformer = (
   schema: ModelSchemaReader,
   actionTypes: ActionTypes,
   selectors: Selectors,
-  options: Options,
+  options: Options
 ): DeriveActionWithOps => {
-  const transformAction = (state: State, action: Action, pending?: PendingState): OpAction => {
+  const transformAction = (
+    state: State,
+    action: Action,
+    pending?: PendingState
+  ): OpAction => {
     const pendingState = pending || new PendingState(schema, state, selectors);
 
     if (action.type === actionTypes.BATCH) {
       const batchAction = action as BatchAction;
 
-      batchAction.actions.forEach(action => transformAction(state, action, pendingState));
+      batchAction.actions.forEach(action =>
+        transformAction(state, action, pendingState)
+      );
       batchAction.ops = pendingState.getOps();
 
       return batchAction;
@@ -41,7 +57,9 @@ export const makeActionTransformer = (
 
       if (addAction.attach) {
         addAction.attach.forEach(attachable => {
-          const rel = schema.entity(entity).resolveRel(attachable.rel, options.resolveRelFromEntity);
+          const rel = schema
+            .entity(entity)
+            .resolveRel(attachable.rel, options.resolveRelFromEntity);
 
           if (rel) {
             pendingState.attachResources(
@@ -50,8 +68,8 @@ export const makeActionTransformer = (
               rel,
               attachable.id,
               attachable.index,
-              attachable.reciprocalIndex,
-            )
+              attachable.reciprocalIndex
+            );
           }
         });
       }
@@ -63,7 +81,7 @@ export const makeActionTransformer = (
 
     if (action.type === actionTypes.REMOVE) {
       const removeAction = action as RemoveAction;
-      const { entity, id, removalSchema } = removeAction ;
+      const { entity, id, removalSchema } = removeAction;
 
       if (!selectors.checkResource(state, { entity, id })) {
         removeAction.ops = [];
@@ -71,8 +89,14 @@ export const makeActionTransformer = (
       }
 
       if (removalSchema) {
-        const removables = selectors.getResourceTree(state, { entity, id, schema: removalSchema });
-        removables.forEach(attached => pendingState.removeResource(attached.entity, attached.id));
+        const removables = selectors.getResourceTree(state, {
+          entity,
+          id,
+          schema: removalSchema,
+        });
+        removables.forEach(attached =>
+          pendingState.removeResource(attached.entity, attached.id)
+        );
       }
 
       pendingState.removeResource(entity, id);
@@ -100,7 +124,11 @@ export const makeActionTransformer = (
 
     if (action.type === actionTypes.MOVE) {
       const moveAction = action as MoveAction;
-      pendingState.moveResource(moveAction.entity, moveAction.src, moveAction.dest);
+      pendingState.moveResource(
+        moveAction.entity,
+        moveAction.src,
+        moveAction.dest
+      );
       moveAction.ops = pendingState.getOps();
       return moveAction;
     }
@@ -109,9 +137,18 @@ export const makeActionTransformer = (
       const attachAction = action as AttachAction;
       const { entity, id, rel, relId, index, reciprocalIndex } = attachAction;
 
-      const resolvedRel = schema.entity(entity).resolveRel(rel, options.resolveRelFromEntity);
+      const resolvedRel = schema
+        .entity(entity)
+        .resolveRel(rel, options.resolveRelFromEntity);
       if (resolvedRel) {
-        pendingState.attachResources(entity, id, resolvedRel, relId, index, reciprocalIndex);
+        pendingState.attachResources(
+          entity,
+          id,
+          resolvedRel,
+          relId,
+          index,
+          reciprocalIndex
+        );
       }
 
       attachAction.ops = pendingState.getOps();
@@ -123,7 +160,9 @@ export const makeActionTransformer = (
       const detachAction = action as DetachAction;
       const { entity, id, rel, relId } = detachAction;
 
-      const resolvedRel = schema.entity(entity).resolveRel(rel, options.resolveRelFromEntity);
+      const resolvedRel = schema
+        .entity(entity)
+        .resolveRel(rel, options.resolveRelFromEntity);
       if (resolvedRel) {
         pendingState.detachResources(entity, id, resolvedRel, relId);
       }
@@ -137,7 +176,9 @@ export const makeActionTransformer = (
       const moveAttachedAction = action as MoveAttachedAction;
       const { entity, id, rel, src, dest } = moveAttachedAction;
 
-      const resolvedRel = schema.entity(entity).resolveRel(rel, options.resolveRelFromEntity);
+      const resolvedRel = schema
+        .entity(entity)
+        .resolveRel(rel, options.resolveRelFromEntity);
       if (resolvedRel) {
         pendingState.moveAttachedResource(entity, id, resolvedRel, src, dest);
       }

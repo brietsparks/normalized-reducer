@@ -13,53 +13,53 @@ export enum OpTypes {
 }
 
 export interface Op {
-  opType: string,
-  entity: string,
+  opType: string;
+  entity: string;
 }
 
 export interface AddResourceOp extends Op {
-  id: string,
-  opType: OpTypes.ADD_RESOURCE,
-  data?: object,
-  index?: number,
+  id: string;
+  opType: OpTypes.ADD_RESOURCE;
+  data?: object;
+  index?: number;
 }
 
 export interface RemoveResourceOp extends Op {
-  id: string,
-  opType: OpTypes.REMOVE_RESOURCE,
+  id: string;
+  opType: OpTypes.REMOVE_RESOURCE;
 }
 
 export interface EditResourceOp extends Op {
-  id: string,
-  opType: OpTypes.EDIT_RESOURCE,
-  data: { [key: string]: any },
+  id: string;
+  opType: OpTypes.EDIT_RESOURCE;
+  data: { [key: string]: any };
 }
 
 export interface MoveResourceOp extends Op {
-  opType: OpTypes.MOVE_RESOURCE,
-  src: number,
-  dest: number,
+  opType: OpTypes.MOVE_RESOURCE;
+  src: number;
+  dest: number;
 }
 
 export interface AddRelIdOp extends Op {
-  id: string,
-  rel: string,
-  relId: string,
-  index?: number,
-  reciprocalIndex?: number,
+  id: string;
+  rel: string;
+  relId: string;
+  index?: number;
+  reciprocalIndex?: number;
 }
 
 export interface RemoveRelIdOp extends Op {
-  id: string,
-  rel: string,
-  relId?: string,
+  id: string;
+  rel: string;
+  relId?: string;
 }
 
 export interface MoveRelIdOp extends Op {
-  id: string,
-  rel: string,
-  src: number,
-  dest: number,
+  id: string;
+  rel: string;
+  src: number;
+  dest: number;
 }
 
 //
@@ -67,153 +67,204 @@ export interface MoveRelIdOp extends Op {
 //
 
 export interface Action {
-  type: string,
+  type: string;
 }
 
 export interface OpAction extends Action {
-  ops?: Op[],
+  ops?: Op[];
 }
 
 // actions
 export interface AddAction extends OpAction {
+  entity: string;
+  id: string;
+  data?: object;
+  attach?: AddAttachable[];
+  index?: number;
+}
+
+export interface AddAttachable {
+  rel: string;
+  id: string;
+  index?: number;
+  reciprocalIndex?: number;
+}
+
+export interface RemoveAction extends OpAction {
+  entity: string;
+  id: string;
+  removalSchema?: SelectorTreeSchema;
+}
+
+export interface EditAction extends OpAction {
+  entity: string;
+  id: string;
+  data: object;
+}
+
+export interface MoveAction extends Omit<OpAction, 'id'> {
+  entity: string;
+  src: number;
+  dest: number;
+}
+
+export interface AttachAction extends OpAction {
+  entity: string;
+  id: string;
+  rel: string;
+  relId: string;
+  index?: number; // the index within the base resource where the relId should be placed
+  reciprocalIndex?: number; // the index within the rel resource where base id should be placed
+}
+
+export interface DetachAction extends OpAction {
+  entity: string;
+  id: string;
+  rel: string;
+  relId: string;
+}
+
+export interface MoveAttachedAction extends OpAction {
+  entity: string;
+  id: string;
+  rel: string;
+  src: number;
+  dest: number;
+}
+
+export type ConcreteOpAction =
+  | AddAction
+  | RemoveAction
+  | EditAction
+  | MoveAction
+  | AttachAction
+  | DetachAction
+  | MoveAttachedAction;
+
+export interface BatchAction extends Action {
+  actions: ConcreteOpAction[];
+  ops?: Op[];
+}
+
+export interface SetStateAction {
+  type: string;
+  state: ResourcesByEntityState;
+}
+
+export interface SetEntityState {
+  type: string;
+  entity: string;
+  state: ResourcesState;
+}
+
+export interface SetResourceState {
+  type: string;
+  entity: string;
+  id: string;
+  state: ResourceState;
+}
+
+export interface SetRelState {
+  type: string;
+  entity: string;
+  id: string;
+  rel: string;
+  state: RelDataState;
+}
+
+// action creators
+export type AddActionCreator = (
   entity: string,
   id: string,
   data?: object,
   attach?: AddAttachable[],
-  index?: number,
-}
-
-export interface AddAttachable {
-  rel: string,
-  id: string,
-  index?: number,
-  reciprocalIndex?: number,
-}
-
-export interface RemoveAction extends OpAction {
+  index?: number
+) => AddAction;
+export type RemoveActionCreator = (
   entity: string,
   id: string,
-  removalSchema?: SelectorTreeSchema,
-}
-
-export interface EditAction extends OpAction {
+  removalSchema?: SelectorTreeSchema
+) => RemoveAction;
+export type EditActionCreator = (
   entity: string,
   id: string,
   data: object
-}
-
-export interface MoveAction extends Omit<OpAction, 'id'> {
+) => EditAction;
+export type MoveActionCreator = (
   entity: string,
   src: number,
-  dest: number,
-}
-
-export interface AttachAction extends OpAction {
+  dest: number
+) => MoveAction;
+export type AttachActionCreator = (
   entity: string,
   id: string,
   rel: string,
   relId: string,
-  index?: number, // the index within the base resource where the relId should be placed
-  reciprocalIndex?: number, // the index within the rel resource where base id should be placed
-}
-
-export interface DetachAction extends OpAction {
+  opts?: { index?: number; reciprocalIndex?: number }
+) => AttachAction;
+export type DetachActionCreator = (
   entity: string,
   id: string,
   rel: string,
-  relId: string,
-}
-
-export interface MoveAttachedAction extends OpAction {
+  relId: string
+) => DetachAction;
+export type MoveAttachedActionCreator = (
   entity: string,
   id: string,
   rel: string,
   src: number,
-  dest: number,
-}
-
-export type ConcreteOpAction =
-  AddAction |
-  RemoveAction |
-  EditAction |
-  MoveAction |
-  AttachAction |
-  DetachAction |
-  MoveAttachedAction;
-
-export interface BatchAction extends Action {
-  actions: ConcreteOpAction[],
-  ops?: Op[],
-}
-
-export interface SetStateAction {
-  type: string,
+  dest: number
+) => MoveAttachedAction;
+export type BatchActionCreator = (
+  ...actions: ConcreteOpAction[]
+) => BatchAction;
+export type SetStateActionCreator = (
   state: ResourcesByEntityState
-}
-
-export interface SetEntityState {
-  type: string,
+) => SetStateAction;
+export type SetEntityStateCreator = (
   entity: string,
   state: ResourcesState
-}
-
-export interface SetResourceState {
-  type: string,
+) => SetEntityState;
+export type SetResourceStateCreator = (
   entity: string,
   id: string,
   state: ResourceState
-}
-
-export interface SetRelState {
-  type: string,
+) => SetResourceState;
+export type SetRelStateCreator = (
   entity: string,
   id: string,
   rel: string,
   state: RelDataState
-}
-
-// action creators
-export type AddActionCreator = (entity: string, id: string, data?: object, attach?: AddAttachable[], index?: number) => AddAction;
-export type RemoveActionCreator = (entity: string, id: string, removalSchema?: SelectorTreeSchema) => RemoveAction;
-export type EditActionCreator = (entity: string, id: string, data: object) => EditAction;
-export type MoveActionCreator = (entity: string, src: number, dest: number) => MoveAction;
-export type AttachActionCreator = (entity: string, id: string, rel: string, relId: string, opts?: { index?: number, reciprocalIndex?: number }) => AttachAction;
-export type DetachActionCreator = (entity: string, id: string, rel: string, relId: string) => DetachAction;
-export type MoveAttachedActionCreator = (entity: string, id: string, rel: string, src: number, dest: number) => MoveAttachedAction;
-export type BatchActionCreator = (...actions: ConcreteOpAction[]) => BatchAction;
-export type SetStateActionCreator = (state: ResourcesByEntityState) => SetStateAction;
-export type SetEntityStateCreator = (entity: string, state: ResourcesState) => SetEntityState;
-export type SetResourceStateCreator = (entity: string, id: string, state: ResourceState) => SetResourceState;
-export type SetRelStateCreator = (entity: string, id: string, rel: string, state: RelDataState) => SetRelState;
+) => SetRelState;
 
 export interface ActionTypes {
-  ADD: string,
-  REMOVE: string,
-  EDIT: string,
-  MOVE: string,
-  ATTACH: string,
-  DETACH: string,
-  MOVE_ATTACHED: string,
-  BATCH: string
-  SET_STATE: string,
-  SET_ENTITY_STATE: string,
-  SET_RESOURCE_STATE: string,
-  SET_REL_STATE: string,
+  ADD: string;
+  REMOVE: string;
+  EDIT: string;
+  MOVE: string;
+  ATTACH: string;
+  DETACH: string;
+  MOVE_ATTACHED: string;
+  BATCH: string;
+  SET_STATE: string;
+  SET_ENTITY_STATE: string;
+  SET_RESOURCE_STATE: string;
+  SET_REL_STATE: string;
 }
 
 export interface ActionCreators {
-  add: AddActionCreator,
-  remove: RemoveActionCreator,
-  edit: EditActionCreator,
-  move: MoveActionCreator,
-  attach: AttachActionCreator,
-  detach: DetachActionCreator,
-  moveAttached: MoveAttachedActionCreator,
-  batch: BatchActionCreator,
-  setState: SetStateActionCreator,
-  setEntityState: SetEntityStateCreator,
-  setResourceState: SetResourceStateCreator,
-  setRelState: SetRelStateCreator,
+  add: AddActionCreator;
+  remove: RemoveActionCreator;
+  edit: EditActionCreator;
+  move: MoveActionCreator;
+  attach: AttachActionCreator;
+  detach: DetachActionCreator;
+  moveAttached: MoveAttachedActionCreator;
+  batch: BatchActionCreator;
+  setState: SetStateActionCreator;
+  setEntityState: SetEntityStateCreator;
+  setResourceState: SetResourceStateCreator;
+  setRelState: SetRelStateCreator;
 }
 
 //
@@ -221,18 +272,18 @@ export interface ActionCreators {
 //
 
 export interface ModelSchema {
-  [entity: string]: EntitySchema
+  [entity: string]: EntitySchema;
 }
 
 export interface EntitySchema {
-  [rel: string]: RelSchema
+  [rel: string]: RelSchema;
 }
 
 export type RelSchema = {
-  entity: string,
-  cardinality: Cardinality,
-  reciprocal: string,
-}
+  entity: string;
+  cardinality: Cardinality;
+  reciprocal: string;
+};
 
 export type Cardinality = Cardinalities[keyof Cardinalities];
 
@@ -245,13 +296,15 @@ export enum Cardinalities {
 // state types todo: remove state suffix
 //
 
-export type State = { resources: ResourcesByEntityState, ids: IdsByEntityState };
+export type State = {
+  resources: ResourcesByEntityState;
+  ids: IdsByEntityState;
+};
 export type IdsByEntityState = { [entity: string]: string[] };
 export type ResourcesByEntityState = { [entity: string]: ResourcesState };
 export type ResourcesState = { [id: string]: ResourceState };
 export type ResourceState = { [attr: string]: RelDataState | any };
 export type RelDataState = undefined | string | string[];
-
 
 //
 // selector types
@@ -261,31 +314,57 @@ export type DeriveActionWithOps = (state: State, action: OpAction) => OpAction;
 export type GetAllIds = (state: State) => IdsByEntityState;
 export type GetAllResources = (state: State) => ResourcesByEntityState;
 export type GetIds = (state: State, args: { entity: string }) => string[];
-export type GetResources = (state: State, args: { entity: string }) => ResourcesState;
-export type CheckResource = (state: State, args: { entity: string, id: string }) => boolean;
-export type GetResource = (state: State, args: { entity: string, id: string }) => ResourceState | undefined;
-export type GetAttached = (state: State, args: { entity: string, id: string, rel: string }) => string[]|string|undefined;
-export type GetAttachedArr = (state: State, args: { entity: string, id: string, rel: string }) => string[]
-export type GetAllAttachedArr = (state: State, args: { entity: string, id: string }) => { [rel: string]: string[] };
-export type GetResourceTree = (state: State, args: { entity: string, id: string, schema: SelectorTreeSchema }) => ResourceTreeNode[];
-export type CheckAttached = (state: State, args: { entity: string, id: string, rel: string, relId: string }) => boolean;
+export type GetResources = (
+  state: State,
+  args: { entity: string }
+) => ResourcesState;
+export type CheckResource = (
+  state: State,
+  args: { entity: string; id: string }
+) => boolean;
+export type GetResource = (
+  state: State,
+  args: { entity: string; id: string }
+) => ResourceState | undefined;
+export type GetAttached = (
+  state: State,
+  args: { entity: string; id: string; rel: string }
+) => string[] | string | undefined;
+export type GetAttachedArr = (
+  state: State,
+  args: { entity: string; id: string; rel: string }
+) => string[];
+export type GetAllAttachedArr = (
+  state: State,
+  args: { entity: string; id: string }
+) => { [rel: string]: string[] };
+export type GetResourceTree = (
+  state: State,
+  args: { entity: string; id: string; schema: SelectorTreeSchema }
+) => ResourceTreeNode[];
+export type CheckAttached = (
+  state: State,
+  args: { entity: string; id: string; rel: string; relId: string }
+) => boolean;
 
 export interface Selectors {
-  getAllIds: GetAllIds,
-  getAllResources: GetAllResources,
-  getIds: GetIds,
-  getResources: GetResources,
-  checkResource: CheckResource,
-  getResource: GetResource,
-  getAttached: GetAttached,
-  getAttachedArr: GetAttachedArr,
-  getAllAttachedArr: GetAllAttachedArr,
-  getResourceTree: GetResourceTree,
-  checkAttached: CheckAttached
+  getAllIds: GetAllIds;
+  getAllResources: GetAllResources;
+  getIds: GetIds;
+  getResources: GetResources;
+  checkResource: CheckResource;
+  getResource: GetResource;
+  getAttached: GetAttached;
+  getAttachedArr: GetAttachedArr;
+  getAllAttachedArr: GetAllAttachedArr;
+  getResourceTree: GetResourceTree;
+  checkAttached: CheckAttached;
 }
 
-export type SelectorTreeSchema = { [rel: string]: SelectorTreeSchema } | (() => SelectorTreeSchema)
-export type ResourceTreeNode = { id: string, entity: string, resource: object };
+export type SelectorTreeSchema =
+  | { [rel: string]: SelectorTreeSchema }
+  | (() => SelectorTreeSchema);
+export type ResourceTreeNode = { id: string; entity: string; resource: object };
 
 //
 // reducer types
@@ -293,12 +372,15 @@ export type ResourceTreeNode = { id: string, entity: string, resource: object };
 
 export type EntityIdsReducer = (state: string[], ops: Op[]) => string[];
 export interface EntityIdsReducers {
-  [entity: string]: EntityIdsReducer
+  [entity: string]: EntityIdsReducer;
 }
 
-export type EntityReducer = (state: ResourcesState, ops: Op[]) => ResourcesState;
+export type EntityReducer = (
+  state: ResourcesState,
+  ops: Op[]
+) => ResourcesState;
 export interface EntityReducers {
-  [entity: string]: EntityReducer
+  [entity: string]: EntityReducer;
 }
 
 //
@@ -306,18 +388,18 @@ export interface EntityReducers {
 //
 
 export interface Options {
-  namespaced: Namespaced,
-  resolveRelFromEntity: boolean,
-  onInvalidEntity: InvalidEntityHandler,
-  onInvalidRel: InvalidRelHandler,
-  onInvalidRelData: InvalidRelDataHandler,
-  onNonexistentResource: NonexistentResourceHandler,
+  namespaced: Namespaced;
+  resolveRelFromEntity: boolean;
+  onInvalidEntity: InvalidEntityHandler;
+  onInvalidRel: InvalidRelHandler;
+  onInvalidRelData: InvalidRelDataHandler;
+  onNonexistentResource: NonexistentResourceHandler;
 }
 
 export type InvalidEntityHandler = (entity: string) => void;
 export type NonexistentResourceHandler = (entity: string, id: string) => void;
 export type InvalidRelHandler = (entity: string, rel: string) => void;
-export type InvalidRelDataHandler = (entity: string, rel: string, data: any) => void;
+export type InvalidRelDataHandler = (entity: string, rel: string) => void;
 
 export type ExistingResourceStrategy = 'ignore' | 'put' | 'patch'; // put replaces completely; patch merges their attached ids
 

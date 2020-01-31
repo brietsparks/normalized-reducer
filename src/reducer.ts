@@ -39,28 +39,37 @@ export const makeReducer = (
     const opAction = anyAction as OpAction;
     const actionWithOps = transformAction(state, opAction);
 
-    return ({
+    return {
       ids: idsByEntityReducer(state.ids, actionWithOps),
       resources: resourcesByEntityReducer(state.resources, actionWithOps),
-    })
-  }
+    };
+  };
 };
 
 export const makeIdsByEntityReducer = (schema: ModelSchemaReader) => {
   const entities = schema.getEntities();
 
-  const idsReducers = entities.reduce<EntityIdsReducers>((reducers, entity)  =>{
+  const idsReducers = entities.reduce<EntityIdsReducers>((reducers, entity) => {
     reducers[entity] = makeIdsReducer(schema.entity(entity));
     return reducers;
   }, {});
 
-  return (state: IdsByEntityState = schema.getEmptyIdsByEntityState(), action: OpAction) => {
-    return Object.keys(idsReducers).reduce((reducedState: IdsByEntityState, entity: string) => {
-      const newReducedState = {...reducedState};
-      const entityReducer = idsReducers[entity];
-      newReducedState[entity] = entityReducer(newReducedState[entity], action.ops || []);
-      return newReducedState;
-    }, state)
+  return (
+    state: IdsByEntityState = schema.getEmptyIdsByEntityState(),
+    action: OpAction
+  ) => {
+    return Object.keys(idsReducers).reduce(
+      (reducedState: IdsByEntityState, entity: string) => {
+        const newReducedState = { ...reducedState };
+        const entityReducer = idsReducers[entity];
+        newReducedState[entity] = entityReducer(
+          newReducedState[entity],
+          action.ops || []
+        );
+        return newReducedState;
+      },
+      state
+    );
   };
 };
 
@@ -98,25 +107,38 @@ export const makeIdsReducer = (schema: EntitySchemaReader) => {
 export const makeResourcesByEntityReducer = (schema: ModelSchemaReader) => {
   const entities = schema.getEntities();
 
-  const resourcesReducers = entities.reduce<EntityReducers>((reducers, entity) => {
-    reducers[entity] = makeResourcesReducer(schema.entity(entity));
-    return reducers;
-  }, {});
+  const resourcesReducers = entities.reduce<EntityReducers>(
+    (reducers, entity) => {
+      reducers[entity] = makeResourcesReducer(schema.entity(entity));
+      return reducers;
+    },
+    {}
+  );
 
-  return (state: ResourcesByEntityState = schema.getEmptyResourcesByEntityState(), action: OpAction) => {
-    return Object.keys(resourcesReducers).reduce((reducedState: ResourcesByEntityState, entity: string) => {
-      const newReducedState = {...reducedState};
-      const entityReducer = resourcesReducers[entity];
-      newReducedState[entity] = entityReducer(newReducedState[entity], action.ops || []);
-      return newReducedState;
-    }, state)
+  return (
+    state: ResourcesByEntityState = schema.getEmptyResourcesByEntityState(),
+    action: OpAction
+  ) => {
+    return Object.keys(resourcesReducers).reduce(
+      (reducedState: ResourcesByEntityState, entity: string) => {
+        const newReducedState = { ...reducedState };
+        const entityReducer = resourcesReducers[entity];
+        newReducedState[entity] = entityReducer(
+          newReducedState[entity],
+          action.ops || []
+        );
+        return newReducedState;
+      },
+      state
+    );
   };
 };
 
-
-export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer => {
+export const makeResourcesReducer = (
+  schema: EntitySchemaReader
+): EntityReducer => {
   // the state is all the resources of a given entity
-  return (state= {}, ops: Op[] = []) => {
+  return (state = {}, ops: Op[] = []) => {
     return ops.reduce((state, op) => {
       if (op.entity !== schema.getEntity()) {
         return state;
@@ -131,8 +153,9 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
 
         return {
           ...state,
-          [addResourceOp.id]: addResourceOp.data || schema.getEmptyResourceState()
-        }
+          [addResourceOp.id]:
+            addResourceOp.data || schema.getEmptyResourceState(),
+        };
       }
 
       if (op.opType === OpTypes.REMOVE_RESOURCE) {
@@ -160,14 +183,14 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
         if (cardinality === Cardinalities.ONE) {
           return {
             ...state,
-            [id]: { ...state[id], [rel]: relId }
+            [id]: { ...state[id], [rel]: relId },
           };
         }
 
         if (!resource.hasOwnProperty(rel)) {
           return {
             ...state,
-            [id]: { ...state[id], [rel]: [relId] }
+            [id]: { ...state[id], [rel]: [relId] },
           };
         }
 
@@ -182,8 +205,8 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
 
         return {
           ...state,
-          [id]: { ...state[id], [rel]: relState }
-        }
+          [id]: { ...state[id], [rel]: relState },
+        };
       }
 
       if (op.opType === OpTypes.EDIT_RESOURCE) {
@@ -203,7 +226,7 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
 
         return {
           ...state,
-          [id]: newResource
+          [id]: newResource,
         };
       }
 
@@ -225,7 +248,7 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
 
           return {
             ...state,
-            [id]: { ...state[id], [rel]: undefined }
+            [id]: { ...state[id], [rel]: undefined },
           };
         }
 
@@ -235,8 +258,8 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
           ...state,
           [id]: {
             ...state[id],
-            [rel]: relState.filter(existingRelId => existingRelId !== relId)
-          }
+            [rel]: relState.filter(existingRelId => existingRelId !== relId),
+          },
         };
       }
 
@@ -247,7 +270,11 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
 
         let resource = state[id];
 
-        if (!resource || !resource.hasOwnProperty(rel) || cardinality === Cardinalities.ONE) {
+        if (
+          !resource ||
+          !resource.hasOwnProperty(rel) ||
+          cardinality === Cardinalities.ONE
+        ) {
           return state;
         }
 
@@ -259,12 +286,12 @@ export const makeResourcesReducer = (schema: EntitySchemaReader): EntityReducer 
           ...state,
           [id]: {
             ...state[id],
-            [rel]: relState
-          }
+            [rel]: relState,
+          },
         };
       }
 
       return state;
     }, state);
-  }
+  };
 };

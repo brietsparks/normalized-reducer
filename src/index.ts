@@ -1,4 +1,4 @@
-import { ModelSchema, State, } from './types';
+import { ModelSchema, State } from './types';
 
 import { ModelSchemaReader } from './schema';
 import { makeActions } from './actions';
@@ -17,7 +17,7 @@ import { Options } from './types';
 
 export * from './types';
 
-export default function <S extends State> (
+export default function<S extends State>(
   schema: ModelSchema,
   options?: Partial<Options>
 ) {
@@ -29,12 +29,18 @@ export default function <S extends State> (
     onInvalidEntity: options?.onInvalidEntity || defaultInvalidEntityHandler,
     onInvalidRel: options?.onInvalidRel || defaultInvalidRelHandler,
     onInvalidRelData: options?.onInvalidRelData || defaultInvalidRelDataHandler,
-    onNonexistentResource: options?.onNonexistentResource || defaultNonExistentResourceHandler,
+    onNonexistentResource:
+      options?.onNonexistentResource || defaultNonExistentResourceHandler,
   };
 
   const { types, creators } = makeActions(schemaReader, opts);
   const selectors = makeSelectors(schemaReader, creators, opts);
-  const transformAction = makeActionTransformer(schemaReader, types, selectors, opts);
+  const transformAction = makeActionTransformer(
+    schemaReader,
+    types,
+    selectors,
+    opts
+  );
   const reducer = makeReducer(schemaReader, types, transformAction);
   const emptyState = schemaReader.getEmptyState<S>();
 
@@ -45,5 +51,5 @@ export default function <S extends State> (
     actionCreators: creators,
     transformAction,
     emptyState,
-  }
+  };
 }
