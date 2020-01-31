@@ -6,6 +6,7 @@ import {
   ForumState,
 } from './test-cases/forum';
 
+// @ts-ignore
 function deepFreeze(o: any) {
   Object.freeze(o);
 

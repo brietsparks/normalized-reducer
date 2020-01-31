@@ -1,10 +1,4 @@
-import {
-  ModelSchema,
-  Namespaced,
-  InvalidEntityHandler,
-  InvalidRelHandler,
-  State,
-} from './types';
+import { ModelSchema, State, } from './types';
 
 import { ModelSchemaReader } from './schema';
 import { makeActions } from './actions';

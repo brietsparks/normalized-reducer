@@ -1,6 +1,5 @@
 import {
   State,
-  ResourcesState,
   OpAction,
   ActionTypes,
   AddRelIdOp,
@@ -19,7 +18,6 @@ import {
   IdsByEntityState,
   MoveResourceOp,
   EntityIdsReducers,
-  EntityIdsReducer,
   ResourcesByEntityState,
 } from './types';
 import { EntitySchemaReader, ModelSchemaReader } from './schema';

@@ -1,6 +1,6 @@
 import { blogModelSchemaReader, } from './test-cases/blog';
 import { forumModelSchemaReader, } from './test-cases/forum';
-import { Cardinalities } from '../types';
+import { Cardinalities } from '../src';
 
 describe('schema', () => {
   describe('entity', () => {

@@ -1,5 +1,4 @@
 import {
-  ResourcesByEntityState,
   AddRelIdOp,
   AddResourceOp,
   Cardinalities,
@@ -110,9 +109,9 @@ export class OpsBatch {
     const key = concat(OpTypes.ADD_RESOURCE, entity, id);
     return this.ops[key];
   }
-  deleteAddResource(entity: string, id: string) {
-    throw new Error('deleteAddResource not implemented');
-  }
+  // deleteAddResource(entity: string, id: string) {
+  //   throw new Error('deleteAddResource not implemented');
+  // }
 
   //
   // removeResource
@@ -121,12 +120,12 @@ export class OpsBatch {
     const key = concat(OpTypes.REMOVE_RESOURCE, entity, id);
     this.ops[key] = makeRemoveResourceOp(entity, id);
   }
-  getRemoveResource(entity: string, id: string) {
-    throw new Error('getRemoveResource not implemented');
-  }
-  deleteRemoveResource(entity: string, id: string) {
-    throw new Error('deleteRemoveResource not implemented');
-  }
+  // getRemoveResource(entity: string, id: string) {
+  //   throw new Error('getRemoveResource not implemented');
+  // }
+  // deleteRemoveResource(entity: string, id: string) {
+  //   throw new Error('deleteRemoveResource not implemented');
+  // }
 
   //
   // editResource
@@ -188,9 +187,9 @@ export class OpsBatch {
     const key = concat(entity, id, rel, relId);
     this.ops[key] = makeRemoveRelIdOp(entity, id, rel, relId);
   }
-  getRemoveRelId(entity: string, id: string, rel: string, relId: string) {
-    throw new Error('getRemoveRelId not implemented');
-  }
+  // getRemoveRelId(entity: string, id: string, rel: string, relId: string) {
+  //   throw new Error('getRemoveRelId not implemented');
+  // }
   deleteRemoveRelId(entity: string, id: string, rel: string, relId: string) {
     const key = concat(entity, id, rel, relId);
     if (key) {

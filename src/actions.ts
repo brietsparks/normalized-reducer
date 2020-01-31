@@ -1,18 +1,13 @@
 import {
-  Namespaced,
   AddAction,
-  InvalidEntityHandler,
   AddAttachable,
   ActionTypes,
   ActionCreators,
   RemoveAction,
-  InvalidRelHandler,
-  ResourcesByEntityState,
   ResourceState,
   RelDataState,
   ResourcesState,
   ConcreteOpAction,
-  EditAction,
   SelectorTreeSchema,
   Options
 } from './types';

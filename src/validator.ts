@@ -1,6 +1,6 @@
 import { ModelSchemaReader } from './schema';
 import { isObjectLiteral } from './util';
-import { Cardinalities, ModelSchema, EntitySchema, RelSchema } from './types';
+import { Cardinalities, ModelSchema } from './types';
 
 export const validateSchema = (schema: ModelSchema) => {
   if (!isObjectLiteral(schema)) {

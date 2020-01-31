@@ -12,6 +12,7 @@ const emptyResources: ResourcesState = {};
 
 export const makeSelectors = (
   schema: ModelSchemaReader,
+  // @ts-ignore
   actionCreators: ActionCreators,
   options: Options,
 ): Selectors => {

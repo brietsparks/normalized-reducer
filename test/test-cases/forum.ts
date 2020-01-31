@@ -1,7 +1,7 @@
-import { Cardinalities, State, } from '../../types';
+import { Cardinalities, State, } from '../../src';
 
-import makeModule from '../..';
-import { ModelSchemaReader } from '../../schema';
+import makeModule from '../../src/index';
+import { ModelSchemaReader } from '../../src/schema';
 
 export enum ForumEntities {
   ACCOUNT = 'account',

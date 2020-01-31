@@ -1,5 +1,3 @@
-import { makeActions } from '../actions';
-
 import { blogActionCreators, blogActionTypes } from './test-cases/blog';
 
 describe('actions', () => {

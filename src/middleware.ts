@@ -2,7 +2,7 @@ import { ModelSchemaReader } from './schema';
 import {
   OpAction,
   ActionTypes, AddAction, AttachAction,
-  DeriveActionWithOps, DetachAction, MoveAttachedAction, Op,
+  DeriveActionWithOps, DetachAction, MoveAttachedAction,
   RemoveAction,
   Selectors, BatchAction, Action, EditAction, State, MoveAction, Options
 } from './types';

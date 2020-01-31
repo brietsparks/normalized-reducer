@@ -1,7 +1,5 @@
-import { makeActionTransformer } from '../middleware';
-
 import { blogActionTypes, blogExampleState, BlogState, transformBlogAction } from './test-cases/blog';
-import { AddAction, OpTypes } from '../types';
+import { AddAction, OpTypes } from '../src';
 
 describe('middleware', () => {
   describe('makeActionTransformer', () => {

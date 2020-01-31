@@ -1,6 +1,6 @@
-import { validateSchema } from '../validator';
+import { validateSchema } from '../src/validator';
 import { forumSchema } from './test-cases/forum';
-import { Cardinalities } from '../types';
+import { Cardinalities } from '../src';
 
 const nonObjectLiterals = [1, '1' ,[] ,() => {}, null, true, undefined];
 

@@ -4,18 +4,18 @@ import {
   EntitySchema,
   Cardinalities,
   RelDataState
-} from '../../types';
-import { makeActions } from '../../actions';
+} from '../../src';
+import { makeActions } from '../../src/actions';
 import {
   defaultInvalidEntityHandler,
   defaultInvalidRelHandler,
   defaultInvalidRelDataHandler,
   defaultNonExistentResourceHandler,
   defaultNamespaced,
-} from '../../util';
-import { ModelSchemaReader } from '../../schema';
-import { makeSelectors } from '../../selectors';
-import { makeActionTransformer } from '../../middleware';
+} from '../../src/util';
+import { ModelSchemaReader } from '../../src/schema';
+import { makeSelectors } from '../../src/selectors';
+import { makeActionTransformer } from '../../src/middleware';
 
 export enum BlogEntities {
   ARTICLE = 'article',

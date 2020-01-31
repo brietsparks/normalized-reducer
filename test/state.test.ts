@@ -1,7 +1,7 @@
-import { PendingState } from '../state';
+import { PendingState } from '../src/state';
 
 import { BlogState, blogExampleState, blogModelSchemaReader, blogSelectors } from './test-cases/blog';
-import { makeAddRelIdOp, makeRemoveRelIdOp } from '../ops';
+import { makeAddRelIdOp, makeRemoveRelIdOp } from '../src/ops';
 
 describe('pendingState', () => {
   test('add-resource-op', () => {
