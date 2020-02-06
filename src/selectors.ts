@@ -24,7 +24,6 @@ export const makeSelectors = (
     onInvalidRel,
     onInvalidRelData,
     onInvalidEntity,
-    onNonexistentResource,
   } = options;
 
   const resolveRel = (entity: string, rel: string) => {
@@ -109,7 +108,6 @@ export const makeSelectors = (
     const resource = entityState[args.id];
 
     if (!resource) {
-      onNonexistentResource(args.entity, args.id);
       return undefined;
     }
 

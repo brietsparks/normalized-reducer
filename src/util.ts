@@ -6,6 +6,10 @@ export const arrayPut = <T>(array: T[], item: T, index?: number) => {
 };
 
 export function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
+  if (fromIndex < 0 || toIndex < 0) {
+    return;
+  }
+
   const element = arr[fromIndex];
   arr.splice(fromIndex, 1);
   arr.splice(toIndex, 0, element);
