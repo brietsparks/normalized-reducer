@@ -148,28 +148,30 @@ describe('unit/schema', () => {
     });
   });
 
-  describe('getEmptyState', () => {
-    it('returns the empty-state', () => {
-      const result = forumModelSchemaReader.getEmptyState();
+  describe('schema', () => {
+    describe('getEmptyState', () => {
+      it('returns the empty-state', () => {
+        const result = forumModelSchemaReader.getEmptyState();
 
-      const expected = {
-        entities: {
-          account: {},
-          profile: {},
-          post: {},
-          category: {},
-          tag: {},
-        },
-        ids: {
-          account: [],
-          profile: [],
-          post: [],
-          category: [],
-          tag: [],
-        },
-      };
+        const expected = {
+          entities: {
+            account: {},
+            profile: {},
+            post: {},
+            category: {},
+            tag: {},
+          },
+          ids: {
+            account: [],
+            profile: [],
+            post: [],
+            category: [],
+            tag: [],
+          },
+        };
 
-      expect(result).toEqual(expected);
+        expect(result).toEqual(expected);
+      });
     });
   });
 });

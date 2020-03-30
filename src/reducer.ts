@@ -10,6 +10,7 @@ import {
   SingularAction,
   DetachAction,
   Entity,
+  DerivedAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
@@ -44,7 +45,16 @@ export const makeReducer = <S extends State>(
 
   function singularReducer(state: S, action: SingularAction): S {
     if (actionUtils.isDerivable(action)) {
-      action = derivator.deriveAction(state, action);
+      const derivedAction = derivator.deriveAction(state, action) as DerivedAction;
+
+      // a derived action can have other actions that need
+      // to be handled in the same run, so reduce iteratively
+      return derivedAction.derived.reduce((prevState: S, childAction: SingularAction) => {
+        return {
+          entities: entitiesReducer(prevState.entities, childAction),
+          ids: idsReducer(prevState.ids, childAction),
+        } as S;
+      }, state);
     }
 
     return {
