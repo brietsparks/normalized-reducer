@@ -1,12 +1,29 @@
 {
+  "include": ["src", "types"],
   "compilerOptions": {
-    "lib": ["es6", "dom", "es2017"],
-    "target": "es5",
-    "module": "commonjs",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "importHelpers": true,
     "declaration": true,
-    "outDir": "./dist",
-    "strict": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "src/**/*.test.*"]
+    "sourceMap": true,
+    "rootDir": "./src",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*", "node_modules/*"]
+    },
+    "jsx": "react",
+    "esModuleInterop": true
+  }
 }
