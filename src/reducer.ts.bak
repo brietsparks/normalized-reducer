@@ -1,0 +1,22 @@
+/* tslint:disable */
+
+import {
+  ActionTypes,
+  State
+} from './interfaces';
+import { ModelSchemaReader } from './schema';
+
+interface AnyAction {
+  type: string
+}
+
+export const makeReducer = (
+  schema: ModelSchemaReader,
+  actionTypes: ActionTypes,
+) => {
+
+
+  return (state: State, action: AnyAction) => {
+
+  }
+};
