@@ -144,7 +144,7 @@ export const forumModelSchemaReader = new ModelSchemaReader(forumSchema);
 export const {
   emptyState: forumEmptyState,
   actionCreators: forumActionCreators,
-  // reducer: forumReducer,
+  reducer: forumReducer,
   selectors: forumSelectors,
   actionTypes: forumActionTypes,
 } = makeModule<ForumState>(forumSchema);

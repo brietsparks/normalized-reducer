@@ -1,7 +1,7 @@
-import { forumModelSchemaReader } from '../src/test-cases';
-import { Cardinalities } from '../src/enums';
+import { forumModelSchemaReader } from '../../src/test-cases';
+import { Cardinalities } from '../../src/enums';
 
-describe('schema', () => {
+describe('unit/schema', () => {
   describe('entity schema', () => {
     describe('resolveRelationKey', () => {
       it('returns a relationKey given a existing relationKey', () => {

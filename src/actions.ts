@@ -1,7 +1,5 @@
 import {
   Namespaced,
-  ActionTypes,
-  ActionCreators,
   InvalidActionCreator,
   AttachActionCreator,
   AttachAction,
@@ -9,18 +7,16 @@ import {
   DetachAction,
   DeleteAction,
   DeleteActionCreator,
+  AnyAction,
+  ActionTypes,
 } from './interfaces';
 
 import { ModelSchemaReader } from './schema';
 
 import * as messages from './messages';
 
-export interface ReturnObject {
-  actionTypes: ActionTypes;
-  actionCreators: ActionCreators;
-}
-
-export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced): ReturnObject => {
+export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) => {
+  const BATCH = namespaced('BATCH');
   const INVALID = namespaced('INVALID');
   const ATTACH = namespaced('ATTACH');
   const DETACH = namespaced('DETACH');
@@ -38,7 +34,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced): 
       entityType,
       id,
       relation,
-      relatedId,
+      attachableId: relatedId,
       index: options.index,
       reciprocalIndex: options.reciprocalIndex,
     };
@@ -60,7 +56,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced): 
       entityType,
       id,
       relation,
-      relatedId,
+      detachableId: relatedId,
     };
 
     if (!schema.typeExists(entityType)) {
@@ -88,17 +84,46 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced): 
     return action;
   };
 
+  const actionTypes = {
+    BATCH,
+    INVALID,
+    ATTACH,
+    DETACH,
+    DELETE,
+  };
+
+  const actionCreators = {
+    attach,
+    detach,
+    delete: del,
+  };
+
+  const actionUtils = new ActionUtils(actionTypes);
+
   return {
-    actionTypes: {
-      INVALID,
-      ATTACH,
-      DETACH,
-      DELETE,
-    },
-    actionCreators: {
-      attach,
-      detach,
-      delete: del,
-    },
+    actionTypes,
+    actionCreators,
+    actionUtils,
   };
 };
+
+export class ActionUtils {
+  actionTypes: ActionTypes;
+
+  constructor(actionTypes: ActionTypes) {
+    this.actionTypes = actionTypes;
+  }
+
+  isHandleable(action: AnyAction) {
+    return Object.values(this.actionTypes).includes(action.type);
+  }
+
+  isDerivable(action: AnyAction) {
+    const { DETACH, DELETE, ATTACH } = this.actionTypes;
+    return [DETACH, DELETE, ATTACH].includes(action.type);
+  }
+
+  isBatch(action: AnyAction) {
+    return action.type === this.actionTypes.BATCH;
+  }
+}

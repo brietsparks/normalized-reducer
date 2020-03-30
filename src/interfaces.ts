@@ -4,9 +4,13 @@ export type Id = string | number;
 
 export type Namespaced = (actionType: string) => string;
 
+export interface AnyAction {
+  type: string;
+}
+
 export interface ActionTypes {
   INVALID: string;
-  // BATCH: string;
+  BATCH: string;
   // CREATE: string;
   DELETE: string;
   // UPDATE: string;
@@ -95,7 +99,7 @@ export interface AttachAction {
   entityType: string;
   id: Id;
   relation: string;
-  relatedId: Id;
+  attachableId: Id;
   index?: number;
   reciprocalIndex?: number;
 }
@@ -105,7 +109,7 @@ export interface DetachAction {
   entityType: string;
   id: Id;
   relation: string;
-  relatedId: Id;
+  detachableId: Id;
 }
 
 export interface MoveAttachedAction {
@@ -116,7 +120,9 @@ export interface MoveAttachedAction {
   dest: number;
 }
 
-export interface SetState {}
+export interface SetState {
+  type: string;
+}
 
 //
 // action-creator types

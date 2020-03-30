@@ -6,13 +6,13 @@ import {
   ForumEntities,
   forumEmptyState,
   ForumState,
-} from '../src/test-cases';
+} from '../../src/test-cases';
 
-import { DetachAction, DerivedAction, AttachAction } from '../src';
+import { DetachAction, DerivedAction, AttachAction } from '../../src';
 
-import Derivator from '../src/derivator';
+import Derivator from '../../src/derivator';
 
-describe('derivator', () => {
+describe('unit/derivator', () => {
   // do a type-assertion so that we can pass in the variables that
   // implement their internal interfaces
   const derivator = new Derivator(
@@ -28,7 +28,7 @@ describe('derivator', () => {
       entityType: ForumEntities.PROFILE,
       id: 'p1',
       relation: ForumEntities.ACCOUNT,
-      relatedId: 'a1',
+      detachableId: 'a1',
     };
 
     const expectedDerivedAction: DerivedAction = {
@@ -41,7 +41,7 @@ describe('derivator', () => {
           entityType: ForumEntities.ACCOUNT,
           id: 'a1',
           relation: 'profileId',
-          relatedId: 'p1',
+          detachableId: 'p1',
         },
       ],
     };
@@ -113,7 +113,7 @@ describe('derivator', () => {
         entityType: 'post',
         id: 'o900',
         relation: 'profile',
-        relatedId: 'p1',
+        attachableId: 'p1',
       };
 
       const derivedAction = derivator.deriveAction(state, action);
@@ -144,7 +144,7 @@ describe('derivator', () => {
         entityType: 'post',
         id: 'o1',
         relation: 'profile',
-        relatedId: 'p900',
+        attachableId: 'p900',
       };
 
       const derivedAction = derivator.deriveAction(state, action);
@@ -177,7 +177,7 @@ describe('derivator', () => {
         entityType: 'post',
         id: 'o1',
         relation: 'account',
-        relatedId: 'a1',
+        attachableId: 'a1',
       };
 
       const derivedAction = derivator.deriveAction(state, action);
@@ -210,7 +210,7 @@ describe('derivator', () => {
         entityType: 'post',
         id: 'o1',
         relation: 'profile',
-        relatedId: 'p1',
+        attachableId: 'p1',
       };
 
       const derivedAction = derivator.deriveAction(state, action);
@@ -225,7 +225,7 @@ describe('derivator', () => {
             entityType: 'profile',
             id: 'p1',
             relation: 'postIds',
-            relatedId: 'o1',
+            attachableId: 'o1',
             index: undefined,
             reciprocalIndex: undefined,
           },
@@ -260,7 +260,7 @@ describe('derivator', () => {
         entityType: 'account',
         id: 'a1',
         relation: 'profile',
-        relatedId: 'p20',
+        attachableId: 'p20',
       };
 
       const derivedAction = derivator.deriveAction(state, action);
@@ -275,7 +275,7 @@ describe('derivator', () => {
             entityType: 'profile',
             id: 'p20',
             relation: 'accountId',
-            relatedId: 'a1',
+            attachableId: 'a1',
             index: undefined,
             reciprocalIndex: undefined,
           },
@@ -284,28 +284,28 @@ describe('derivator', () => {
             entityType: 'account',
             id: 'a1',
             relation: 'profile',
-            relatedId: 'p1',
+            detachableId: 'p1',
           },
           {
             type: forumActionTypes.DETACH,
             entityType: 'profile',
             id: 'p1',
             relation: 'accountId',
-            relatedId: 'a1',
+            detachableId: 'a1',
           },
           {
             type: forumActionTypes.DETACH,
             entityType: 'profile',
             id: 'p20',
             relation: 'account',
-            relatedId: 'a20',
+            detachableId: 'a20',
           },
           {
             type: forumActionTypes.DETACH,
             entityType: 'account',
             id: 'a20',
             relation: 'profileId',
-            relatedId: 'p20',
+            detachableId: 'p20',
           },
         ],
       };
@@ -338,7 +338,7 @@ describe('derivator', () => {
         entityType: 'post',
         id: 'o1',
         relation: 'category',
-        relatedId: 'c2',
+        attachableId: 'c2',
       };
 
       const derivedAction = derivator.deriveAction(state, action);
@@ -353,7 +353,7 @@ describe('derivator', () => {
             entityType: 'category',
             id: 'c2',
             relation: 'postIds',
-            relatedId: 'o1',
+            attachableId: 'o1',
             index: undefined,
             reciprocalIndex: undefined,
           },
@@ -494,21 +494,21 @@ describe('derivator', () => {
             entityType: 'profile',
             id: 'p1',
             relation: 'postIds',
-            relatedId: 'o1',
+            detachableId: 'o1',
           },
           {
             type: forumActionTypes.DETACH,
             entityType: 'category',
             id: 'c1',
             relation: 'postIds',
-            relatedId: 'o1',
+            detachableId: 'o1',
           },
           {
             type: forumActionTypes.DETACH,
             entityType: 'post',
             id: 'o1.1',
             relation: 'parentId',
-            relatedId: 'o1',
+            detachableId: 'o1',
           },
         ],
       };

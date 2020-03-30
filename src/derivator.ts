@@ -72,7 +72,7 @@ export default class Derivator<S extends State> {
   }
 
   private deriveDetachActions(action: DetachAction): (DerivableAction | InvalidAction)[] {
-    const { entityType, id, relation, relatedId } = action;
+    const { entityType, id, relation, detachableId } = action;
 
     const schema = this.schema.type(entityType);
 
@@ -83,13 +83,13 @@ export default class Derivator<S extends State> {
       return [action];
     }
 
-    const reciprocalAction = this.actionCreators.detach(relationType, relatedId, reciprocalKey, id);
+    const reciprocalAction = this.actionCreators.detach(relationType, detachableId, reciprocalKey, id);
 
     return [action, reciprocalAction];
   }
 
   private deriveAttachActions(state: S, action: AttachAction): (DerivableAction | InvalidAction)[] {
-    const { entityType, id, relation, relatedId } = action;
+    const { entityType, id, relation, attachableId } = action;
 
     const schema = this.schema.type(entityType);
 
@@ -101,7 +101,7 @@ export default class Derivator<S extends State> {
     // check existence of attachable entity
     const attachableEntity = this.selectors.getEntity(state, {
       type: relationType,
-      id: relatedId,
+      id: attachableId,
     });
     const reciprocalKey = schema.resolveRelationReciprocalKey(relation);
     if (!attachableEntity || !reciprocalKey) {
@@ -111,7 +111,7 @@ export default class Derivator<S extends State> {
     //
     // make the attach-action
     //
-    const relAttachAction = this.actionCreators.attach(relationType, relatedId, reciprocalKey, id, {
+    const relAttachAction = this.actionCreators.attach(relationType, attachableId, reciprocalKey, id, {
       index: action.reciprocalIndex,
       reciprocalIndex: action.index,
     });
@@ -120,7 +120,7 @@ export default class Derivator<S extends State> {
     // make the detach-actions for the occupant entities
     //
     const entityDetachments = this.detachOccupant(state, entityType, id, relation);
-    const relEntityDetachments = this.detachOccupant(state, relationType, relatedId, reciprocalKey);
+    const relEntityDetachments = this.detachOccupant(state, relationType, attachableId, reciprocalKey);
 
     return [action, relAttachAction, ...entityDetachments, ...relEntityDetachments];
   }

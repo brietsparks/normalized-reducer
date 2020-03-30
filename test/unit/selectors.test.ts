@@ -1,8 +1,8 @@
-import { Profile, ForumState, forumSelectors, forumEmptyState } from '../src/test-cases';
+import { Profile, ForumState, forumSelectors, forumEmptyState } from '../../src/test-cases';
 
-import { Id } from '../src';
+import { Id } from '../../src';
 
-describe('selectors', () => {
+describe('unit/selectors', () => {
   describe('getEntity', () => {
     it('returns undefined if the type does not exist', () => {
       const state = {
