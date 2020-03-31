@@ -1,5 +1,6 @@
 import makeModule, { Id, ModelSchema } from './index';
 import { ModelSchemaReader } from './schema';
+import { makeSelectors } from './selectors';
 
 export enum ForumEntities {
   ACCOUNT = 'account',
@@ -148,3 +149,5 @@ export const {
   selectors: forumSelectors,
   actionTypes: forumActionTypes,
 } = makeModule<ForumState>(forumSchema);
+
+export const allForumSelectors = makeSelectors<ForumState>(forumModelSchemaReader);

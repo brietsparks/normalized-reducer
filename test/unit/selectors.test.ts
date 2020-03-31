@@ -1,6 +1,9 @@
-import { Profile, ForumState, forumSelectors, forumEmptyState } from '../../src/test-cases';
+import { Profile, ForumState, forumEmptyState, forumModelSchemaReader } from '../../src/test-cases';
+import { makeSelectors } from '../../src/selectors';
 
 import { Id } from '../../src';
+
+const forumSelectors = makeSelectors(forumModelSchemaReader);
 
 describe('unit/selectors', () => {
   describe('getEntity', () => {
@@ -216,8 +219,125 @@ describe('unit/selectors', () => {
       const expected = {
         profileId: ['p1'],
         categoryIds: ['c1', 'c2'],
-        tagIds: [],
       };
+
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe('getEntityTree', () => {
+    it('returns a collection of entity nodes given a non-recursive selector-schema', () => {
+      const state: ForumState = {
+        entities: {
+          account: {
+            a1: { profileId: 'p1' },
+            a2: { profileId: 'p2' },
+          },
+          profile: {
+            p1: { accountId: 'p1', postIds: ['o1', 'o2'] },
+            p2: { accountId: 'p2', postIds: ['o3'] },
+          },
+          post: {
+            o1: { profileId: 'p1', categoryIds: ['c1'], tagIds: ['t1'] },
+            o2: { profileId: 'p1', categoryIds: ['c1', 'c2'] },
+            o3: { profileId: 'p2', categoryIds: ['c2', 'c3'] },
+          },
+          tag: {
+            t1: { postIds: ['o1'] },
+          },
+          category: {
+            c1: { postIds: ['o1', 'o2'] },
+            c2: { postIds: ['o2', 'o3'] },
+            c3: { postIds: ['o3'] },
+          },
+        },
+        ids: {
+          account: ['a1', 'a2'],
+          profile: ['p1', 'p2'],
+          post: ['o1', 'o2', 'o3'],
+          tag: ['t1'],
+          category: ['c1', 'c2', 'c3'],
+        },
+      };
+
+      const schema = {
+        profileId: {
+          postIds: {
+            tagIds: {},
+            categoryIds: {},
+          },
+        },
+      };
+
+      const result = forumSelectors.getEntityTree(state, {
+        type: 'account',
+        id: 'a1',
+        schema,
+      });
+
+      const expected = [
+        { type: 'account', id: 'a1', entity: { profileId: 'p1' } },
+        {
+          type: 'profile',
+          id: 'p1',
+          entity: { accountId: 'p1', postIds: ['o1', 'o2'] },
+        },
+        {
+          type: 'post',
+          id: 'o1',
+          entity: { profileId: 'p1', categoryIds: ['c1'], tagIds: ['t1'] },
+        },
+        { type: 'tag', id: 't1', entity: { postIds: ['o1'] } },
+        { type: 'category', id: 'c1', entity: { postIds: ['o1', 'o2'] } },
+        {
+          type: 'post',
+          id: 'o2',
+          entity: { profileId: 'p1', categoryIds: ['c1', 'c2'] },
+        },
+        { type: 'category', id: 'c2', entity: { postIds: ['o2', 'o3'] } },
+      ];
+
+      expect(result).toEqual(expected);
+    });
+
+    it('returns a collection of entity nodes given a recursive selector-schema', () => {
+      const state: ForumState = {
+        entities: {
+          ...forumEmptyState.entities,
+          post: {
+            o1: { childIds: ['o1.1', 'o1.2'] },
+            'o1.1': { parentId: 'o1', childIds: ['o1.1.1', 'o1.1.2'] },
+            'o1.1.1': { parentId: 'o1.1' },
+            'o1.1.2': { parentId: 'o1.1' },
+            'o1.2': { parentId: 'o1' },
+            o2: {},
+          },
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          post: ['o1', 'o1.1', 'o1.1.1', 'o1.1.2', 'o1.2', 'o2'],
+        },
+      };
+
+      const schema = () => ({ childIds: schema });
+
+      const result = forumSelectors.getEntityTree(state, {
+        type: 'post',
+        id: 'o1',
+        schema,
+      });
+
+      const expected = [
+        { type: 'post', id: 'o1', entity: { childIds: ['o1.1', 'o1.2'] } },
+        {
+          type: 'post',
+          id: 'o1.1',
+          entity: { parentId: 'o1', childIds: ['o1.1.1', 'o1.1.2'] },
+        },
+        { type: 'post', id: 'o1.1.1', entity: { parentId: 'o1.1' } },
+        { type: 'post', id: 'o1.1.2', entity: { parentId: 'o1.1' } },
+        { type: 'post', id: 'o1.2', entity: { parentId: 'o1' } },
+      ];
 
       expect(result).toEqual(expected);
     });

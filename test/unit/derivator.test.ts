@@ -2,7 +2,7 @@ import {
   forumActionTypes,
   forumActionCreators,
   forumModelSchemaReader,
-  forumSelectors,
+  allForumSelectors,
   ForumEntities,
   forumEmptyState,
   ForumState,
@@ -19,7 +19,7 @@ describe('unit/derivator', () => {
     forumActionTypes,
     forumActionCreators,
     forumModelSchemaReader,
-    forumSelectors
+    allForumSelectors
   );
 
   describe('given a detach-action', () => {

@@ -4,6 +4,7 @@ describe('integration/delete', () => {
   /*
   delete an entity
   delete an entity and detach entities from it
+  delete an entity with a deletion schema
 
   if no such entity type, then no change
   if entity not found, then no change

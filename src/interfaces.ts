@@ -150,7 +150,11 @@ export type DetachActionCreator = (
   relatedId: Id
 ) => DetachAction | InvalidAction;
 
-export type DeleteActionCreator = (entityType: string, id: Id) => DeleteAction | InvalidAction;
+export type DeleteActionCreator = (
+  entityType: string,
+  id: Id,
+  deletionSchema?: SelectorTreeSchema
+) => DeleteAction | InvalidAction;
 
 //
 // state types
@@ -164,8 +168,6 @@ export type IdsByType = { [type: string]: Id[] };
 export type EntitiesByType = { [type: string]: Entities };
 export type Entities = { [id: string]: object };
 export type Entity = { [k: string]: any };
-
-export type SelectorTreeSchema = { [relation: string]: SelectorTreeSchema } | (() => SelectorTreeSchema);
 
 //
 // schema types
@@ -199,6 +201,7 @@ export interface PublicSelectors<S extends State> {
 export interface InternalSelectors<S extends State> {
   getAttached: GetAttached<S>;
   getAllAttachedIds: GetAllAttachedIds<S>;
+  getEntityTree: GetEntityTree<S>;
 }
 
 export type GetEntity<S extends State> = <E extends Entity>(
@@ -215,3 +218,11 @@ export type GetAllAttachedIds<S extends State> = (
   state: S,
   args: { type: string; id: Id }
 ) => { [relationKey: string]: Id[] };
+
+export type GetEntityTree<S extends State> = (
+  state: S,
+  args: { type: string; id: Id; schema: SelectorTreeSchema }
+) => EntityTreeNode[];
+
+export type SelectorTreeSchema = { [relation: string]: SelectorTreeSchema } | (() => SelectorTreeSchema);
+export type EntityTreeNode = { id: Id; type: string; entity: object };

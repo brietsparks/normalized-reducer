@@ -9,6 +9,7 @@ import {
   DeleteActionCreator,
   AnyAction,
   ActionTypes,
+  SelectorTreeSchema,
 } from './interfaces';
 
 import { ModelSchemaReader } from './schema';
@@ -70,11 +71,12 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
-  const del: DeleteActionCreator = (entityType, id) => {
+  const del: DeleteActionCreator = (entityType, id, deletionSchema?: SelectorTreeSchema) => {
     const action: DeleteAction = {
       type: DELETE,
       entityType,
       id,
+      deletionSchema,
     };
 
     if (!schema.typeExists(entityType)) {
