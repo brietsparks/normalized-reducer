@@ -12,6 +12,7 @@ import {
   Entity,
   DerivedAction,
   AttachAction,
+  DeleteAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
@@ -171,6 +172,27 @@ export const makeReducer = <S extends State>(
       };
     }
 
+    if (action.type === actionTypes.DELETE) {
+      const { entityType, id } = action as DeleteAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      const entity = state[entityType][id] as Entity;
+      if (!entity) {
+        return state; // if entity not found, then no change
+      }
+
+      const entitiesOfType = { ...state[entityType] };
+      delete entitiesOfType[id];
+
+      return {
+        ...state,
+        [entityType]: entitiesOfType,
+      };
+    }
+
     return state;
   }
 
@@ -178,6 +200,21 @@ export const makeReducer = <S extends State>(
   function idsReducer(state: IdsByType = defaultIdsState, action: SingularAction): IdsByType {
     if (action.type === actionTypes.INVALID) {
       return state;
+    }
+
+    if (action.type === actionTypes.DELETE) {
+      const { entityType, id } = action as DeleteAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      const idsOfEntity = state[entityType].filter(existingId => existingId !== id);
+
+      return {
+        ...state,
+        [entityType]: idsOfEntity,
+      };
     }
 
     return state;
