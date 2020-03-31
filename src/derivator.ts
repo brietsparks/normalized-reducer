@@ -98,6 +98,12 @@ export default class Derivator<S extends State> {
       return [];
     }
 
+    // check existence of entity
+    const entity = this.selectors.getEntity(state, { type: entityType, id });
+    if (!entity) {
+      return [];
+    }
+
     // check existence of attachable entity
     const attachableEntity = this.selectors.getEntity(state, {
       type: relationType,

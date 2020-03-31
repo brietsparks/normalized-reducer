@@ -1,18 +1,28 @@
 export const noop = () => {};
 
-export const arrayPut = <T>(array: T[], item: T, index?: number) => {
-  // must check against undefined because index might === 0
-  index === undefined ? array.push(item) : array.splice(index, 0, item);
-};
-
-export function arrayMove(arr: any[], fromIndex: number, toIndex: number) {
-  if (fromIndex < 0 || toIndex < 0) {
-    return;
+export const arrayPut = <T>(item: T, array?: T[], index?: number): T[] => {
+  if (!array) {
+    return [item];
   }
 
-  const element = arr[fromIndex];
-  arr.splice(fromIndex, 1);
-  arr.splice(toIndex, 0, element);
+  const newArray = [...array];
+  // must check against undefined because index might === 0
+  index === undefined ? newArray.push(item) : newArray.splice(index, 0, item);
+  return newArray;
+};
+
+export function arrayMove<T>(arr: T[], fromIndex: number, toIndex: number): T[] {
+  if (fromIndex < 0 || toIndex < 0) {
+    return arr;
+  }
+
+  const newArray = [...arr];
+
+  const element = newArray[fromIndex];
+  newArray.splice(fromIndex, 1);
+  newArray.splice(toIndex, 0, element);
+
+  return newArray;
 }
 
 export const isObjectLiteral = (v: any): v is object => {

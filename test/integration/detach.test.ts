@@ -228,7 +228,7 @@ describe('integration/detach', () => {
       expect(nextState).toEqual(state);
     });
 
-    test('if entity relation key not found, then no change', () => {
+    test('if entity relation does not exist, then no change', () => {
       const action = forumActionCreators.detach('account', 'a1', 'chickenId', 'c1');
       const nextState = forumReducer(state, action);
       expect(nextState).toEqual(state);

@@ -28,7 +28,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     action,
   });
 
-  const attach: AttachActionCreator = (entityType, id, relation, relatedId, options) => {
+  const attach: AttachActionCreator = (entityType, id, relation, relatedId, options = {}) => {
     const action: AttachAction = {
       type: ATTACH,
       entityType,

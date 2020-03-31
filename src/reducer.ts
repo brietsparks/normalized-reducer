@@ -11,11 +11,13 @@ import {
   DetachAction,
   Entity,
   DerivedAction,
+  AttachAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
 import { ActionUtils } from './actions';
 import { Cardinalities } from './enums';
+import { arrayPut } from './util';
 
 export const makeReducer = <S extends State>(
   schema: ModelSchemaReader,
@@ -89,9 +91,9 @@ export const makeReducer = <S extends State>(
         return state; // if entity relation key not found, then no change
       }
 
-      const cardinality = schema.type(entityType).resolveRelationCardinality(relation);
+      let newEntity = entity; // to contain the change immutably
 
-      let newEntity = entity; // to be immutably overwritten
+      const cardinality = schema.type(entityType).resolveRelationCardinality(relation);
 
       if (cardinality === Cardinalities.ONE) {
         const attachedId = entity[relationKey] as Id;
@@ -112,6 +114,52 @@ export const makeReducer = <S extends State>(
           ...entity,
           [relationKey]: attachedIds.filter(attachedId => attachedId !== detachableId),
         };
+      }
+
+      return {
+        ...state,
+        [entityType]: {
+          ...state[entityType],
+          [id]: newEntity,
+        },
+      };
+    }
+
+    if (action.type === actionTypes.ATTACH) {
+      const { entityType, id, attachableId, relation, index } = action as AttachAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      const entity = state[entityType][id] as Entity;
+      if (!entity) {
+        return state; // if entity not found, then no change
+      }
+
+      const relationKey = schema.type(entityType).resolveRelationKey(relation);
+      if (!relationKey) {
+        return state; // if entity relation key not found, then no change
+      }
+
+      let newEntity = entity; // to contain the change immutably
+
+      const cardinality = schema.type(entityType).resolveRelationCardinality(relation);
+
+      if (cardinality === Cardinalities.ONE) {
+        newEntity = {
+          ...newEntity,
+          [relationKey]: attachableId,
+        };
+      }
+
+      if (cardinality === Cardinalities.MANY) {
+        if (!entity[relationKey] || !entity[relationKey].includes(attachableId)) {
+          newEntity = {
+            ...newEntity,
+            [relationKey]: arrayPut(attachableId, newEntity[relationKey], index),
+          };
+        }
       }
 
       return {

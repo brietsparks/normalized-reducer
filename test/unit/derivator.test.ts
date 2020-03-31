@@ -49,18 +49,18 @@ describe('unit/derivator', () => {
     test('it derives the detachment of two attached entities', () => {
       const state: ForumState = {
         entities: {
+          ...forumEmptyState.entities,
           account: {
             a1: { profileId: 'p1' },
           },
           profile: {
             p1: { accountId: 'a1' },
           },
-          ...forumEmptyState.entities,
         },
         ids: {
+          ...forumEmptyState.ids,
           account: ['a1'],
           profile: ['p1'],
-          ...forumEmptyState.ids,
         },
       };
 
@@ -72,14 +72,14 @@ describe('unit/derivator', () => {
     it('if the entity exists but not the attached entity, it still derives both detachments', () => {
       const state: ForumState = {
         entities: {
+          ...forumEmptyState.entities,
           profile: {
             p1: {},
           },
-          ...forumEmptyState.entities,
         },
         ids: {
-          profile: ['p1'],
           ...forumEmptyState.ids,
+          profile: ['p1'],
         },
       };
 
@@ -99,12 +99,12 @@ describe('unit/derivator', () => {
     it('derives a no-op if the entity does not exist', () => {
       const state: ForumState = {
         entities: {
-          profile: { p1: {} },
           ...forumEmptyState.entities,
+          profile: { p1: {} },
         },
         ids: {
-          profile: ['p1'],
           ...forumEmptyState.ids,
+          profile: ['p1'],
         },
       };
 
@@ -130,12 +130,12 @@ describe('unit/derivator', () => {
     it('derives a no-op if the attachable entity does not exist', () => {
       const state: ForumState = {
         entities: {
-          post: { o1: {} },
           ...forumEmptyState.entities,
+          post: { o1: {} },
         },
         ids: {
-          post: ['o1'],
           ...forumEmptyState.ids,
+          post: ['o1'],
         },
       };
 
@@ -161,14 +161,14 @@ describe('unit/derivator', () => {
     it('derives a no-op if two existing entities are not related', () => {
       const state: ForumState = {
         entities: {
+          ...forumEmptyState.entities,
           account: { a1: {} },
           post: { o1: {} },
-          ...forumEmptyState.entities,
         },
         ids: {
+          ...forumEmptyState.ids,
           account: ['a1'],
           post: ['o1'],
-          ...forumEmptyState.ids,
         },
       };
 
@@ -368,14 +368,14 @@ describe('unit/derivator', () => {
     it('derives a no-op if the type does not exist', () => {
       const state = {
         entities: {
+          ...forumEmptyState.entities,
           chicken: {
             c1: { name: 'nugget' },
           },
-          ...forumEmptyState.entities,
         },
         ids: {
-          chicken: ['c1'],
           ...forumEmptyState.ids,
+          chicken: ['c1'],
         },
       };
 
@@ -399,14 +399,14 @@ describe('unit/derivator', () => {
     it('derives a removal action for an existing entity', () => {
       const state = {
         entities: {
+          ...forumEmptyState.entities,
           post: {
             o1: {},
           },
-          ...forumEmptyState.entities,
         },
         ids: {
-          post: ['o1'],
           ...forumEmptyState.ids,
+          post: ['o1'],
         },
       };
 

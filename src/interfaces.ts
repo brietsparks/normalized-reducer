@@ -140,7 +140,7 @@ export type AttachActionCreator = (
   id: Id,
   relation: string,
   relatedId: Id,
-  options: { index?: number; reciprocalIndex?: number }
+  options?: { index?: number; reciprocalIndex?: number }
 ) => AttachAction | InvalidAction;
 
 export type DetachActionCreator = (
