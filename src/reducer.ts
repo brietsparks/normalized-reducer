@@ -12,6 +12,7 @@ import {
   Entity,
   Id,
   IdsByType,
+  MoveAction,
   SingularAction,
   State,
   UpdateAction,
@@ -20,7 +21,7 @@ import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
 import { ActionUtils } from './actions';
 import { Cardinalities, UpdateActionMethod } from './enums';
-import { arrayPut } from './util';
+import { arrayPut, arrayMove } from './util';
 
 export const makeReducer = <S extends State>(
   schema: ModelSchemaReader,
@@ -280,6 +281,19 @@ export const makeReducer = <S extends State>(
       return {
         ...state,
         [entityType]: arrayPut(id, state[entityType], index),
+      };
+    }
+
+    if (action.type === actionTypes.MOVE) {
+      const { entityType, src, dest } = action as MoveAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      return {
+        ...state,
+        [entityType]: arrayMove(state[entityType], src, dest),
       };
     }
 

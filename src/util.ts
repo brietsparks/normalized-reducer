@@ -16,8 +16,10 @@ export function arrayMove<T>(arr: T[], fromIndex: number, toIndex: number): T[] 
     return arr;
   }
 
-  const newArray = [...arr];
+  // if the fromIndex is greater than the highest index, then set it as the highest index
+  fromIndex = fromIndex > arr.length - 1 ? arr.length - 1 : fromIndex;
 
+  const newArray = [...arr];
   const element = newArray[fromIndex];
   newArray.splice(fromIndex, 1);
   newArray.splice(toIndex, 0, element);

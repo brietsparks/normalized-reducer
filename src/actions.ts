@@ -14,6 +14,8 @@ import {
   CreateAction,
   UpdateActionCreator,
   UpdateAction,
+  MoveAction,
+  MoveActionCreator,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
@@ -28,6 +30,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
   const DELETE = namespaced('DELETE');
   const CREATE = namespaced('CREATE');
   const UPDATE = namespaced('UPDATE');
+  const MOVE = namespaced('MOVE');
 
   const invalid: InvalidActionCreator = (action, error) => ({
     type: INVALID,
@@ -130,6 +133,29 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
+  const move: MoveActionCreator = (entityType, src, dest) => {
+    const action: MoveAction = {
+      type: MOVE,
+      entityType,
+      src,
+      dest,
+    };
+
+    if (!schema.typeExists(entityType)) {
+      return invalid(action, messages.entityTypeDne(entityType));
+    }
+
+    if (src < 0) {
+      return invalid(action, messages.indexLtZero('source'));
+    }
+
+    if (dest < 0) {
+      return invalid(action, messages.indexLtZero('destination'));
+    }
+
+    return action;
+  };
+
   const actionTypes = {
     BATCH,
     INVALID,
@@ -138,6 +164,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     DELETE,
     CREATE,
     UPDATE,
+    MOVE,
   };
 
   const actionCreators = {
@@ -146,6 +173,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     delete: del,
     create,
     update,
+    move,
   };
 
   const actionUtils = new ActionUtils(actionTypes);

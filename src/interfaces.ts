@@ -14,7 +14,7 @@ export interface ActionTypes {
   CREATE: string;
   DELETE: string;
   UPDATE: string;
-  // MOVE: string;
+  MOVE: string;
   ATTACH: string;
   DETACH: string;
   // MOVE_ATTACHED: string;
@@ -133,6 +133,7 @@ export type ActionCreators = {
   delete: DeleteActionCreator;
   create: CreateActionCreator;
   update: UpdateActionCreator;
+  move: MoveActionCreator;
 };
 
 export type InvalidActionCreator = (action: ValidAction, error: string) => InvalidAction;
@@ -171,6 +172,8 @@ export type UpdateActionCreator = (
   data: object,
   options?: { method?: UpdateActionMethod }
 ) => UpdateAction | InvalidAction;
+
+export type MoveActionCreator = (entityType: string, src: number, dest: number) => MoveAction | InvalidAction;
 
 //
 // state types
