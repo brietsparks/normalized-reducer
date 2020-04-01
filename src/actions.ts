@@ -16,6 +16,8 @@ import {
   UpdateAction,
   MoveAction,
   MoveActionCreator,
+  MoveAttachedAction,
+  MoveAttachedActionCreator,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
@@ -31,6 +33,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
   const CREATE = namespaced('CREATE');
   const UPDATE = namespaced('UPDATE');
   const MOVE = namespaced('MOVE');
+  const MOVE_ATTACHED = namespaced('MOVE_ATTACHED');
 
   const invalid: InvalidActionCreator = (action, error) => ({
     type: INVALID,
@@ -156,6 +159,35 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
+  const moveAttached: MoveAttachedActionCreator = (entityType, id, relation, src, dest) => {
+    const action: MoveAttachedAction = {
+      type: MOVE_ATTACHED,
+      entityType,
+      id,
+      relation,
+      src,
+      dest,
+    };
+
+    if (!schema.typeExists(entityType)) {
+      return invalid(action, messages.entityTypeDne(entityType));
+    }
+
+    if (!schema.type(entityType).resolveRelationKey(relation)) {
+      return invalid(action, messages.relDne(entityType, relation));
+    }
+
+    if (src < 0) {
+      return invalid(action, messages.indexLtZero('source'));
+    }
+
+    if (dest < 0) {
+      return invalid(action, messages.indexLtZero('destination'));
+    }
+
+    return action;
+  };
+
   const actionTypes = {
     BATCH,
     INVALID,
@@ -165,6 +197,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     CREATE,
     UPDATE,
     MOVE,
+    MOVE_ATTACHED,
   };
 
   const actionCreators = {
@@ -174,6 +207,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     create,
     update,
     move,
+    moveAttached,
   };
 
   const actionUtils = new ActionUtils(actionTypes);

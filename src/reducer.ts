@@ -13,6 +13,7 @@ import {
   Id,
   IdsByType,
   MoveAction,
+  MoveAttachedAction,
   SingularAction,
   State,
   UpdateAction,
@@ -230,6 +231,47 @@ export const makeReducer = <S extends State>(
       }
 
       const newEntity = method === UpdateActionMethod.PUT ? data : { ...entity, ...data };
+
+      return {
+        ...state,
+        [entityType]: {
+          ...state[entityType],
+          [id]: newEntity,
+        },
+      };
+    }
+
+    if (action.type === actionTypes.MOVE_ATTACHED) {
+      const { entityType, id, relation, src, dest } = action as MoveAttachedAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      const entity = state[entityType][id] as Entity;
+      if (!entity) {
+        return state; // if entity not found, then no change
+      }
+
+      const relationKey = schema.type(entityType).resolveRelationKey(relation);
+      if (!relationKey) {
+        return state; // if entity relation key not found, then no change
+      }
+
+      const cardinality = schema.type(entityType).resolveRelationCardinality(relation);
+      if (cardinality === Cardinalities.ONE) {
+        return state; // if cardinality is one, then no change
+      }
+
+      const attachedIds = entity[relationKey];
+      if (!Array.isArray(attachedIds)) {
+        return state; // if attached ids is not an array, then no change
+      }
+
+      const newEntity = {
+        ...entity,
+        [relationKey]: arrayMove(attachedIds, src, dest),
+      };
 
       return {
         ...state,

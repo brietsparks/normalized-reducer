@@ -17,7 +17,7 @@ export interface ActionTypes {
   MOVE: string;
   ATTACH: string;
   DETACH: string;
-  // MOVE_ATTACHED: string;
+  MOVE_ATTACHED: string;
   // SET_STATE: string;
   // SET_ALL_IDS: string;
   // SET_ALL_ENTITIES: string;
@@ -115,6 +115,7 @@ export interface DetachAction {
 export interface MoveAttachedAction {
   type: string;
   entityType: string;
+  id: Id;
   relation: string;
   src: number;
   dest: number;
@@ -174,6 +175,14 @@ export type UpdateActionCreator = (
 ) => UpdateAction | InvalidAction;
 
 export type MoveActionCreator = (entityType: string, src: number, dest: number) => MoveAction | InvalidAction;
+
+export type MoveAttachedActionCreator = (
+  entityType: string,
+  id: Id,
+  relation: string,
+  src: number,
+  dest: number
+) => MoveAttachedAction | InvalidAction;
 
 //
 // state types

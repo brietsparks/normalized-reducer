@@ -5,8 +5,8 @@ describe('integration/move', () => {
   move entity given between two non-zero indices
   move entity to index 0
 
-  move entity from index beyond highest existing index
-  move entity to index beyond highest existing index
+  attempt to move entity from an index beyond highest existing index
+  attempt to move entity to an index beyond highest existing index
 
   if no such entity type, then no change
   if source index < 0, then no change
