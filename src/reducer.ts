@@ -1,24 +1,25 @@
 import {
-  Id,
-  State,
-  IdsByType,
-  EntitiesByType,
+  Action,
   ActionTypes,
   AnyAction,
-  Action,
-  BatchAction,
-  SingularAction,
-  DetachAction,
-  Entity,
-  DerivedAction,
   AttachAction,
-  DeleteAction,
+  BatchAction,
   CreateAction,
+  DeleteAction,
+  DerivedAction,
+  DetachAction,
+  EntitiesByType,
+  Entity,
+  Id,
+  IdsByType,
+  SingularAction,
+  State,
+  UpdateAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
 import { ActionUtils } from './actions';
-import { Cardinalities } from './enums';
+import { Cardinalities, UpdateActionMethod } from './enums';
 import { arrayPut } from './util';
 
 export const makeReducer = <S extends State>(
@@ -211,6 +212,29 @@ export const makeReducer = <S extends State>(
         [entityType]: {
           ...state[entityType],
           [id]: data || {},
+        },
+      };
+    }
+
+    if (action.type === actionTypes.UPDATE) {
+      const { entityType, id, data, method } = action as UpdateAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      const entity = state[entityType][id] as Entity;
+      if (!entity) {
+        return state; // if entity not found, then no change
+      }
+
+      const newEntity = method === UpdateActionMethod.PUT ? data : { ...entity, ...data };
+
+      return {
+        ...state,
+        [entityType]: {
+          ...state[entityType],
+          [id]: newEntity,
         },
       };
     }

@@ -12,12 +12,13 @@ import {
   SelectorTreeSchema,
   CreateActionCreator,
   CreateAction,
-  Entity,
+  UpdateActionCreator,
+  UpdateAction,
 } from './interfaces';
-
 import { ModelSchemaReader } from './schema';
-
 import * as messages from './messages';
+import { UpdateActionMethod } from './enums';
+import { cleanData } from './validator';
 
 export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) => {
   const BATCH = namespaced('BATCH');
@@ -26,6 +27,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
   const DETACH = namespaced('DETACH');
   const DELETE = namespaced('DELETE');
   const CREATE = namespaced('CREATE');
+  const UPDATE = namespaced('UPDATE');
 
   const invalid: InvalidActionCreator = (action, error) => ({
     type: INVALID,
@@ -90,7 +92,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
-  const create: CreateActionCreator = (entityType, id, data?, index?) => {
+  const create: CreateActionCreator = (entityType, id, data = {}, index?) => {
     const action: CreateAction = {
       type: CREATE,
       entityType,
@@ -103,16 +105,27 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
       return invalid(action, messages.entityTypeDne(entityType));
     }
 
-    // data can only have non-relational attributes
-    let cleanedData: Entity = { ...data };
-    if (typeof data === 'object') {
-      for (let key of Object.keys(cleanedData)) {
-        if (schema.type(entityType).hasRelationKey(key)) {
-          delete cleanedData[key];
-        }
-      }
+    // data must be an object with only non-relational attributes
+    action.data = cleanData(data, schema, entityType);
+
+    return action;
+  };
+
+  const update: UpdateActionCreator = (entityType, id, data, options = {}) => {
+    const action: UpdateAction = {
+      type: UPDATE,
+      entityType,
+      id,
+      data,
+      method: options.method || UpdateActionMethod.PATCH,
+    };
+
+    if (!schema.typeExists(entityType)) {
+      return invalid(action, messages.entityTypeDne(entityType));
     }
-    action.data = cleanedData;
+
+    // data must be an object with only non-relational attributes
+    action.data = cleanData(data, schema, entityType);
 
     return action;
   };
@@ -124,6 +137,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     DETACH,
     DELETE,
     CREATE,
+    UPDATE,
   };
 
   const actionCreators = {
@@ -131,6 +145,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     detach,
     delete: del,
     create,
+    update,
   };
 
   const actionUtils = new ActionUtils(actionTypes);

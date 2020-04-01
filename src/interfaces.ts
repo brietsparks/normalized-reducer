@@ -1,4 +1,4 @@
-import { Cardinalities } from './enums';
+import { Cardinalities, UpdateActionMethod } from './enums';
 
 export type Id = string | number;
 
@@ -13,7 +13,7 @@ export interface ActionTypes {
   BATCH: string;
   CREATE: string;
   DELETE: string;
-  // UPDATE: string;
+  UPDATE: string;
   // MOVE: string;
   ATTACH: string;
   DETACH: string;
@@ -84,7 +84,7 @@ export interface UpdateAction {
   entityType: string;
   id: Id;
   data: object;
-  options: { partial?: boolean };
+  method: UpdateActionMethod;
 }
 
 export interface MoveAction {
@@ -132,6 +132,7 @@ export type ActionCreators = {
   detach: DetachActionCreator;
   delete: DeleteActionCreator;
   create: CreateActionCreator;
+  update: UpdateActionCreator;
 };
 
 export type InvalidActionCreator = (action: ValidAction, error: string) => InvalidAction;
@@ -163,6 +164,13 @@ export type CreateActionCreator = (
   data?: object,
   index?: number
 ) => CreateAction | InvalidAction;
+
+export type UpdateActionCreator = (
+  entityType: string,
+  id: Id,
+  data: object,
+  options?: { method?: UpdateActionMethod }
+) => UpdateAction | InvalidAction;
 
 //
 // state types
