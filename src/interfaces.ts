@@ -18,6 +18,8 @@ export interface ActionTypes {
   ATTACH: string;
   DETACH: string;
   MOVE_ATTACHED: string;
+  SORT: string;
+  // SORT_ATTACHED: string;
   // SET_STATE: string;
   // SET_ALL_IDS: string;
   // SET_ALL_ENTITIES: string;
@@ -121,6 +123,13 @@ export interface MoveAttachedAction {
   dest: number;
 }
 
+export interface SortAction<T extends Entity = Entity> {
+  type: string;
+  entityType: string;
+  compare: Compare<T>;
+}
+export type Compare<T extends Entity = Entity> = (a: T, b: T) => number;
+
 export interface SetState {
   type: string;
 }
@@ -135,6 +144,7 @@ export type ActionCreators = {
   create: CreateActionCreator;
   update: UpdateActionCreator;
   move: MoveActionCreator;
+  sort: SortActionCreator;
 };
 
 export type InvalidActionCreator = (action: ValidAction, error: string) => InvalidAction;
@@ -183,6 +193,11 @@ export type MoveAttachedActionCreator = (
   src: number,
   dest: number
 ) => MoveAttachedAction | InvalidAction;
+
+export type SortActionCreator = <T extends Entity = Entity>(
+  entityType: string,
+  compare: Compare<T>
+) => SortAction<T> | InvalidAction;
 
 //
 // state types

@@ -35,6 +35,7 @@ export type Post = {
   // non-relational
   title: string;
   body: string;
+  meta: any;
 };
 
 export type Category = {
