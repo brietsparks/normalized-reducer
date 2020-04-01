@@ -4,6 +4,8 @@ export type Id = string | number;
 
 export type Namespaced = (actionType: string) => string;
 
+export type Compare<T extends Entity = Entity> = (a: T, b: T) => number;
+
 export interface AnyAction {
   type: string;
 }
@@ -19,7 +21,7 @@ export interface ActionTypes {
   DETACH: string;
   MOVE_ATTACHED: string;
   SORT: string;
-  // SORT_ATTACHED: string;
+  SORT_ATTACHED: string;
   // SET_STATE: string;
   // SET_ALL_IDS: string;
   // SET_ALL_ENTITIES: string;
@@ -128,7 +130,14 @@ export interface SortAction<T extends Entity = Entity> {
   entityType: string;
   compare: Compare<T>;
 }
-export type Compare<T extends Entity = Entity> = (a: T, b: T) => number;
+
+export interface SortAttachedAction<T extends Entity = Entity> {
+  type: string;
+  entityType: string;
+  id: string;
+  relation: string;
+  compare: Compare<T>;
+}
 
 export interface SetState {
   type: string;
@@ -144,7 +153,9 @@ export type ActionCreators = {
   create: CreateActionCreator;
   update: UpdateActionCreator;
   move: MoveActionCreator;
+  moveAttached: MoveAttachedActionCreator;
   sort: SortActionCreator;
+  sortAttached: SortAttachedActionCreator;
 };
 
 export type InvalidActionCreator = (action: ValidAction, error: string) => InvalidAction;
@@ -196,6 +207,13 @@ export type MoveAttachedActionCreator = (
 
 export type SortActionCreator = <T extends Entity = Entity>(
   entityType: string,
+  compare: Compare<T>
+) => SortAction<T> | InvalidAction;
+
+export type SortAttachedActionCreator = <T extends Entity = Entity>(
+  entityType: string,
+  id: string,
+  relation: string,
   compare: Compare<T>
 ) => SortAction<T> | InvalidAction;
 

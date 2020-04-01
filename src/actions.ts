@@ -21,6 +21,7 @@ import {
   SortActionCreator,
   Entity,
   Compare,
+  SortAttachedActionCreator,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
@@ -38,6 +39,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
   const MOVE = namespaced('MOVE');
   const MOVE_ATTACHED = namespaced('MOVE_ATTACHED');
   const SORT = namespaced('SORT');
+  const SORT_ATTACHED = namespaced('SORT_ATTACHED');
 
   const invalid: InvalidActionCreator = (action, error) => ({
     type: INVALID,
@@ -206,6 +208,31 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
+  const sortAttached: SortAttachedActionCreator = <T extends Entity = Entity>(
+    entityType: string,
+    id: string,
+    relation: string,
+    compare: Compare<T>
+  ) => {
+    const action = {
+      type: SORT_ATTACHED,
+      entityType,
+      id,
+      relation,
+      compare,
+    };
+
+    if (!schema.typeExists(entityType)) {
+      return invalid(action, messages.entityTypeDne(entityType));
+    }
+
+    if (!schema.type(entityType).resolveRelationKey(relation)) {
+      return invalid(action, messages.relDne(entityType, relation));
+    }
+
+    return action;
+  };
+
   const actionTypes = {
     BATCH,
     INVALID,
@@ -217,6 +244,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     MOVE,
     MOVE_ATTACHED,
     SORT,
+    SORT_ATTACHED,
   };
 
   const actionCreators = {
@@ -228,6 +256,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     move,
     moveAttached,
     sort,
+    sortAttached,
   };
 
   const actionUtils = new ActionUtils(actionTypes);

@@ -16,6 +16,7 @@ import {
   MoveAttachedAction,
   SingularAction,
   SortAction,
+  SortAttachedAction,
   State,
   UpdateAction,
 } from './interfaces';
@@ -295,6 +296,59 @@ export const makeReducer = <S extends State>(
       const newEntity = {
         ...entity,
         [relationKey]: arrayMove(attachedIds, src, dest),
+      };
+
+      return {
+        ...state,
+        [entityType]: {
+          ...state[entityType],
+          [id]: newEntity,
+        },
+      };
+    }
+
+    if (action.type === actionTypes.SORT_ATTACHED) {
+      const { entityType, id, relation, compare } = action as SortAttachedAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      const entity = state[entityType][id] as Entity;
+      if (!entity) {
+        return state; // if entity not found, then no change
+      }
+
+      const relationKey = schema.type(entityType).resolveRelationKey(relation);
+      const relationType = schema.type(entityType).resolveRelationType(relation);
+      if (!relationKey || !relationType) {
+        return state; // if entity relation key or relation type not found, then no change
+      }
+
+      const cardinality = schema.type(entityType).resolveRelationCardinality(relation);
+      if (cardinality === Cardinalities.ONE) {
+        return state; // if cardinality is one, then no change
+      }
+
+      const attachedIds = entity[relationKey];
+      if (!Array.isArray(attachedIds)) {
+        return state; // if attached ids is not an array, then no change
+      }
+
+      const relatedEntities = state[relationType];
+      const sortedIds = [...attachedIds].sort((idA, idB) => {
+        const entityA = relatedEntities[idA];
+        const entityB = relatedEntities[idB];
+
+        // comparison error will need to be handled in the future
+        // ...
+
+        return compare(entityA, entityB);
+      });
+
+      const newEntity = {
+        ...entity,
+        [relationKey]: sortedIds,
       };
 
       return {
