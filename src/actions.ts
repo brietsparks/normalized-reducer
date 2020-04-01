@@ -10,6 +10,9 @@ import {
   AnyAction,
   ActionTypes,
   SelectorTreeSchema,
+  CreateActionCreator,
+  CreateAction,
+  Entity,
 } from './interfaces';
 
 import { ModelSchemaReader } from './schema';
@@ -22,6 +25,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
   const ATTACH = namespaced('ATTACH');
   const DETACH = namespaced('DETACH');
   const DELETE = namespaced('DELETE');
+  const CREATE = namespaced('CREATE');
 
   const invalid: InvalidActionCreator = (action, error) => ({
     type: INVALID,
@@ -86,18 +90,47 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
+  const create: CreateActionCreator = (entityType, id, data?, index?) => {
+    const action: CreateAction = {
+      type: CREATE,
+      entityType,
+      id,
+      data,
+      index,
+    };
+
+    if (!schema.typeExists(entityType)) {
+      return invalid(action, messages.entityTypeDne(entityType));
+    }
+
+    // data can only have non-relational attributes
+    let cleanedData: Entity = { ...data };
+    if (typeof data === 'object') {
+      for (let key of Object.keys(cleanedData)) {
+        if (schema.type(entityType).hasRelationKey(key)) {
+          delete cleanedData[key];
+        }
+      }
+    }
+    action.data = cleanedData;
+
+    return action;
+  };
+
   const actionTypes = {
     BATCH,
     INVALID,
     ATTACH,
     DETACH,
     DELETE,
+    CREATE,
   };
 
   const actionCreators = {
     attach,
     detach,
     delete: del,
+    create,
   };
 
   const actionUtils = new ActionUtils(actionTypes);

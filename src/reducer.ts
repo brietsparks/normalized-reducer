@@ -13,6 +13,7 @@ import {
   DerivedAction,
   AttachAction,
   DeleteAction,
+  CreateAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
@@ -193,6 +194,27 @@ export const makeReducer = <S extends State>(
       };
     }
 
+    if (action.type === actionTypes.CREATE) {
+      const { entityType, id, data } = action as CreateAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      const entity = state[entityType][id] as Entity;
+      if (entity) {
+        return state; // if entity exists, then no change
+      }
+
+      return {
+        ...state,
+        [entityType]: {
+          ...state[entityType],
+          [id]: data || {},
+        },
+      };
+    }
+
     return state;
   }
 
@@ -214,6 +236,26 @@ export const makeReducer = <S extends State>(
       return {
         ...state,
         [entityType]: idsOfEntity,
+      };
+    }
+
+    if (action.type === actionTypes.CREATE) {
+      const { entityType, id, index } = action as CreateAction;
+
+      if (!schema.typeExists(entityType)) {
+        return state; // if no such entityType, then no change
+      }
+
+      // this O(n) operation can be improved if existence is checked
+      // in an O(c) lookup against the entities slice from one level up,
+      // and then set the existence boolean on the action
+      if (state[entityType].includes(id)) {
+        return state; // if entity exists, then no change
+      }
+
+      return {
+        ...state,
+        [entityType]: arrayPut(id, state[entityType], index),
       };
     }
 

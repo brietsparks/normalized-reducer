@@ -11,7 +11,7 @@ export interface AnyAction {
 export interface ActionTypes {
   INVALID: string;
   BATCH: string;
-  // CREATE: string;
+  CREATE: string;
   DELETE: string;
   // UPDATE: string;
   // MOVE: string;
@@ -68,7 +68,7 @@ export interface CreateAction {
   type: string;
   entityType: string;
   id: Id;
-  data?: object;
+  data?: Entity;
   index?: number;
 }
 
@@ -131,6 +131,7 @@ export type ActionCreators = {
   attach: AttachActionCreator;
   detach: DetachActionCreator;
   delete: DeleteActionCreator;
+  create: CreateActionCreator;
 };
 
 export type InvalidActionCreator = (action: ValidAction, error: string) => InvalidAction;
@@ -155,6 +156,13 @@ export type DeleteActionCreator = (
   id: Id,
   deletionSchema?: SelectorTreeSchema
 ) => DeleteAction | InvalidAction;
+
+export type CreateActionCreator = (
+  entityType: string,
+  id: Id,
+  data?: object,
+  index?: number
+) => CreateAction | InvalidAction;
 
 //
 // state types
