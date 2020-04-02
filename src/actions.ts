@@ -89,12 +89,12 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
-  const del: DeleteActionCreator = (entityType, id, deletionSchema?: SelectorTreeSchema) => {
+  const del: DeleteActionCreator = (entityType, id, cascade?: SelectorTreeSchema) => {
     const action: DeleteAction = {
       type: DELETE,
       entityType,
       id,
-      deletionSchema,
+      cascade,
     };
 
     if (!schema.typeExists(entityType)) {

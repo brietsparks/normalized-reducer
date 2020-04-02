@@ -11,6 +11,7 @@ import {
   ActionCreators,
   DeleteAction,
   InvalidAction,
+  EntityTreeNode,
 } from './interfaces';
 
 import { Cardinalities } from './enums';
@@ -59,7 +60,33 @@ export default class Derivator<S extends State> {
 
     if (action.type === this.actionTypes.DELETE) {
       const deleteAction = action as DeleteAction;
-      const derivedActions = this.deriveDeleteActions(state, deleteAction);
+
+      // derive the actions that go along with deleting this entity
+      let derivedActions: (InvalidAction | DeleteAction | DetachAction)[] = [];
+
+      if (!deleteAction.cascade) {
+        derivedActions = this.deriveDeleteActions(state, deleteAction);
+      }
+
+      // if cascading deletion, then derive all those actions
+      if (deleteAction.cascade) {
+        const cascadeNodes: EntityTreeNode[] = this.selectors.getEntityTree(state, {
+          type: deleteAction.entityType,
+          id: deleteAction.id,
+          schema: deleteAction.cascade,
+        });
+
+        const cascadeActions: (InvalidAction | DeleteAction | DetachAction)[] = [];
+        cascadeNodes.forEach(({ id, type }) => {
+          const cascadeAction = this.actionCreators.delete(type, id);
+          if (cascadeAction.type === this.actionTypes.DELETE) {
+            const cascadeDeleteAction = cascadeAction as DeleteAction;
+            cascadeActions.push(...this.deriveDeleteActions(state, cascadeDeleteAction));
+          }
+        });
+
+        derivedActions.push(...cascadeActions);
+      }
 
       return {
         type: action.type,
@@ -131,7 +158,10 @@ export default class Derivator<S extends State> {
     return [action, relAttachAction, ...entityDetachments, ...relEntityDetachments];
   }
 
-  private deriveDeleteActions(state: S, action: DeleteAction) {
+  private deriveDeleteActions(
+    state: S,
+    action: DeleteAction
+  ): (InvalidAction | DeleteAction | DetachAction)[] {
     const { entityType, id } = action;
 
     const entitySchema = this.schema.type(entityType);

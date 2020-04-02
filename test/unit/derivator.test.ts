@@ -8,7 +8,7 @@ import {
   ForumState,
 } from '../../src/test-cases';
 
-import { DetachAction, DerivedAction, AttachAction } from '../../src';
+import { DetachAction, DerivedAction, AttachAction, DeleteAction } from '../../src';
 
 import Derivator from '../../src/derivator';
 
@@ -396,7 +396,7 @@ describe('unit/derivator', () => {
       expect(result).toEqual(expected);
     });
 
-    it('derives a removal action for an existing entity', () => {
+    it('derives a delete-action for an existing entity', () => {
       const state = {
         entities: {
           ...forumEmptyState.entities,
@@ -427,7 +427,7 @@ describe('unit/derivator', () => {
       expect(result).toEqual(expected);
     });
 
-    it('derives a removal action for a nonexistent entity', () => {
+    it('derives a delete-action for a nonexistent entity', () => {
       const action = {
         type: forumActionTypes.DELETE,
         entityType: 'post',
@@ -445,7 +445,7 @@ describe('unit/derivator', () => {
       expect(result).toEqual(expected);
     });
 
-    it('derives a detachment action for each attached entity', () => {
+    it('derives a detach-action for each attached entity', () => {
       const state: ForumState = {
         entities: {
           ...forumEmptyState.entities,
@@ -509,6 +509,249 @@ describe('unit/derivator', () => {
             id: 'o1.1',
             relation: 'parentId',
             detachableId: 'o1',
+          },
+        ],
+      };
+
+      expect(result).toEqual(expected);
+    });
+
+    it('derives delete-actions given a non-recursive deletion schema', () => {
+      const state: ForumState = {
+        entities: {
+          ...forumEmptyState.entities,
+          account: {
+            a1: { profileId: 'p1' },
+          },
+          profile: {
+            p1: { accountId: 'a1', postIds: ['o1'] },
+          },
+          post: {
+            o1: { profileId: 'p1', categoryIds: ['c1'] },
+          },
+          category: {
+            c1: { postIds: ['o1'] },
+          },
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          account: ['a1'],
+          profile: ['p1'],
+          post: ['o1'],
+          category: ['c1'],
+        },
+      };
+
+      const cascadeSchema = {
+        profileId: {
+          postIds: {},
+        },
+      };
+
+      const action = forumActionCreators.delete('account', 'a1', cascadeSchema);
+
+      const result = derivator.deriveAction(state, action) as DerivedAction<DeleteAction>;
+
+      const expected = {
+        type: forumActionTypes.DELETE,
+        original: action,
+        derived: [
+          // a1 (original action)
+          { type: forumActionTypes.DELETE, entityType: 'account', id: 'a1', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'profile',
+            id: 'p1',
+            relation: 'accountId',
+            detachableId: 'a1',
+          },
+
+          // p1
+          { type: forumActionTypes.DELETE, entityType: 'profile', id: 'p1', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'account',
+            id: 'a1',
+            relation: 'profileId',
+            detachableId: 'p1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1',
+            relation: 'profileId',
+            detachableId: 'p1',
+          },
+
+          // o1
+          { type: forumActionTypes.DELETE, entityType: 'post', id: 'o1', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'profile',
+            id: 'p1',
+            relation: 'postIds',
+            detachableId: 'o1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'category',
+            id: 'c1',
+            relation: 'postIds',
+            detachableId: 'o1',
+          },
+        ],
+      };
+
+      expect(result).toEqual(expected);
+    });
+
+    test('derives delete-actions given a recursive deletion schema', () => {
+      const state: ForumState = {
+        entities: {
+          ...forumEmptyState.entities,
+          profile: {
+            p1: { postIds: ['o1'] },
+          },
+          post: {
+            o1: {
+              profileId: 'p1',
+              childIds: ['o1.1'],
+            },
+            'o1.1': {
+              profileId: 'p1',
+              parentId: 'o1',
+              childIds: ['o1.1.1', 'o1.1.2'],
+              categoryIds: ['c1'],
+            },
+            'o1.1.1': {
+              profileId: 'p1',
+              parentId: 'o1.1',
+            },
+            'o1.1.2': {
+              profileId: 'p1',
+              parentId: 'o1.1',
+            },
+          },
+          category: {
+            c1: { postIds: ['o1'] },
+          },
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          profile: ['p1'],
+          post: ['o1', 'o1.1', 'o1.1.1', 'o1.1.2'],
+          category: ['c1'],
+        },
+      };
+
+      const postCascadeSchema = () => ({ childIds: postCascadeSchema });
+      const cascadeSchema = { postIds: postCascadeSchema };
+
+      const action = forumActionCreators.delete('profile', 'p1', cascadeSchema);
+
+      const result = derivator.deriveAction(state, action) as DerivedAction<DeleteAction>;
+
+      const expected = {
+        type: forumActionTypes.DELETE,
+        original: action,
+        derived: [
+          // p1
+          { type: forumActionTypes.DELETE, entityType: 'profile', id: 'p1', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1',
+            relation: 'profileId',
+            detachableId: 'p1',
+          },
+
+          // o1
+          { type: forumActionTypes.DELETE, entityType: 'post', id: 'o1', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'profile',
+            id: 'p1',
+            relation: 'postIds',
+            detachableId: 'o1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1.1',
+            relation: 'parentId',
+            detachableId: 'o1',
+          },
+
+          // o1.1
+          { type: forumActionTypes.DELETE, entityType: 'post', id: 'o1.1', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'profile',
+            id: 'p1',
+            relation: 'postIds',
+            detachableId: 'o1.1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'category',
+            id: 'c1',
+            relation: 'postIds',
+            detachableId: 'o1.1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1',
+            relation: 'childIds',
+            detachableId: 'o1.1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1.1.1',
+            relation: 'parentId',
+            detachableId: 'o1.1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1.1.2',
+            relation: 'parentId',
+            detachableId: 'o1.1',
+          },
+
+          // o1.1.1
+          { type: forumActionTypes.DELETE, entityType: 'post', id: 'o1.1.1', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'profile',
+            id: 'p1',
+            relation: 'postIds',
+            detachableId: 'o1.1.1',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1.1',
+            relation: 'childIds',
+            detachableId: 'o1.1.1',
+          },
+
+          // o1.1.2
+          { type: forumActionTypes.DELETE, entityType: 'post', id: 'o1.1.2', cascadeSchema: undefined },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'profile',
+            id: 'p1',
+            relation: 'postIds',
+            detachableId: 'o1.1.2',
+          },
+          {
+            type: forumActionTypes.DETACH,
+            entityType: 'post',
+            id: 'o1.1',
+            relation: 'childIds',
+            detachableId: 'o1.1.2',
           },
         ],
       };

@@ -80,7 +80,7 @@ export interface DeleteAction {
   type: string;
   entityType: string;
   id: Id;
-  deletionSchema?: SelectorTreeSchema;
+  cascade?: SelectorTreeSchema;
 }
 
 export interface UpdateAction {
@@ -178,7 +178,7 @@ export type DetachActionCreator = (
 export type DeleteActionCreator = (
   entityType: string,
   id: Id,
-  deletionSchema?: SelectorTreeSchema
+  cascade?: SelectorTreeSchema
 ) => DeleteAction | InvalidAction;
 
 export type CreateActionCreator = (
@@ -286,4 +286,4 @@ export type GetEntityTree<S extends State> = (
 ) => EntityTreeNode[];
 
 export type SelectorTreeSchema = { [relation: string]: SelectorTreeSchema } | (() => SelectorTreeSchema);
-export type EntityTreeNode = { id: Id; type: string; entity: object };
+export type EntityTreeNode = { id: Id; type: string; entity: Entity };
