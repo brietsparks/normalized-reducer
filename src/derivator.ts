@@ -2,7 +2,6 @@ import {
   Id,
   State,
   AnyAction,
-  DerivableAction,
   DerivedAction,
   ActionTypes,
   AttachAction,
@@ -20,13 +19,13 @@ import { ModelSchemaReader } from './schema';
 
 export default class Derivator<S extends State> {
   actionTypes: ActionTypes;
-  actionCreators: ActionCreators;
+  actionCreators: ActionCreators<S>;
   schema: ModelSchemaReader;
   selectors: Selectors<S>;
 
   constructor(
     actionTypes: ActionTypes,
-    actionCreators: ActionCreators,
+    actionCreators: ActionCreators<S>,
     schema: ModelSchemaReader,
     selectors: Selectors<S>
   ) {
@@ -98,7 +97,7 @@ export default class Derivator<S extends State> {
     return action;
   }
 
-  private deriveDetachActions(action: DetachAction): (DerivableAction | InvalidAction)[] {
+  private deriveDetachActions(action: DetachAction): (DetachAction | InvalidAction)[] {
     const { entityType, id, relation, detachableId } = action;
 
     const schema = this.schema.type(entityType);
@@ -115,7 +114,10 @@ export default class Derivator<S extends State> {
     return [action, reciprocalAction];
   }
 
-  private deriveAttachActions(state: S, action: AttachAction): (DerivableAction | InvalidAction)[] {
+  private deriveAttachActions(
+    state: S,
+    action: AttachAction
+  ): (AttachAction | DetachAction | InvalidAction)[] {
     const { entityType, id, relation, attachableId } = action;
 
     const schema = this.schema.type(entityType);

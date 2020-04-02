@@ -22,7 +22,7 @@ export interface ActionTypes {
   MOVE_ATTACHED: string;
   SORT: string;
   SORT_ATTACHED: string;
-  // SET_STATE: string;
+  SET_STATE: string;
   // SET_ALL_IDS: string;
   // SET_ALL_ENTITIES: string;
   // SET_IDS: string;
@@ -30,38 +30,34 @@ export interface ActionTypes {
   // SET_ENTITY: string;
 }
 
-export type DerivedAction<A extends DerivableAction = DerivableAction> = {
-  type: string;
-  original: A;
-  derived: DerivableAction[];
-};
-
 export interface AnyAction {
   type: string;
 }
 
-export type Action = ValidAction | InvalidAction;
+export type DerivedAction<A extends SingularAction = SingularAction> = {
+  type: string;
+  original: A;
+  derived: SingularAction[];
+};
 
 export interface InvalidAction {
   type: string;
   error: string;
-  action: ValidAction;
+  action: SingularAction;
 }
 
-export type ValidAction = SingularAction | BatchAction;
-
-export type SingularAction = NonDerivableAction | DerivableAction;
-
-export type NonDerivableAction = SetState;
-
-export type DerivableAction =
+export type SingularAction =
   | CreateAction
   | DeleteAction
   | UpdateAction
   | MoveAction
   | AttachAction
   | DetachAction
-  | MoveAttachedAction;
+  | MoveAttachedAction
+  | SortAction
+  | SortAttachedAction;
+
+export type StateSetterAction<S extends State> = SetStateAction<S>;
 
 export interface BatchAction {
   type: string;
@@ -139,14 +135,15 @@ export interface SortAttachedAction<T extends Entity = Entity> {
   compare: Compare<T>;
 }
 
-export interface SetState {
+export interface SetStateAction<S extends State> {
   type: string;
+  state: S;
 }
 
 //
 // action-creator types
 //
-export type ActionCreators = {
+export type ActionCreators<S extends State> = {
   batch: BatchActionCreator;
   attach: AttachActionCreator;
   detach: DetachActionCreator;
@@ -157,9 +154,10 @@ export type ActionCreators = {
   moveAttached: MoveAttachedActionCreator;
   sort: SortActionCreator;
   sortAttached: SortAttachedActionCreator;
+  setState: SetStateActionCreator<S>;
 };
 
-export type InvalidActionCreator = (action: ValidAction, error: string) => InvalidAction;
+export type InvalidActionCreator = (action: SingularAction, error: string) => InvalidAction;
 
 export type BatchActionCreator = (...actions: SingularAction[]) => BatchAction;
 
@@ -219,6 +217,8 @@ export type SortAttachedActionCreator = <T extends Entity = Entity>(
   relation: string,
   compare: Compare<T>
 ) => SortAction<T> | InvalidAction;
+
+export type SetStateActionCreator<S extends State> = (state: S) => SetStateAction<S>;
 
 //
 // state types

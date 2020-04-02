@@ -1,5 +1,4 @@
 import {
-  Action,
   ActionTypes,
   AnyAction,
   AttachAction,
@@ -32,13 +31,11 @@ export const makeReducer = <S extends State>(
   actionTypes: ActionTypes,
   actionUtils: ActionUtils
 ) => {
-  function rootReducer(state: S, anyAction: AnyAction) {
+  function rootReducer(state: S, action: AnyAction) {
     // if not handleable, then return state without changes
-    if (!actionUtils.isHandleable(anyAction)) {
+    if (!actionUtils.isHandleable(action)) {
       return state;
     }
-
-    let action = anyAction as Action;
 
     if (actionUtils.isBatch(action)) {
       // with a batch action, reduce iteratively
@@ -48,7 +45,7 @@ export const makeReducer = <S extends State>(
       }, state);
     } else {
       // with a singular action, reduce once
-      return singularReducer(state, action);
+      return singularReducer(state, action as SingularAction);
     }
   }
 

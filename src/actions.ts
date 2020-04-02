@@ -1,4 +1,5 @@
 import {
+  State,
   Namespaced,
   InvalidActionCreator,
   AttachActionCreator,
@@ -24,13 +25,15 @@ import {
   SortAttachedActionCreator,
   BatchActionCreator,
   SingularAction,
+  SortAction,
+  SetStateActionCreator,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
 import { UpdateActionMethod } from './enums';
 import { cleanData } from './validator';
 
-export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) => {
+export const makeActions = <S extends State>(schema: ModelSchemaReader, namespaced: Namespaced) => {
   const BATCH = namespaced('BATCH');
   const INVALID = namespaced('INVALID');
   const ATTACH = namespaced('ATTACH');
@@ -42,6 +45,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
   const MOVE_ATTACHED = namespaced('MOVE_ATTACHED');
   const SORT = namespaced('SORT');
   const SORT_ATTACHED = namespaced('SORT_ATTACHED');
+  const SET_STATE = namespaced('SET_STATE');
 
   const invalid: InvalidActionCreator = (action, error) => ({
     type: INVALID,
@@ -209,7 +213,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     };
 
     if (!schema.typeExists(entityType)) {
-      return invalid(action, messages.entityTypeDne(entityType));
+      return invalid(action as SortAction, messages.entityTypeDne(entityType));
     }
 
     return action;
@@ -240,6 +244,13 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     return action;
   };
 
+  const setState: SetStateActionCreator<S> = (state: S) => {
+    return {
+      type: SET_STATE,
+      state,
+    };
+  };
+
   const actionTypes = {
     BATCH,
     INVALID,
@@ -252,6 +263,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     MOVE_ATTACHED,
     SORT,
     SORT_ATTACHED,
+    SET_STATE,
   };
 
   const actionCreators = {
@@ -265,6 +277,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     moveAttached,
     sort,
     sortAttached,
+    setState,
   };
 
   const actionUtils = new ActionUtils(actionTypes);
