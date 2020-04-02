@@ -308,4 +308,8 @@ export class ActionUtils {
   isBatch(action: AnyAction) {
     return action.type === this.actionTypes.BATCH;
   }
+
+  isStateSetter(action: AnyAction) {
+    return action.type === this.actionTypes.SET_STATE;
+  }
 }

@@ -18,6 +18,7 @@ import {
   SortAttachedAction,
   State,
   UpdateAction,
+  SetStateAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
@@ -35,6 +36,12 @@ export const makeReducer = <S extends State>(
     // if not handleable, then return state without changes
     if (!actionUtils.isHandleable(action)) {
       return state;
+    }
+
+    if (actionUtils.isStateSetter(action)) {
+      if (action.type === actionTypes.SET_STATE) {
+        return (action as SetStateAction<S>).state;
+      }
     }
 
     if (actionUtils.isBatch(action)) {
