@@ -61,7 +61,7 @@ export type StateSetterAction<S extends State> = SetStateAction<S>;
 
 export interface BatchAction {
   type: string;
-  actions: SingularAction[];
+  actions: (SingularAction | InvalidAction)[];
 }
 
 export interface CreateAction {
@@ -159,7 +159,7 @@ export type ActionCreators<S extends State> = {
 
 export type InvalidActionCreator = (action: SingularAction, error: string) => InvalidAction;
 
-export type BatchActionCreator = (...actions: SingularAction[]) => BatchAction;
+export type BatchActionCreator = (...actions: (SingularAction | InvalidAction)[]) => BatchAction;
 
 export type AttachActionCreator = (
   entityType: string,
@@ -259,6 +259,8 @@ export type Cardinality = Cardinalities[keyof Cardinalities];
 export type Selectors<S extends State> = PublicSelectors<S> & InternalSelectors<S>;
 
 export interface PublicSelectors<S extends State> {
+  getIds: GetIds<S>;
+  getEntities: GetEntities<S>;
   getEntity: GetEntity<S>;
 }
 
@@ -267,6 +269,13 @@ export interface InternalSelectors<S extends State> {
   getAllAttachedIds: GetAllAttachedIds<S>;
   getEntityTree: GetEntityTree<S>;
 }
+
+export type GetIds<S extends State> = (state: S, args: { type: string }) => Id[];
+
+export type GetEntities<S extends State> = <E extends Entity>(
+  state: S,
+  args: { type: string }
+) => Record<Id, E>;
 
 export type GetEntity<S extends State> = <E extends Entity>(
   state: S,

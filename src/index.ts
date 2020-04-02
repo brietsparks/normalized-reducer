@@ -26,5 +26,6 @@ const makeModule = <T extends State>(schema: ModelSchema, namespaced: Namespaced
 };
 
 export * from './interfaces';
+export * from './enums';
 
 export default makeModule;

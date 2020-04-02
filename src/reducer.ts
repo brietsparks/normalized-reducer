@@ -14,6 +14,7 @@ import {
   MoveAction,
   MoveAttachedAction,
   SingularAction,
+  InvalidAction,
   SortAction,
   SortAttachedAction,
   State,
@@ -32,7 +33,7 @@ export const makeReducer = <S extends State>(
   actionTypes: ActionTypes,
   actionUtils: ActionUtils
 ) => {
-  function rootReducer(state: S, action: AnyAction) {
+  function rootReducer(state: S = schema.getEmptyState(), action: AnyAction) {
     // if not handleable, then return state without changes
     if (!actionUtils.isHandleable(action)) {
       return state;
@@ -47,7 +48,7 @@ export const makeReducer = <S extends State>(
     if (actionUtils.isBatch(action)) {
       // with a batch action, reduce iteratively
       const batchAction = action as BatchAction;
-      return batchAction.actions.reduce((prevState: S, action: SingularAction) => {
+      return batchAction.actions.reduce((prevState: S, action: SingularAction | InvalidAction) => {
         return singularReducer(prevState, action);
       }, state);
     } else {
@@ -56,13 +57,19 @@ export const makeReducer = <S extends State>(
     }
   }
 
-  function singularReducer(state: S, action: SingularAction): S {
+  function singularReducer(state: S, action: SingularAction | InvalidAction): S {
+    if (action.type === actionTypes.INVALID) {
+      return state;
+    }
+
+    const singularAction = action as SingularAction;
+
     let actions: SingularAction[];
-    if (actionUtils.isDerivable(action)) {
-      const derivedAction = derivator.deriveAction(state, action) as DerivedAction;
+    if (actionUtils.isDerivable(singularAction)) {
+      const derivedAction = derivator.deriveAction(state, singularAction) as DerivedAction;
       actions = derivedAction.derived;
     } else {
-      actions = [action];
+      actions = [singularAction];
     }
 
     return actions.reduce((prevState: S, action: SingularAction) => {

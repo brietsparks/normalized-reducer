@@ -6,8 +6,46 @@ import { Id } from '../../src';
 const forumSelectors = makeSelectors(forumModelSchemaReader);
 
 describe('unit/selectors', () => {
+  const state = {
+    entities: {
+      ...forumEmptyState.entities,
+      post: {
+        o1: {},
+        o2: {},
+      },
+    },
+    ids: {
+      ...forumEmptyState.ids,
+      post: ['o1', 'o2'],
+    },
+  };
+
+  describe('getIds', () => {
+    it('returns an empty array if the type does not exist in the schema', () => {
+      const result = forumSelectors.getIds(state, { type: 'chicken' });
+      expect(result).toEqual([]);
+    });
+
+    it('returns the id collection of an entity type', () => {
+      const result = forumSelectors.getIds(state, { type: 'post' });
+      expect(result).toEqual(['o1', 'o2']);
+    });
+  });
+
+  describe('getEntities', () => {
+    it('returns an empty object literal if the type does not exist in the schema', () => {
+      const result = forumSelectors.getEntities(state, { type: 'chicken' });
+      expect(result).toEqual({});
+    });
+
+    it('returns the entity collection of an entity type', () => {
+      const result = forumSelectors.getEntities(state, { type: 'post' });
+      expect(result).toEqual({ o1: {}, o2: {} });
+    });
+  });
+
   describe('getEntity', () => {
-    it('returns undefined if the type does not exist', () => {
+    it('returns undefined if the type does not exist in the schema', () => {
       const state = {
         entities: {
           chicken: {
@@ -23,6 +61,11 @@ describe('unit/selectors', () => {
         id: 'c1',
       });
 
+      expect(result).toEqual(undefined);
+    });
+
+    it('returns undefined if the entity does not exist in state', () => {
+      const result = forumSelectors.getEntity(state, { type: 'post', id: 'p900' });
       expect(result).toEqual(undefined);
     });
 

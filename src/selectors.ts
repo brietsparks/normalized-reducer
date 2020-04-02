@@ -11,14 +11,41 @@ import {
   InternalSelectors,
 } from './interfaces';
 
+const emptyIds: Id[] = [];
+const emptyEntities = {};
+
 export const makeSelectors = <S extends State>(schema: ModelSchemaReader): Selectors<S> => {
+  const getIds = (state: S, args: { type: string }): Id[] => {
+    const typeExists = schema.typeExists(args.type);
+    if (!typeExists) {
+      return emptyIds;
+    }
+
+    const ids = state.ids[args.type] as Id[];
+
+    return ids || emptyIds;
+  };
+
+  const getEntities = <E extends Entity>(state: S, args: { type: string }): Record<Id, E> => {
+    const typeExists = schema.typeExists(args.type);
+    if (!typeExists) {
+      return emptyEntities;
+    }
+
+    const entities = state.entities[args.type];
+
+    return (entities || emptyEntities) as Record<Id, E>;
+  };
+
   const getEntity = <E extends Entity>(state: S, args: { type: string; id: Id }): E | undefined => {
     const typeExists = schema.typeExists(args.type);
     if (!typeExists) {
       return undefined;
     }
 
-    return state.entities[args.type][args.id] as E;
+    const entities = getEntities<E>(state, args);
+
+    return entities[args.id] as E;
   };
 
   const getAttached = <E extends Id[] | Id>(
@@ -141,6 +168,8 @@ export const makeSelectors = <S extends State>(schema: ModelSchemaReader): Selec
   };
 
   return {
+    getIds,
+    getEntities,
     getEntity,
     getAttached,
     getAllAttachedIds,
@@ -149,8 +178,13 @@ export const makeSelectors = <S extends State>(schema: ModelSchemaReader): Selec
 };
 
 export const getPublicSelectors = <S extends State>(selectors: Selectors<S>): PublicSelectors<S> => {
-  const { getEntity } = selectors;
-  return { getEntity };
+  const { getIds, getEntities, getEntity } = selectors;
+
+  return {
+    getIds,
+    getEntities,
+    getEntity,
+  };
 };
 
 export const getInternalSelectors = <S extends State>(selectors: Selectors<S>): InternalSelectors<S> => {
