@@ -22,6 +22,8 @@ import {
   Entity,
   Compare,
   SortAttachedActionCreator,
+  BatchActionCreator,
+  SingularAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
@@ -45,6 +47,11 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
     type: INVALID,
     error,
     action,
+  });
+
+  const batch: BatchActionCreator = (...actions: SingularAction[]) => ({
+    type: BATCH,
+    actions,
   });
 
   const attach: AttachActionCreator = (entityType, id, relation, relatedId, options = {}) => {
@@ -248,6 +255,7 @@ export const makeActions = (schema: ModelSchemaReader, namespaced: Namespaced) =
   };
 
   const actionCreators = {
+    batch,
     attach,
     detach,
     delete: del,

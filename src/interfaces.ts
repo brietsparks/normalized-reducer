@@ -147,6 +147,7 @@ export interface SetState {
 // action-creator types
 //
 export type ActionCreators = {
+  batch: BatchActionCreator;
   attach: AttachActionCreator;
   detach: DetachActionCreator;
   delete: DeleteActionCreator;
@@ -159,6 +160,8 @@ export type ActionCreators = {
 };
 
 export type InvalidActionCreator = (action: ValidAction, error: string) => InvalidAction;
+
+export type BatchActionCreator = (...actions: SingularAction[]) => BatchAction;
 
 export type AttachActionCreator = (
   entityType: string,
