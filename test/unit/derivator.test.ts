@@ -13,9 +13,7 @@ import { DetachAction, DerivedAction, AttachAction, DeleteAction } from '../../s
 import Derivator from '../../src/derivator';
 
 describe('unit/derivator', () => {
-  // do a type-assertion so that we can pass in the variables that
-  // implement their internal interfaces
-  const derivator = new Derivator(
+  const derivator = new Derivator<ForumState>(
     forumActionTypes,
     forumActionCreators,
     forumModelSchemaReader,

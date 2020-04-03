@@ -27,6 +27,7 @@ import {
   SingularAction,
   SortAction,
   SetStateActionCreator,
+  InvalidAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
@@ -53,7 +54,7 @@ export const makeActions = <S extends State>(schema: ModelSchemaReader, namespac
     action,
   });
 
-  const batch: BatchActionCreator = (...actions: SingularAction[]) => ({
+  const batch: BatchActionCreator = (...actions: (SingularAction | InvalidAction)[]) => ({
     type: BATCH,
     actions,
   });

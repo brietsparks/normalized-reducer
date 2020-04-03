@@ -7,14 +7,14 @@ import { makeReducer } from './reducer';
 
 const defaultNamespaced = (actionType: string) => `normalized/${actionType}`;
 
-const makeModule = <T extends State>(schema: ModelSchema, namespaced: Namespaced = defaultNamespaced) => {
+const makeModule = <S extends State>(schema: ModelSchema, namespaced: Namespaced = defaultNamespaced) => {
   const schemaReader = new ModelSchemaReader(schema);
-  const { actionTypes, actionCreators, actionUtils } = makeActions(schemaReader, namespaced);
-  const allSelectors = makeSelectors(schemaReader);
-  const selectors = getPublicSelectors(allSelectors);
-  const emptyState = schemaReader.getEmptyState<T>();
-  const derivator = new Derivator(actionTypes, actionCreators, schemaReader, allSelectors);
-  const reducer = makeReducer(schemaReader, derivator, actionTypes, actionUtils);
+  const { actionTypes, actionCreators, actionUtils } = makeActions<S>(schemaReader, namespaced);
+  const allSelectors = makeSelectors<S>(schemaReader);
+  const selectors = getPublicSelectors<S>(allSelectors);
+  const emptyState = schemaReader.getEmptyState<S>();
+  const derivator = new Derivator<S>(actionTypes, actionCreators, schemaReader, allSelectors);
+  const reducer = makeReducer<S>(schemaReader, derivator, actionTypes, actionUtils);
 
   return {
     emptyState,
