@@ -1,11 +1,12 @@
 import { forumActionCreators, forumEmptyState, forumReducer, ForumState } from '../../src/test-cases';
-import { UpdateActionMethod } from '../../src/enums';
+import { UpdateActionMethod } from '../../src';
 
 describe('integration/update', () => {
   /*
   update an entity via patch
   update an entity via put
   update an entity with omitted relational data
+  updating an entity via put does not replace relational data
 
   if no such entity type, then no change
   if entity not found, then no change
@@ -120,6 +121,69 @@ describe('integration/update', () => {
       profileId: 'p1',
       categoryIds: ['c1'],
     });
+    const nextState = forumReducer(state, action);
+    expect(nextState).toEqual(expectedNextState);
+  });
+
+  test('updating an entity via put does not replace relational data', () => {
+    const state: ForumState = {
+      entities: {
+        ...forumEmptyState.entities,
+        profile: {
+          p1: { postIds: ['o1'] },
+        },
+        post: {
+          o1: {
+            profileId: 'o1',
+            categoryIds: ['c1'],
+            title: 'first post',
+            body: 'lorem ipsum',
+          },
+        },
+        category: {
+          c1: { postIds: ['o1'] },
+        },
+      },
+      ids: {
+        ...forumEmptyState.ids,
+        profile: ['p1'],
+        post: ['o1'],
+        category: ['c1'],
+      },
+    };
+
+    const expectedNextState = {
+      entities: {
+        ...forumEmptyState.entities,
+        profile: {
+          p1: { postIds: ['o1'] },
+        },
+        post: {
+          o1: {
+            profileId: 'o1',
+            categoryIds: ['c1'],
+            body: 'the sky is falling',
+          },
+        },
+        category: {
+          c1: { postIds: ['o1'] },
+        },
+      },
+      ids: {
+        ...forumEmptyState.ids,
+        profile: ['p1'],
+        post: ['o1'],
+        category: ['c1'],
+      },
+    };
+
+    const action = forumActionCreators.update(
+      'post',
+      'o1',
+      { body: 'the sky is falling' },
+      { method: UpdateActionMethod.PUT }
+    );
+
     const nextState = forumReducer(state, action);
     expect(nextState).toEqual(expectedNextState);
   });

@@ -11,21 +11,21 @@ import {
   Entity,
   Id,
   IdsByType,
+  InvalidAction,
   MoveAction,
   MoveAttachedAction,
+  SetStateAction,
   SingularAction,
-  InvalidAction,
   SortAction,
   SortAttachedAction,
   State,
   UpdateAction,
-  SetStateAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
 import { ActionUtils } from './actions';
 import { Cardinalities, UpdateActionMethod } from './enums';
-import { arrayPut, arrayMove } from './util';
+import { arrayMove, arrayPut } from './util';
 
 export const makeReducer = <S extends State>(
   schema: ModelSchemaReader,
@@ -266,8 +266,26 @@ export const makeReducer = <S extends State>(
         return state; // if entity not found, then no change
       }
 
-      // todo: fix PUT so that it does not overwrite relational data
-      const newEntity = method === UpdateActionMethod.PUT ? data : { ...entity, ...data };
+      let newEntity = { ...entity };
+
+      if (method === UpdateActionMethod.PUT) {
+        // extract the current relational data, so we have a copy of it and it won't get overwritten
+        const relationKeys = schema.type(entityType).getRelationKeys();
+        const relationalData = relationKeys.reduce((relationalData, relationKey) => {
+          if (entity[relationKey]) {
+            relationalData[relationKey] = entity[relationKey];
+          }
+          return relationalData;
+        }, {} as { [k: string]: Id | Id[] });
+
+        // replace the current entity with the update data and the relational data
+        newEntity = { ...data, ...relationalData };
+      }
+
+      if (method === UpdateActionMethod.PATCH) {
+        // merge the update data with the current data
+        newEntity = { ...entity, ...data };
+      }
 
       return {
         ...state,
