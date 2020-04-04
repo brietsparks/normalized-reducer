@@ -130,7 +130,7 @@ export interface SortAction<T extends Entity = Entity> {
 export interface SortAttachedAction<T extends Entity = Entity> {
   type: string;
   entityType: string;
-  id: string;
+  id: Id;
   relation: string;
   compare: Compare<T>;
 }
@@ -165,7 +165,7 @@ export type AttachActionCreator = (
   entityType: string,
   id: Id,
   relation: string,
-  relatedId: Id,
+  attachableId: Id,
   options?: { index?: number; reciprocalIndex?: number }
 ) => AttachAction | InvalidAction;
 
@@ -173,7 +173,7 @@ export type DetachActionCreator = (
   entityType: string,
   id: Id,
   relation: string,
-  relatedId: Id
+  detachableId: Id
 ) => DetachAction | InvalidAction;
 
 export type DeleteActionCreator = (
@@ -213,7 +213,7 @@ export type SortActionCreator = <T extends Entity = Entity>(
 
 export type SortAttachedActionCreator = <T extends Entity = Entity>(
   entityType: string,
-  id: string,
+  id: Id,
   relation: string,
   compare: Compare<T>
 ) => SortAction<T> | InvalidAction;
@@ -230,19 +230,19 @@ export type State = {
 };
 export type IdsByType = { [type: string]: Id[] };
 export type EntitiesByType = { [type: string]: Entities };
-export type Entities = { [id: string]: object };
+export type Entities = { [id in Id]: object };
 export type Entity = { [k: string]: any };
 
 //
 // schema types
 //
 
-export interface ModelSchema {
+export interface Schema {
   [type: string]: EntitySchema;
 }
 
 export interface EntitySchema {
-  [type: string]: RelationSchema;
+  [relationKey: string]: RelationSchema;
 }
 
 export type RelationSchema = {

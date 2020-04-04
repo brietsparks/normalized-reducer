@@ -1,9 +1,9 @@
 import { ModelSchemaReader } from './schema';
 import { isObjectLiteral } from './util';
-import { ModelSchema } from './interfaces';
+import { Schema } from './interfaces';
 import { Cardinalities } from './enums';
 
-export const validateSchema = (schema: ModelSchema) => {
+export const validateSchema = (schema: Schema) => {
   if (!isObjectLiteral(schema)) {
     throw new Error('schema must be an object literal');
   }

@@ -1,11 +1,11 @@
-import { ModelSchema, EntitySchema, RelationSchema, EntitiesByType, IdsByType, State } from './interfaces';
+import { Schema, EntitySchema, RelationSchema, EntitiesByType, IdsByType, State } from './interfaces';
 
 import { Cardinalities } from './enums';
 
 import { validateSchema } from './validator';
 
 export class ModelSchemaReader {
-  schema: ModelSchema;
+  schema: Schema;
   entitySchemaReaders: Record<string, EntitySchemaReader>;
 
   // singleton values
@@ -13,7 +13,7 @@ export class ModelSchemaReader {
   private emptyEntitiesByTypeState?: EntitiesByType;
   private emptyIdsByTypeState?: IdsByType;
 
-  constructor(schema: ModelSchema) {
+  constructor(schema: Schema) {
     validateSchema(schema);
 
     this.schema = schema;

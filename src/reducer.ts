@@ -266,6 +266,7 @@ export const makeReducer = <S extends State>(
         return state; // if entity not found, then no change
       }
 
+      // todo: fix PUT so that it does not overwrite relational data
       const newEntity = method === UpdateActionMethod.PUT ? data : { ...entity, ...data };
 
       return {

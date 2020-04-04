@@ -1,4 +1,5 @@
 import {
+  Id,
   State,
   Namespaced,
   InvalidActionCreator,
@@ -59,13 +60,13 @@ export const makeActions = <S extends State>(schema: ModelSchemaReader, namespac
     actions,
   });
 
-  const attach: AttachActionCreator = (entityType, id, relation, relatedId, options = {}) => {
+  const attach: AttachActionCreator = (entityType, id, relation, attachableId, options = {}) => {
     const action: AttachAction = {
       type: ATTACH,
       entityType,
       id,
       relation,
-      attachableId: relatedId,
+      attachableId,
       index: options.index,
       reciprocalIndex: options.reciprocalIndex,
     };
@@ -81,13 +82,13 @@ export const makeActions = <S extends State>(schema: ModelSchemaReader, namespac
     return action;
   };
 
-  const detach: DetachActionCreator = (entityType, id, relation, relatedId) => {
+  const detach: DetachActionCreator = (entityType, id, relation, detachableId) => {
     const action: DetachAction = {
       type: DETACH,
       entityType,
       id,
       relation,
-      detachableId: relatedId,
+      detachableId,
     };
 
     if (!schema.typeExists(entityType)) {
@@ -222,7 +223,7 @@ export const makeActions = <S extends State>(schema: ModelSchemaReader, namespac
 
   const sortAttached: SortAttachedActionCreator = <T extends Entity = Entity>(
     entityType: string,
-    id: string,
+    id: Id,
     relation: string,
     compare: Compare<T>
   ) => {

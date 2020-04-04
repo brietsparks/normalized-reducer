@@ -1,4 +1,4 @@
-import makeModule, { Id, ModelSchema } from './index';
+import makeNormalizedSlice, { Id, Schema } from './index';
 import { ModelSchemaReader } from './schema';
 import { makeSelectors } from './selectors';
 
@@ -78,7 +78,7 @@ account ---- profile ---< post >--< category
 
 */
 
-export const forumSchema: ModelSchema = {
+export const forumSchema: Schema = {
   account: {
     profileId: {
       type: ForumEntities.PROFILE,
@@ -149,6 +149,6 @@ export const {
   reducer: forumReducer,
   selectors: forumSelectors,
   actionTypes: forumActionTypes,
-} = makeModule<ForumState>(forumSchema);
+} = makeNormalizedSlice<ForumState>(forumSchema);
 
 export const allForumSelectors = makeSelectors<ForumState>(forumModelSchemaReader);

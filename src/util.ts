@@ -31,4 +31,4 @@ export const isObjectLiteral = (v: any): v is object => {
   return typeof v === 'object' && v !== null && !Array.isArray(v) && typeof v !== 'function';
 };
 
-export const defaultNamespaced = (actionType: string) => `relational/${actionType}`;
+export const defaultNamespaced = (actionType: string) => `normalized/${actionType}`;
