@@ -1,5 +1,6 @@
 {
   "include": ["src", "types"],
+  "exclude": ["./src/test-cases.ts"],
   "compilerOptions": {
     "module": "esnext",
     "lib": ["dom", "esnext"],
