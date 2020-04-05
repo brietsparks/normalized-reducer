@@ -1,5 +1,5 @@
 import { Profile, ForumState, forumEmptyState, forumModelSchemaReader } from '../../src/test-cases';
-import { makeSelectors } from '../../src/selectors';
+import { makeSelectors, getInternalSelectors, getPublicSelectors } from '../../src/selectors';
 
 import { Id } from '../../src';
 
@@ -384,5 +384,74 @@ describe('unit/selectors', () => {
 
       expect(result).toEqual(expected);
     });
+
+    it('omits nodes of nonexistent resources', () => {
+      const state: ForumState = {
+        entities: {
+          ...forumEmptyState.entities,
+          profile: {
+            p1: { postIds: ['o1', 'o2', 'o3'] },
+          },
+          post: {
+            o1: { profileId: 'p1' },
+            o3: { profileId: 'p1' },
+          },
+        },
+        ids: {
+          ...forumEmptyState.ids,
+          profile: ['p1'],
+          post: ['o1', 'o3'],
+        },
+      };
+
+      const schema = { postIds: {} };
+      const result = forumSelectors.getEntityTree(state, { type: 'profile', id: 'p1', schema });
+
+      const expected = [
+        { id: 'p1', type: 'profile', entity: { postIds: ['o1', 'o2', 'o3'] } },
+        { id: 'o1', type: 'post', entity: { profileId: 'p1' } },
+        { id: 'o3', type: 'post', entity: { profileId: 'p1' } },
+      ];
+
+      expect(result).toEqual(expected);
+    });
+
+    const state: ForumState = {
+      entities: {
+        ...forumEmptyState.entities,
+        profile: { p1: { postIds: ['o1'] } },
+        post: { o1: { profileId: 'p1' } },
+      },
+      ids: {
+        ...forumEmptyState.ids,
+        profile: ['p1'],
+        post: ['o1'],
+      },
+    };
+    it('returns an empty array if the entity type does not exist', () => {
+      const result = forumSelectors.getEntityTree(state, { type: 'chicken', id: 'p1', schema: { post: {} } });
+      expect(result).toEqual([]);
+    });
+
+    it('returns an empty array if the entity does not exist', () => {
+      const result = forumSelectors.getEntityTree(state, {
+        type: 'profile',
+        id: 'p900',
+        schema: { post: {} },
+      });
+      expect(result).toEqual([]);
+    });
+  });
+
+  test('getPublicSelectors', () => {
+    const result = getPublicSelectors(forumSelectors);
+    const { getIds, getEntities, getEntity } = forumSelectors;
+    expect(result).toEqual({ getIds, getEntities, getEntity });
+  });
+
+  test('getInternalSelectors', () => {
+    const result = getInternalSelectors(forumSelectors);
+    const { getEntityTree, getAllAttachedIds, getAttached } = forumSelectors;
+    expect(result).toEqual({ getEntityTree, getAllAttachedIds, getAttached });
   });
 });

@@ -175,15 +175,6 @@ export class EntitySchemaReader {
     return this.modelSchemaReader.type(relationType).getRelationCardinality(relationReciprocalKey);
   }
 
-  relationDataIsValid(rel: string, data: any) {
-    const cardinality = this.getRelationCardinality(rel);
-
-    return (
-      (cardinality === Cardinalities.MANY && (data === undefined || Array.isArray(data))) ||
-      (cardinality === Cardinalities.ONE && (data === undefined || typeof data === 'string'))
-    );
-  }
-
   getRelationKeys() {
     return Object.keys(this.schema);
   }

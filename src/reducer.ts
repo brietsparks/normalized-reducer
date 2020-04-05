@@ -58,10 +58,6 @@ export const makeReducer = <S extends State>(
   }
 
   function singularReducer(state: S, action: SingularAction | InvalidAction): S {
-    if (action.type === actionTypes.INVALID) {
-      return state;
-    }
-
     const singularAction = action as SingularAction;
 
     let actions: SingularAction[];
@@ -72,6 +68,7 @@ export const makeReducer = <S extends State>(
       actions = [singularAction];
     }
 
+    // reduce [action]
     return actions.reduce((prevState: S, action: SingularAction) => {
       // sort has to be handled here because it needs both slices
       if (action.type === actionTypes.SORT) {
@@ -115,12 +112,12 @@ export const makeReducer = <S extends State>(
       return state;
     }
 
+    if (!schema.typeExists(action.entityType)) {
+      return state; // if no such entityType, then no change
+    }
+
     if (action.type === actionTypes.DETACH) {
       const { entityType, id, detachableId, relation } = action as DetachAction;
-
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
 
       const entity = state[entityType][id] as Entity;
       if (!entity) {
@@ -169,10 +166,6 @@ export const makeReducer = <S extends State>(
     if (action.type === actionTypes.ATTACH) {
       const { entityType, id, attachableId, relation, index } = action as AttachAction;
 
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
-
       const entity = state[entityType][id] as Entity;
       if (!entity) {
         return state; // if entity not found, then no change
@@ -215,10 +208,6 @@ export const makeReducer = <S extends State>(
     if (action.type === actionTypes.DELETE) {
       const { entityType, id } = action as DeleteAction;
 
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
-
       const entity = state[entityType][id] as Entity;
       if (!entity) {
         return state; // if entity not found, then no change
@@ -236,10 +225,6 @@ export const makeReducer = <S extends State>(
     if (action.type === actionTypes.CREATE) {
       const { entityType, id, data } = action as CreateAction;
 
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
-
       const entity = state[entityType][id] as Entity;
       if (entity) {
         return state; // if entity exists, then no change
@@ -256,10 +241,6 @@ export const makeReducer = <S extends State>(
 
     if (action.type === actionTypes.UPDATE) {
       const { entityType, id, data, method } = action as UpdateAction;
-
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
 
       const entity = state[entityType][id] as Entity;
       if (!entity) {
@@ -299,10 +280,6 @@ export const makeReducer = <S extends State>(
     if (action.type === actionTypes.MOVE_ATTACHED) {
       const { entityType, id, relation, src, dest } = action as MoveAttachedAction;
 
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
-
       const entity = state[entityType][id] as Entity;
       if (!entity) {
         return state; // if entity not found, then no change
@@ -339,10 +316,6 @@ export const makeReducer = <S extends State>(
 
     if (action.type === actionTypes.SORT_ATTACHED) {
       const { entityType, id, relation, compare } = action as SortAttachedAction;
-
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
 
       const entity = state[entityType][id] as Entity;
       if (!entity) {
@@ -399,12 +372,12 @@ export const makeReducer = <S extends State>(
       return state;
     }
 
+    if (!schema.typeExists(action.entityType)) {
+      return state; // if no such entityType, then no change
+    }
+
     if (action.type === actionTypes.DELETE) {
       const { entityType, id } = action as DeleteAction;
-
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
 
       const idsOfEntity = state[entityType].filter(existingId => existingId !== id);
 
@@ -416,10 +389,6 @@ export const makeReducer = <S extends State>(
 
     if (action.type === actionTypes.CREATE) {
       const { entityType, id, index } = action as CreateAction;
-
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
 
       // this O(n) operation can be improved if existence is checked
       // in an O(c) lookup against the entities slice from one level up,
@@ -436,10 +405,6 @@ export const makeReducer = <S extends State>(
 
     if (action.type === actionTypes.MOVE) {
       const { entityType, src, dest } = action as MoveAction;
-
-      if (!schema.typeExists(entityType)) {
-        return state; // if no such entityType, then no change
-      }
 
       return {
         ...state,

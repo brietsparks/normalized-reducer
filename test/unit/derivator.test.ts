@@ -8,7 +8,7 @@ import {
   ForumState,
 } from '../../src/test-cases';
 
-import { DetachAction, DerivedAction, AttachAction, DeleteAction } from '../../src';
+import { DetachAction, DerivedAction, AttachAction, DeleteAction, MoveAction } from '../../src';
 
 import Derivator from '../../src/derivator';
 
@@ -44,7 +44,7 @@ describe('unit/derivator', () => {
       ],
     };
 
-    test('it derives the detachment of two attached entities', () => {
+    it('derives the detachment of two attached entities', () => {
       const state: ForumState = {
         entities: {
           ...forumEmptyState.entities,
@@ -67,7 +67,7 @@ describe('unit/derivator', () => {
       expect(derivedAction).toEqual(expectedDerivedAction);
     });
 
-    it('if the entity exists but not the attached entity, it still derives both detachments', () => {
+    test('if the entity exists but not the attached entity, it still derives both detachments', () => {
       const state: ForumState = {
         entities: {
           ...forumEmptyState.entities,
@@ -90,6 +90,44 @@ describe('unit/derivator', () => {
       const derivedAction = derivator.deriveAction(forumEmptyState, action);
 
       expect(derivedAction).toEqual(expectedDerivedAction);
+    });
+
+    test('if the relation type does not exist, it derives a single detachment (no reciprocal detachment)', () => {
+      const action: DetachAction = {
+        type: forumActionTypes.DETACH,
+        entityType: ForumEntities.PROFILE,
+        id: 'p1',
+        relation: 'chicken',
+        detachableId: 'c1',
+      };
+
+      const derivedAction = derivator.deriveAction(forumEmptyState, action);
+
+      expect(derivedAction).toEqual({
+        type: forumActionTypes.DETACH,
+        original: action,
+        derived: [action],
+      });
+    });
+
+    test('if the reciprocal key does not exist, it derives a single detachment (no reciprocal detachment)', () => {
+      // no reciprocal key can be resolved for this action
+      // because a post has multiple relation keys pointing to post
+      const action: DetachAction = {
+        type: forumActionTypes.DETACH,
+        entityType: ForumEntities.POST,
+        id: 'p1',
+        relation: 'post',
+        detachableId: 'p10',
+      };
+
+      const derivedAction = derivator.deriveAction(forumEmptyState, action);
+
+      expect(derivedAction).toEqual({
+        type: forumActionTypes.DETACH,
+        original: action,
+        derived: [action],
+      });
     });
   });
 
@@ -755,6 +793,21 @@ describe('unit/derivator', () => {
       };
 
       expect(result).toEqual(expected);
+    });
+  });
+
+  describe('given any other action', () => {
+    it('returns the action as-is', () => {
+      const action: MoveAction = {
+        type: forumActionTypes.MOVE,
+        entityType: 'post',
+        src: 3,
+        dest: 1,
+      };
+
+      const result = derivator.deriveAction(forumEmptyState, action);
+
+      expect(result).toEqual(action);
     });
   });
 });

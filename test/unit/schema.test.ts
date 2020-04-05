@@ -1,5 +1,5 @@
 import { forumModelSchemaReader } from '../../src/test-cases';
-import { Cardinalities } from '../../src/enums';
+import { Cardinalities } from '../../src';
 
 describe('unit/schema', () => {
   describe('entity schema', () => {

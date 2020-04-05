@@ -24,7 +24,7 @@ export const validateSchema = (schema: Schema) => {
 
       if (!schema.hasOwnProperty(relSchema.type)) {
         throw new Error(
-          `schema of type "${type}" relation "${rel}" relates to type "${relSchema.type}", but type "${relSchema.type}" does not have an type schema of its own`
+          `schema of type "${type}" relation "${rel}" relates to type "${relSchema.type}", but type "${relSchema.type}" does not have an entity schema of its own`
         );
       }
 
