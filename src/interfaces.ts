@@ -6,9 +6,9 @@ export type Namespaced = (actionType: string) => string;
 
 export type Compare<T extends Entity = Entity> = (a: T, b: T) => number;
 
-export interface AnyAction {
-  type: string;
-}
+export type Reducer<S extends State> = (state: S, action: Action<S>) => S;
+
+export type Action<S extends State> = SingularAction | InvalidAction | BatchAction | StateSetterAction<S>;
 
 export interface ActionTypes {
   INVALID: string;

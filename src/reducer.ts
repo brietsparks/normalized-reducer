@@ -20,6 +20,7 @@ import {
   SortAttachedAction,
   State,
   UpdateAction,
+  Reducer,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import Derivator from './derivator';
@@ -33,7 +34,7 @@ export const makeReducer = <S extends State>(
   actionTypes: ActionTypes,
   actionUtils: ActionUtils
 ) => {
-  function rootReducer(state: S = schema.getEmptyState(), action: AnyAction) {
+  const rootReducer: Reducer<S> = (state: S = schema.getEmptyState(), action: AnyAction): S => {
     // if not handleable, then return state without changes
     if (!actionUtils.isHandleable(action)) {
       return state;
@@ -55,7 +56,7 @@ export const makeReducer = <S extends State>(
       // with a singular action, reduce once
       return singularReducer(state, action as SingularAction);
     }
-  }
+  };
 
   function singularReducer(state: S, action: SingularAction | InvalidAction): S {
     const singularAction = action as SingularAction;
