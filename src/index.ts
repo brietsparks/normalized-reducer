@@ -27,5 +27,6 @@ const makeNormalizedSlice = <S extends State>(schema: Schema, namespaced: Namesp
 
 export * from './interfaces';
 export * from './enums';
+export * from './normalizr';
 
 export default makeNormalizedSlice;
