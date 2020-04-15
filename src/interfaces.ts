@@ -121,18 +121,18 @@ export interface MoveAttachedAction {
   dest: number;
 }
 
-export interface SortAction<T extends Entity = Entity> {
+export interface SortAction {
   type: string;
   entityType: string;
-  compare: Compare<T>;
+  compare: Compare;
 }
 
-export interface SortAttachedAction<T extends Entity = Entity> {
+export interface SortAttachedAction {
   type: string;
   entityType: string;
   id: Id;
   relation: string;
-  compare: Compare<T>;
+  compare: Compare;
 }
 
 export interface SetStateAction<S extends State> {
@@ -209,14 +209,14 @@ export type MoveAttachedActionCreator = (
 export type SortActionCreator = <T extends Entity = Entity>(
   entityType: string,
   compare: Compare<T>
-) => SortAction<T> | InvalidAction;
+) => SortAction | InvalidAction;
 
 export type SortAttachedActionCreator = <T extends Entity = Entity>(
   entityType: string,
   id: Id,
   relation: string,
   compare: Compare<T>
-) => SortAction<T> | InvalidAction;
+) => SortAction | InvalidAction;
 
 export type SetStateActionCreator<S extends State> = (state: S) => SetStateAction<S>;
 

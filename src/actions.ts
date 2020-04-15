@@ -29,6 +29,7 @@ import {
   SortAction,
   SetStateActionCreator,
   InvalidAction,
+  SortAttachedAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
@@ -212,7 +213,7 @@ export const makeActions = <S extends State>(schema: ModelSchemaReader, namespac
       type: SORT,
       entityType,
       compare,
-    };
+    } as SortAction;
 
     if (!schema.typeExists(entityType)) {
       return invalid(action as SortAction, messages.entityTypeDne(entityType));
@@ -233,7 +234,7 @@ export const makeActions = <S extends State>(schema: ModelSchemaReader, namespac
       id,
       relation,
       compare,
-    };
+    } as SortAttachedAction;
 
     if (!schema.typeExists(entityType)) {
       return invalid(action, messages.entityTypeDne(entityType));
