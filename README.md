@@ -27,6 +27,7 @@ Table of Contents:
     - [`getIds`](https://github.com/brietsparks/normalized-reducer#getIds)
     - [`getEntities`](https://github.com/brietsparks/normalized-reducer#getEntities)
     - [`getEntity`](https://github.com/brietsparks/normalized-reducer#getEntity)
+- [Normalizr Integration](https://github.com/brietsparks/normalized-reducer#normalizr-integration)
 - [LICENSE](https://github.com/brietsparks/normalized-reducer#license)
 
 ## The Problem
@@ -144,7 +145,7 @@ Normalized Reducer is a well-tested, framework-agnostic utility that abstracts c
    More info at: [Selectors API](https://github.com/brietsparks/normalized-reducer#selectors-api)
 
 ## Top level API
-The top level API is a higher-order function that accepts a `schema` and an optional `namespaced` argument and returns a reducer, action creators, action types, selectors, and empty state.
+The top level default export is a higher-order function that accepts a `schema` and an optional `namespaced` argument and returns a reducer, action creators, action types, selectors, and empty state.
 ```
 makeNormalizedSlice<S>(schema: ModelSchema, namespaced?: Namespaced): {
     reducer: Reducer<S>,
@@ -720,6 +721,18 @@ const lists = selectors.getEntity(state, { type: 'item', id: 'i1' })
 /*
 { title: 'first list', itemIds: ['i1', 'i2'] }
 */
+```
+
+## Normalizr Integration
+The top level named export `fromNormalizr` takes normalized data produced by a normalizr [`normalize`](https://github.com/paularmstrong/normalizr/blob/master/docs/api.md#normalizedata-schema) call and returns state that can be fed into the reducer.
+
+Example:
+```js
+import { normalize } from 'normalizr'
+import { fromNormalizr } from 'normalized-reducer'
+
+const NormalizrOutput = normalize(denormalizedData, normalizrSchema);
+const initialState = fromNormalizr(normalizedData);
 ```
 
 ## LICENSE
