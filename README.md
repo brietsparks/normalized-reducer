@@ -13,7 +13,7 @@ Table of Contents:
 - [Quick Start](https://github.com/brietsparks/normalized-reducer#quick-start)
 - [Demo](https://github.com/brietsparks/normalized-reducer#demo)
 - [Comparison to Alternatives](https://github.com/brietsparks/normalized-reducer#comparison-to-alternatives)
-- [Top level API](https://github.com/brietsparks/normalized-reducer#top-level-api)
+- [Top-level API](https://github.com/brietsparks/normalized-reducer#top-level-api)
     - [Parameter: `schema`](https://github.com/brietsparks/normalized-reducer#parameter-schema)
     - [Parameter: `namespaced`](https://github.com/brietsparks/normalized-reducer#parameter-namespaced)
     - [Generic Parameter: `<S>`](https://github.com/brietsparks/normalized-reducer#generic-parameter-s-extends-state)
@@ -38,7 +38,7 @@ Table of Contents:
 - [LICENSE](https://github.com/brietsparks/normalized-reducer#license)
 
 ## The Problem
-With [normalized relational data](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape/), a change to one entity often affects other entities. Because of this, implementing reducers for this involves a lot of complexity. A few examples:
+Managing [normalized relational data](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape/) presents various complexities such as:
 - deleting an entity must result in its id being removed from all of its attached entities
 - attaching/detaching two related entities requires the id of each entity being added/removed in the other 
 - implementation of relational behavior differs depending on the cardinality
@@ -70,9 +70,9 @@ Normalized Reducer helps you manage normalized relational state without requirin
     }
     ```
    
-   More info at: [Top level API > Parameter: `schema`](https://github.com/brietsparks/normalized-reducer#parameter-schema)
+   More info at: [Top-level API > Parameter: `schema`](https://github.com/brietsparks/normalized-reducer#parameter-schema)
 
-2. Pass in the schema, and get back a reducer, action creators, action types, selectors, and empty state.
+2. Pass in the schema, and get back a reducer, action-creators, action-types, selectors, and empty state.
     ```javascript
     import makeNormalizedSlice from 'normalized-reducer'
     
@@ -85,7 +85,7 @@ Normalized Reducer helps you manage normalized relational state without requirin
     } = makeNormalizedSlice(mySchema)
     ``` 
    
-   More info at: [Top level API > Return Value](https://github.com/brietsparks/normalized-reducer#return-value)
+   More info at: [Top-level API > Return Value](https://github.com/brietsparks/normalized-reducer#return-value)
 
 3. Use the `reducer` and `actions` to update the state. The following example assumes the use of `dispatch` from either React or React-Redux.
 
@@ -193,7 +193,9 @@ Normalized Reducer helps you manage normalized relational state without requirin
 
 ## Demo
 
-### [Action Demos and Usage Examples](https://brietsparks.github.io/normalized-reducer-demo/)
+### [Action demos and usage examples](https://brietsparks.github.io/normalized-reducer-demo/)
+
+[Demo source repo](https://github.com/brietsparks/normalized-reducer-demo)
 
 ## Comparison to Alternatives
 Normalized Reducer is comparable to [Redux ORM](https://github.com/redux-orm/redux-orm) and Redux Toolkit's [entity adapter](https://redux-toolkit.js.org/api/createEntityAdapter).
@@ -211,15 +213,13 @@ Comparison to Redux ORM:
 Comparison to Redux Tookit's entity adapter
 - Normalized Reducer 
     - performs relational state management
-    - does not depend on Redux
     - is dependency-free
 - Redux Tookit's entity adapter
     - supports automatic entity ordering
-    - is backed by Redux authorities
-    - is more mature
+    - is more mature and backed by Redux authorities
 
-## Top level API
-The top level default export is a higher-order function that accepts a `schema` and an optional `namespaced` argument and returns a reducer, action creators, action types, selectors, and empty state.
+## Top-level API
+The top-level default export is a higher-order function that accepts a `schema` and an optional `namespaced` argument and returns a reducer, action-creators, action-types, selectors, and empty state.
 ```
 makeNormalizedSlice<S>(schema: ModelSchema, namespaced?: Namespaced): {
     reducer: Reducer<S>,
@@ -282,10 +282,10 @@ const schema = {
 };
 ```
 
-Note that `type` must be an entity type (a top level key) within the schema, and `reciprocal` must be a relation key within that entity's definition. 
+Note that `type` must be an entity type (a top-level key) within the schema, and `reciprocal` must be a relation key within that entity's definition. 
 
 ### Parameter: `namespaced`
-This is an optional argument that lets you namespace the action types, which is useful if you are going to compose the Normalized Reducer slice with other reducer slices in your application.
+This is an optional argument that lets you namespace the action-types, which is useful if you are going to compose the Normalized Reducer slice with other reducer slices in your application.
 
 Example:
 ```javascript
@@ -343,7 +343,7 @@ Calling the top-level function will return an object literal containing the thin
 - `emptyState`
 
 ### `reducer`
-A function that accepts state and an action and returns the next state.
+A function that accepts a state + action, and then returns the next state.
 ```
 reducer(state: S, action: { type: string }): S
 ``` 
@@ -371,10 +371,10 @@ const store = createStore(reducer)
 
 
 ### `actionCreators`
-An object literal containing action creators. See the [Action-creators API](https://github.com/brietsparks/normalized-reducer#action-creators-api) section.
+An object literal containing action-creators. See the [Action-creators API](https://github.com/brietsparks/normalized-reducer#action-creators-api) section.
 
 ### `actionTypes`
-An object literal containing the action types.
+An object literal containing the action-types.
 
 ```javascript
 const {
@@ -393,7 +393,7 @@ const {
 ```
 
 Their values are namespaced according to the [`namespaced`](https://github.com/brietsparks/normalized-reducer#parameter-namespaced)
-parameter of the top level function. Example: `normalized/CREATE`
+parameter of the top-level function. Example: `normalized/CREATE`
 
 ### `selectors`
 An object literal containing the selectors. See the [Selectors API](https://github.com/brietsparks/normalized-reducer#selectors-api) section.
@@ -419,7 +419,7 @@ Example:
 
 
 ## Action-creators API
-An action creator is a function that takes parameters and returns an object literal describing how the reducer should enact change upon state. 
+An action-creator is a function that takes parameters and returns an object literal describing how the reducer should enact change upon state. 
 
 ### `create`
 Creates a new entity 
@@ -448,9 +448,6 @@ Example:
 // create a list with a random uuid as the id, and a title, inserted at index 3 
 const creationAction = actionCreators.create('list', uuid(), { title: 'shopping list' }, 3)
 ```
-
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
 
 ### `delete`
 Deletes an existing entity
@@ -486,10 +483,6 @@ detaches any entities attached to the deleted entities
 const deletion = actionCreators.delete('list', 'l1', { itemIds: { tagIds: {} } });
 ```
 
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
-
 ### `update`
 Updates an existing entity
 ```
@@ -507,7 +500,7 @@ Parameters:
 
 Note:
 - if an entity with the `id` does not exist, then the action will be ignored
-- if relational attributes are in the `data`, then they will be ignored; to update relational data, use the `attach` and `detach` action creators.
+- if relational attributes are in the `data`, then they will be ignored; to update relational data, use the `attach` and `detach` action-creators.
 - if no `method` option is provided, then it will default to a patch (partial update)
 
 Example:
@@ -518,10 +511,6 @@ const updateAction = actionCreators.update('list', 'l1', { title: 'do now!' })
 // updates a list whose id is 'l1', full replacement
 const updateAction = actionCreators.update('list', 'l1', { title: 'do later' }, { method: 'put' })
 ```
-
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
 
 ### `attach`
 Attaches two existing related entities
@@ -567,10 +556,6 @@ const firstAttachment = actionCreators.attach('list', 'l1', 'itemId', 'i1');
 const secondAttachment = actionCreators.attach('list', 'l20', 'itemId', 'i1');
 ```
 
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
-
 ### `detach`
 Detaches two attached entities
 ```
@@ -591,10 +576,6 @@ Example:
 // detach item 'i1' from tag 't1'
 const detachmentAction = actionCreators.detach('item', 'i1', 'tagIds', 't1')
 ```
-
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
 
 ### `move`
 Changes an entity's ordinal position
@@ -619,10 +600,6 @@ Example:
 // move the item at index 2 to index 5
 const moveAction = actionCreators.move('item', 2, 5)
 ```
-
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
 
 ### `moveAttached`
 Changes an entity's ordinal position with respect to an attached entity
@@ -653,9 +630,6 @@ Example:
 // in list l1's itemIds array, move itemId at index 2 to index 5
 const moveAction = actionCreators.moveAttached('list', 'l1', 'itemIds', 2, 5)
 ```
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
 
 ### `sort`
 Sorts a top-level entity ids collection
@@ -674,10 +648,6 @@ Example:
 // sort list ids (state.ids.list) by title 
 const sortAction = actionCreators.sort('list', (a, b) => (a.title > b.title ? 1 : -1))
 ```
-
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
 
 ### `sortAttached`
 Sorts an entity's attached-ids collection
@@ -705,10 +675,6 @@ Example:
 const sortAction = actionCreators.sort('list', 'l1', 'itemIds', (a, b) => (a.value > b.value ? 1 : -1))
 ```
 
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
-
 ### `batch`
 Runs a batch of actions in a single reduction
 ```
@@ -729,10 +695,6 @@ const batchAction = actionCreators.batch(
   actionCreators.attach('list', 'l1', 'itemIds', 'i1') // 'l1' and 'i1' would exist during this action due to the previous actions  
 )
 ```
-
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
   
 ### `setState`
 Sets the normalized state
@@ -770,10 +732,6 @@ const state = {
 
 const setStateAction = actionCreators.setState(state)
 ```
-
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
-
 
 ## Selectors API
 Each selector is a function that takes the normalized state and returns a piece of the state. Currently, the selectors API is minimal, but are enough to access any part of the state slice so that you can build your own application-specific selectors. 
@@ -840,19 +798,21 @@ const lists = selectors.getEntity(state, { type: 'item', id: 'i1' })
 ```
 
 ## Normalizr Integration
-The top level named export `fromNormalizr` takes normalized data produced by a normalizr [`normalize`](https://github.com/paularmstrong/normalizr/blob/master/docs/api.md#normalizedata-schema) call and returns state that can be fed into the reducer.
+The top-level named export `fromNormalizr` takes normalized data produced by a normalizr [`normalize`](https://github.com/paularmstrong/normalizr/blob/master/docs/api.md#normalizedata-schema) call and returns state that can be fed into the reducer.
 
 Example:
 ```js
 import { normalize } from 'normalizr'
 import { fromNormalizr } from 'normalized-reducer'
 
-const NormalizrOutput = normalize(denormalizedData, normalizrSchema);
+const denormalizedData = {...}
+const normalizrSchema = {...}
+
+const normalizedData = normalize(denormalizedData, normalizrSchema);
 const initialState = fromNormalizr(normalizedData);
 ```
 
-Demo: 
-- [see demo](https://brietsparks.github.io/normalized-reducer-demo/)
+
 
 
 ## LICENSE
