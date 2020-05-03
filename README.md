@@ -1,10 +1,13 @@
 # Normalized Reducer [![Coverage Status](https://coveralls.io/repos/github/brietsparks/normalized-reducer/badge.svg?branch=master)](https://coveralls.io/github/brietsparks/normalized-reducer?branch=master)
-An easy way to read and write normalized relational reducer state.
+A zero-boilerplate higher-order reducer for managing normalized relational data
 
-✓ use its declarative API without writing any reducer logic  
-✓ easy to learn, with state management patterns you already know  
-✓ zero-dependency, well-tested, written in TypeScript  
-✓ framework-agnostic and integrates with normalizr
+🐒 easy to [get started](https://github.com/brietsparks/normalized-reducer#quick-start) and use without writing any action/reducer logic
+  
+✨ handles basic CRUD, plus complex updates like entity associations and cascading changes from deletes 
+  
+📦 dependency-free and framework-agnostic; use with or without Redux
+  
+🔌 integrates with Normalizr and Redux-Toolkit  
 
 Table of Contents:
 - [The Problem](https://github.com/brietsparks/normalized-reducer#the-problem)
@@ -193,7 +196,32 @@ Normalized Reducer helps you manage normalized relational state without requirin
 
 ## Demo
 
-### [Action demos and usage examples](https://brietsparks.github.io/normalized-reducer-demo/)
+### [Action demos and usage examples](https://normalized-reducer-demo.now.sh)
+
+Demos:
+
+- [Create](https://normalized-reducer-demo.now.sh/demo/create)
+- [Create, indexed](https://normalized-reducer-demo.now.sh/demo/create-indexed)
+- [Update](https://normalized-reducer-demo.now.sh/demo/update)
+- [Move](https://normalized-reducer-demo.now.sh/demo/move)
+- [Delete](https://normalized-reducer-demo.now.sh/demo/delete)
+- [Attach/detach, one-to-many](https://normalized-reducer-demo.now.sh/demo/attach-detach-one-to-many)
+- [Attach/detach, many-to-many](https://normalized-reducer-demo.now.sh/demo/attach-detach-many-to-many)
+- [Attach/detach, one-to-one](https://normalized-reducer-demo.now.sh/demo/attach-detach-one-to-one)
+- [Move attached](https://normalized-reducer-demo.now.sh/demo/move-attached)
+- [Delete + detach](https://normalized-reducer-demo.now.sh/demo/delete-and-detach)
+- [Sort](https://normalized-reducer-demo.now.sh/demo/sort)
+- [Sort attached](https://normalized-reducer-demo.now.sh/demo/sort-attached)
+- [Batch](https://normalized-reducer-demo.now.sh/demo/batch)
+- [Set state](https://normalized-reducer-demo.now.sh/demo/set-state)
+
+Example usage:
+
+- [Sortable tags list](https://normalized-reducer-demo.now.sh/examples/sortable-tags)
+- [Comment tree](https://normalized-reducer-demo.now.sh/examples/comment-tree)
+- [Directory tree (composite tree)](https://normalized-reducer-demo.now.sh/examples/directory-tree)
+- [Normalizr Integration](https://normalized-reducer-demo.now.sh/examples/normalizr-integration)
+- [Redux Toolkit Integration](https://normalized-reducer-demo.now.sh/examples/with-redux-toolkit)
 
 [Demo source repo](https://github.com/brietsparks/normalized-reducer-demo)
 
@@ -449,6 +477,11 @@ Example:
 const creationAction = actionCreators.create('list', uuid(), { title: 'shopping list' }, 3)
 ```
 
+Demos: 
+- [Create](https://normalized-reducer-demo.now.sh/demo/create)
+- [Create, indexed](https://normalized-reducer-demo.now.sh/demo/create-indexed)
+
+
 ### `delete`
 Deletes an existing entity
 ```
@@ -483,6 +516,11 @@ detaches any entities attached to the deleted entities
 const deletion = actionCreators.delete('list', 'l1', { itemIds: { tagIds: {} } });
 ```
 
+Demos:
+- [Delete](https://normalized-reducer-demo.now.sh/demo/delete)
+- [Delete + detach](https://normalized-reducer-demo.now.sh/demo/delete-and-detach)
+
+
 ### `update`
 Updates an existing entity
 ```
@@ -511,6 +549,10 @@ const updateAction = actionCreators.update('list', 'l1', { title: 'do now!' })
 // updates a list whose id is 'l1', full replacement
 const updateAction = actionCreators.update('list', 'l1', { title: 'do later' }, { method: 'put' })
 ```
+
+Demos:
+- [Update](https://normalized-reducer-demo.now.sh/demo/update)
+
 
 ### `attach`
 Attaches two existing related entities
@@ -556,6 +598,12 @@ const firstAttachment = actionCreators.attach('list', 'l1', 'itemId', 'i1');
 const secondAttachment = actionCreators.attach('list', 'l20', 'itemId', 'i1');
 ```
 
+Demos:
+- [Attach/detach, one-to-many](https://normalized-reducer-demo.now.sh/demo/attach-detach-one-to-many)
+- [Attach/detach, many-to-many](https://normalized-reducer-demo.now.sh/demo/attach-detach-many-to-many)
+- [Attach/detach, one-to-one](https://normalized-reducer-demo.now.sh/demo/attach-detach-one-to-one)
+
+
 ### `detach`
 Detaches two attached entities
 ```
@@ -576,6 +624,12 @@ Example:
 // detach item 'i1' from tag 't1'
 const detachmentAction = actionCreators.detach('item', 'i1', 'tagIds', 't1')
 ```
+
+Demos:
+- [Attach/detach, one-to-many](https://normalized-reducer-demo.now.sh/demo/attach-detach-one-to-many)
+- [Attach/detach, many-to-many](https://normalized-reducer-demo.now.sh/demo/attach-detach-many-to-many)
+- [Attach/detach, one-to-one](https://normalized-reducer-demo.now.sh/demo/attach-detach-one-to-one)
+
 
 ### `move`
 Changes an entity's ordinal position
@@ -600,6 +654,9 @@ Example:
 // move the item at index 2 to index 5
 const moveAction = actionCreators.move('item', 2, 5)
 ```
+
+Demos:
+- [Move](https://normalized-reducer-demo.now.sh/demo/move)
 
 ### `moveAttached`
 Changes an entity's ordinal position with respect to an attached entity
@@ -631,6 +688,10 @@ Example:
 const moveAction = actionCreators.moveAttached('list', 'l1', 'itemIds', 2, 5)
 ```
 
+Demos:
+- [Move attached](https://normalized-reducer-demo.now.sh/demo/move-attached)
+
+
 ### `sort`
 Sorts a top-level entity ids collection
 ```
@@ -648,6 +709,9 @@ Example:
 // sort list ids (state.ids.list) by title 
 const sortAction = actionCreators.sort('list', (a, b) => (a.title > b.title ? 1 : -1))
 ```
+
+Demos:
+- [Sort](https://normalized-reducer-demo.now.sh/demo/sort)
 
 ### `sortAttached`
 Sorts an entity's attached-ids collection
@@ -675,6 +739,9 @@ Example:
 const sortAction = actionCreators.sort('list', 'l1', 'itemIds', (a, b) => (a.value > b.value ? 1 : -1))
 ```
 
+Demos:
+- [Sort attached](https://normalized-reducer-demo.now.sh/demo/sort-attached)
+
 ### `batch`
 Runs a batch of actions in a single reduction
 ```
@@ -695,6 +762,10 @@ const batchAction = actionCreators.batch(
   actionCreators.attach('list', 'l1', 'itemIds', 'i1') // 'l1' and 'i1' would exist during this action due to the previous actions  
 )
 ```
+
+Demos:
+- [Batch](https://normalized-reducer-demo.now.sh/demo/batch)
+
   
 ### `setState`
 Sets the normalized state
@@ -732,6 +803,10 @@ const state = {
 
 const setStateAction = actionCreators.setState(state)
 ```
+
+Demos:
+- [Set state](https://normalized-reducer-demo.now.sh/demo/set-state)
+
 
 ## Selectors API
 Each selector is a function that takes the normalized state and returns a piece of the state. Currently, the selectors API is minimal, but are enough to access any part of the state slice so that you can build your own application-specific selectors. 
@@ -812,7 +887,8 @@ const normalizedData = normalize(denormalizedData, normalizrSchema);
 const initialState = fromNormalizr(normalizedData);
 ```
 
-
+Demos:
+- [Normalizr Integration](https://normalized-reducer-demo.now.sh/examples/normalizr-integration)
 
 
 ## LICENSE
