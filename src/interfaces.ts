@@ -159,7 +159,9 @@ export type ActionCreators<S extends State> = {
 
 export type InvalidActionCreator = (action: SingularAction, error: string) => InvalidAction;
 
-export type BatchActionCreator = (...actions: (SingularAction | InvalidAction)[]) => BatchAction;
+export type BatchActionCreator = (
+  ...actions: (SingularAction | InvalidAction | BatchAction)[]
+) => BatchAction;
 
 export type AttachActionCreator = (
   entityType: string,

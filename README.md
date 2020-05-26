@@ -759,7 +759,12 @@ Example:
 const batchAction = actionCreators.batch(
   actionCreators.create('list', 'l1'),
   actionCreators.create('item', 'i1'),
-  actionCreators.attach('list', 'l1', 'itemIds', 'i1') // 'l1' and 'i1' would exist during this action due to the previous actions  
+  actionCreators.attach('list', 'l1', 'itemIds', 'i1'), // 'l1' and 'i1' would exist during this action due to the previous actions
+  // nested batch-actions are also accepted
+  actionCreators.batch(
+    actionCreators.create('item', 'i2'),
+    actionCreators.create('item', 'i3'),
+  )
 )
 ```
 

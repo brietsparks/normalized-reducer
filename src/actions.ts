@@ -30,6 +30,7 @@ import {
   SetStateActionCreator,
   InvalidAction,
   SortAttachedAction,
+  BatchAction,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
 import * as messages from './messages';
@@ -56,10 +57,33 @@ export const makeActions = <S extends State>(schema: ModelSchemaReader, namespac
     action,
   });
 
-  const batch: BatchActionCreator = (...actions: (SingularAction | InvalidAction)[]) => ({
-    type: BATCH,
-    actions,
-  });
+  const batch: BatchActionCreator = (
+    ...actions: (SingularAction | InvalidAction | BatchAction)[]
+  ): BatchAction => {
+    const flattened = flattenActions(actions);
+    return {
+      type: BATCH,
+      actions: flattened,
+    };
+  };
+
+  function flattenActions(
+    actions: (SingularAction | InvalidAction | BatchAction)[]
+  ): (SingularAction | InvalidAction)[] {
+    const accumulator: (SingularAction | InvalidAction)[] = [];
+
+    actions.forEach(action => {
+      if (action.type === BATCH) {
+        const batchAction = action as BatchAction;
+        const flattened = flattenActions(batchAction.actions);
+        accumulator.push(...flattened);
+      } else {
+        accumulator.push(action as SingularAction | InvalidAction);
+      }
+    });
+
+    return accumulator;
+  }
 
   const attach: AttachActionCreator = (entityType, id, relation, attachableId, options = {}) => {
     const action: AttachAction = {
