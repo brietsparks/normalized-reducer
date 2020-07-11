@@ -146,7 +146,7 @@ export const makeReducer = <S extends State>(
       }
 
       if (cardinality === Cardinalities.MANY) {
-        const attachedIds = entity[relationKey] as Id[];
+        const attachedIds = (entity[relationKey] || []) as Id[];
 
         // detach it: filter out the detachableId
         newEntity = {
