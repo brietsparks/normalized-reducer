@@ -10,7 +10,7 @@ import {
 
 import { DetachAction, DerivedAction, AttachAction, DeleteAction, MoveAction } from '../../src';
 
-import Derivator from '../../src/derivator';
+import { Derivator } from '../../src/derivator';
 
 describe('unit/derivator', () => {
   const derivator = new Derivator<ForumState>(

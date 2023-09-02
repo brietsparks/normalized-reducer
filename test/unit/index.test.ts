@@ -1,4 +1,4 @@
-import makeNormalizedSlice from '../../src';
+import { makeNormalizedSlice } from '../../src';
 
 describe('unit/index', () => {
   test('action types namespacing', () => {

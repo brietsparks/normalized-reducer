@@ -17,7 +17,7 @@ import { Cardinalities } from './enums';
 
 import { ModelSchemaReader } from './schema';
 
-export default class Derivator<S extends State> {
+export class Derivator<S extends State> {
   actionTypes: ActionTypes;
   actionCreators: ActionCreators<S>;
   schema: ModelSchemaReader;

@@ -23,7 +23,7 @@ import {
   Reducer,
 } from './interfaces';
 import { ModelSchemaReader } from './schema';
-import Derivator from './derivator';
+import { Derivator } from './derivator';
 import { ActionUtils } from './actions';
 import { Cardinalities, UpdateActionMethod } from './enums';
 import { arrayMove, arrayPut } from './util';

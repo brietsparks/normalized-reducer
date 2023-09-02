@@ -1,4 +1,4 @@
-import makeNormalizedSlice, { Id, Schema } from './index';
+import { makeNormalizedSlice, Id, Schema } from './index';
 import { ModelSchemaReader } from './schema';
 import { makeSelectors } from './selectors';
 
