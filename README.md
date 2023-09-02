@@ -77,7 +77,7 @@ Normalized Reducer helps you manage normalized relational state without requirin
 
 2. Pass in the schema, and get back a reducer, action-creators, action-types, selectors, and empty state.
     ```javascript
-    import makeNormalizedSlice from 'normalized-reducer'
+    import { makeNormalizedSlice } from 'normalized-reducer'
     
     const {
       reducer,
@@ -260,7 +260,7 @@ makeNormalizedSlice<S>(schema: ModelSchema, namespaced?: Namespaced): {
 
 Example:
 ```javascript
-import makeNormalizedSlice from 'normalized-reducer';
+import { makeNormalizedSlice } from 'normalized-reducer';
 
 const {
   reducer,
